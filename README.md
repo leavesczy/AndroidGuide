@@ -13,8 +13,8 @@
   - [compose_chat：Jetpack Compose 最佳实践，用 Jetpack Compose 写一个 IM APP](https://github.com/leavesczy/compose_chat)
   - [Track：一个 Android 字节码插桩库](https://github.com/leavesczy/Track)
   - [asm-samples：Android 字节码插桩实战](https://github.com/leavesczy/asm-samples)
-  - [Monitor：一个适用于 OkHttp / Retrofit 的可视化抓包工具](https://github.com/leavesczy/Monitor)  
-  - [KVHolder：一个基于 Kotlin 语法对 MMKV 进行封装的 key-value 存储库](https://github.com/leavesczy/KVHolder)  
+  - [Monitor：一个适用于 OkHttp / Retrofit 的可视化抓包工具](https://github.com/leavesczy/Monitor)
+  - [KVHolder：一个基于 Kotlin 语法对 MMKV 进行封装的 key-value 存储库](https://github.com/leavesczy/KVHolder)
   - [RobustWebView：Android WebView H5 秒开方案总结](https://github.com/leavesczy/RobustWebView)
   - [SmallestWidthGenerator：基于 SmallestWidth 屏幕适配方案生成 dimens 文件](https://github.com/leavesczy/SmallestWidthGenerator)
   - [EventLiveData：Jetpack LiveData 功能扩展](https://github.com/leavesczy/EventLiveData)
@@ -62,9 +62,9 @@
 
 - Jetpack Compose
   - [Compose Multiplatform 写一个跨平台的 xlog 解析工具](https://juejin.cn/post/7378452954221084682)
-  - [不止 Android，Compose Multiplatform 初探](https://juejin.cn/post/7062533562460799013)  
+  - [不止 Android，Compose Multiplatform 初探](https://juejin.cn/post/7062533562460799013)
   - [随便嵌套？Jetpack Compose 到底优秀在哪里](https://juejin.cn/post/7070158120831418381)
-  - [Jetpack Compose 实现完美屏幕适配](https://juejin.cn/post/7113953940282015758)  
+  - [Jetpack Compose 实现完美屏幕适配](https://juejin.cn/post/7113953940282015758)
   - [Jetpack Compose 写一个图片选择框架](https://juejin.cn/post/7108420791502372895)
   - [Jetpack Compose 写一个 BottomSheetDialog](https://juejin.cn/post/7151792921698631717)
   - [学不动也要学，Jetpack Compose 写一个 IM APP（一）](https://juejin.cn/post/6991429231821684773)
@@ -75,7 +75,7 @@
 
 - Kotlin
   - [两万六千字带你 Kotlin 入门](https://juejin.cn/post/6880602489297895438)
-  - [一文快速入门 Kotlin 协程](https://juejin.cn/post/6908271959381901325)  
+  - [一文快速入门 Kotlin 协程](https://juejin.cn/post/6908271959381901325)
   - [一文读懂 Java 和 Kotlin 的泛型难点](https://juejin.cn/post/6935322686943920159)
   - [Gson 和 Kotlin Data Class 的避坑指南](https://juejin.cn/post/6908391430977224718)
   - [探究 Kotlin 的隐藏性能开销与避坑指南](https://juejin.cn/post/7010367024916660237)
@@ -139,6 +139,6 @@
 
 <div align=center><img src ="https://github.com/user-attachments/assets/bf188a5e-8a9d-4476-9023-efc892adbf56"/></div>
 
-<p align="center">原创不易，能请我一杯肥仔水吗 😆😆😆</p>
+<p align="center">原创不易，能请我一杯肥仔水吗 </p>
 
 <br>

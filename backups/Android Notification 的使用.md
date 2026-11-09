@@ -44,7 +44,8 @@ PendingIntent类中的动作是Context类中的几个方法之一，例如**star
 要发布一个通知，可以使用NotificationManager，这是Android系统中的内建服务之一，是一个已有的系统服务，可以通过如下代码来获取它
 
 ```java
-NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+NotificationManager mNotificationManager =
+        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 ```
 
 然后，在该NotificationManager上调用notify方法来发布一个通知，需要传入唯一的ID和Notification对象
@@ -93,63 +94,62 @@ mNotificationManager.cancel(int id);
         android:text="去除通知" />
 
 </LinearLayout>
-
 ```
 
 ```java
-    private int id = 1;
+private int id = 1;
 
-    public void notification(View view) {
-        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
-        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+public void notification(View view) {
+    Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
+    Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        //设置小图标
-        mBuilder.setSmallIcon(R.drawable.ic_launcher);
-        //设置大图标
-        mBuilder.setLargeIcon(bitmap);
-        //设置标题
-        mBuilder.setContentTitle("这是标题");
-        //设置通知正文
-        mBuilder.setContentText("这是正文，当前ID是：" + id);
-        //设置摘要
-        mBuilder.setSubText("这是摘要");
-        //设置是否点击消息后自动clean
-        mBuilder.setAutoCancel(true);
-        //显示指定文本
-        mBuilder.setContentInfo("Info");
-        //与setContentInfo类似，但如果设置了setContentInfo则无效果
-        //用于当显示了多个相同ID的Notification时，显示消息总数
-        mBuilder.setNumber(2);
-        //通知在状态栏显示时的文本
-        mBuilder.setTicker("在状态栏上显示的文本");
-        //设置优先级
-        mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
-        //自定义消息时间，以毫秒为单位，当前设置为比系统时间少一小时
-        mBuilder.setWhen(System.currentTimeMillis() - 3600000);
-        //设置为一个正在进行的通知，此时用户无法清除通知
-        mBuilder.setOngoing(true);
-        //设置消息的提醒方式，震动提醒：DEFAULT_VIBRATE     声音提醒：NotificationCompat.DEFAULT_SOUND
-        //三色灯提醒NotificationCompat.DEFAULT_LIGHTS     以上三种方式一起：DEFAULT_ALL
-        mBuilder.setDefaults(NotificationCompat.DEFAULT_SOUND);
-        //设置震动方式，延迟零秒，震动一秒，延迟一秒、震动一秒
-        mBuilder.setVibrate(new long[]{0, 1000, 1000, 1000});
+    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+    // 设置小图标
+    mBuilder.setSmallIcon(R.drawable.ic_launcher);
+    // 设置大图标
+    mBuilder.setLargeIcon(bitmap);
+    // 设置标题
+    mBuilder.setContentTitle("这是标题");
+    // 设置通知正文
+    mBuilder.setContentText("这是正文，当前ID是：" + id);
+    // 设置摘要
+    mBuilder.setSubText("这是摘要");
+    // 设置是否点击消息后自动clean
+    mBuilder.setAutoCancel(true);
+    // 显示指定文本
+    mBuilder.setContentInfo("Info");
+    // 与setContentInfo类似，但如果设置了setContentInfo则无效果
+    // 用于当显示了多个相同ID的Notification时，显示消息总数
+    mBuilder.setNumber(2);
+    // 通知在状态栏显示时的文本
+    mBuilder.setTicker("在状态栏上显示的文本");
+    // 设置优先级
+    mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
+    // 自定义消息时间，以毫秒为单位，当前设置为比系统时间少一小时
+    mBuilder.setWhen(System.currentTimeMillis() - 3600000);
+    // 设置为一个正在进行的通知，此时用户无法清除通知
+    mBuilder.setOngoing(true);
+    // 设置消息的提醒方式，震动提醒：DEFAULT_VIBRATE     声音提醒：NotificationCompat.DEFAULT_SOUND
+    // 三色灯提醒NotificationCompat.DEFAULT_LIGHTS     以上三种方式一起：DEFAULT_ALL
+    mBuilder.setDefaults(NotificationCompat.DEFAULT_SOUND);
+    // 设置震动方式，延迟零秒，震动一秒，延迟一秒、震动一秒
+    mBuilder.setVibrate(new long[] {0, 1000, 1000, 1000});
 
-        Intent intent = new Intent(this, ResultActivity.class);
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        mBuilder.setContentIntent(pIntent);
+    Intent intent = new Intent(this, ResultActivity.class);
+    PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+    mBuilder.setContentIntent(pIntent);
 
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(id++, mBuilder.build());
-    }
+    NotificationManager mNotificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    mNotificationManager.notify(id++, mBuilder.build());
+}
 
-
-    public void cleanNotification(View view) {
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancelAll();
-        mNotificationManager.cancel(1);
-    }
+public void cleanNotification(View view) {
+    NotificationManager mNotificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    mNotificationManager.cancelAll();
+    mNotificationManager.cancel(1);
+}
 ```
 运行效果
 
@@ -159,31 +159,31 @@ mNotificationManager.cancel(int id);
 
 ```java
 public void notification(View view) {
-        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
-        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+    Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
+    Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle("这是标题");
-        builder.setContentText("这是正文");
-        builder.setSmallIcon(R.drawable.lufei);
-        builder.setLargeIcon(bitmap);
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setAutoCancel(true);
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+    builder.setContentTitle("这是标题");
+    builder.setContentText("这是正文");
+    builder.setSmallIcon(R.drawable.lufei);
+    builder.setLargeIcon(bitmap);
+    builder.setDefaults(NotificationCompat.DEFAULT_ALL);
+    builder.setAutoCancel(true);
 
-        NotificationCompat.BigTextStyle style = new NotificationCompat.BigTextStyle();
-        style.bigText("这里可以写很长的一段话，不信你试试。这里可以写很长的一段话，不信你试试。这里可以写很长的一段话，不信你试试。");
-        style.setBigContentTitle("点击后的标题");
-        style.setSummaryText("这是摘要");
-        builder.setStyle(style);
+    NotificationCompat.BigTextStyle style = new NotificationCompat.BigTextStyle();
+    style.bigText("这里可以写很长的一段话，不信你试试。这里可以写很长的一段话，不信你试试。这里可以写很长的一段话，不信你试试。");
+    style.setBigContentTitle("点击后的标题");
+    style.setSummaryText("这是摘要");
+    builder.setStyle(style);
 
-        Intent intent = new Intent(this, ResultActivity.class);
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        builder.setContentIntent(pIntent);
+    Intent intent = new Intent(this, ResultActivity.class);
+    PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+    builder.setContentIntent(pIntent);
 
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(id, builder.build());
-    }
+    NotificationManager mNotificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    mNotificationManager.notify(id, builder.build());
+}
 ```
 运行效果
 
@@ -193,34 +193,34 @@ public void notification(View view) {
 
 ```java
 public void notification(View view) {
-        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
-        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+    Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
+    Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle("这是标题");
-        builder.setContentText("这是正文");
-        builder.setSmallIcon(R.drawable.lufei);
-        builder.setLargeIcon(bitmap);
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setAutoCancel(true);
-        
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        String[] events = {"第一", "第二", "第三", "第四", "第五", "第六", "第七"};
-        inboxStyle.setBigContentTitle("展开后的标题");
-        inboxStyle.setSummaryText("这是摘要");
-        for (String event : events) {
-            inboxStyle.addLine(event);
-        }
-        builder.setStyle(inboxStyle);
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+    builder.setContentTitle("这是标题");
+    builder.setContentText("这是正文");
+    builder.setSmallIcon(R.drawable.lufei);
+    builder.setLargeIcon(bitmap);
+    builder.setDefaults(NotificationCompat.DEFAULT_ALL);
+    builder.setAutoCancel(true);
 
-        Intent intent = new Intent(this, ResultActivity.class);
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        builder.setContentIntent(pIntent);
-
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(id, builder.build());
+    NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+    String[] events = {"第一", "第二", "第三", "第四", "第五", "第六", "第七"};
+    inboxStyle.setBigContentTitle("展开后的标题");
+    inboxStyle.setSummaryText("这是摘要");
+    for (String event : events) {
+        inboxStyle.addLine(event);
     }
+    builder.setStyle(inboxStyle);
+
+    Intent intent = new Intent(this, ResultActivity.class);
+    PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+    builder.setContentIntent(pIntent);
+
+    NotificationManager mNotificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    mNotificationManager.notify(id, builder.build());
+}
 ```
 运行效果
 
@@ -230,31 +230,31 @@ public void notification(View view) {
 
 ```java
 public void notification(View view) {
-        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
-        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+    Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
+    Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle("这是标题");
-        builder.setContentText("这是正文");
-        builder.setSmallIcon(R.drawable.lufei);
-        builder.setLargeIcon(bitmap);
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setAutoCancel(true);
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+    builder.setContentTitle("这是标题");
+    builder.setContentText("这是正文");
+    builder.setSmallIcon(R.drawable.lufei);
+    builder.setLargeIcon(bitmap);
+    builder.setDefaults(NotificationCompat.DEFAULT_ALL);
+    builder.setAutoCancel(true);
 
-        NotificationCompat.BigPictureStyle style = new NotificationCompat.BigPictureStyle();
-        style.setBigContentTitle("展开后的标题");
-        style.setSummaryText("这是摘要");
-        style.bigPicture(bitmap);
-        builder.setStyle(style);
+    NotificationCompat.BigPictureStyle style = new NotificationCompat.BigPictureStyle();
+    style.setBigContentTitle("展开后的标题");
+    style.setSummaryText("这是摘要");
+    style.bigPicture(bitmap);
+    builder.setStyle(style);
 
-        Intent intent = new Intent(this, ResultActivity.class);
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        builder.setContentIntent(pIntent);
+    Intent intent = new Intent(this, ResultActivity.class);
+    PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+    builder.setContentIntent(pIntent);
 
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(id, builder.build());
-    }
+    NotificationManager mNotificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    mNotificationManager.notify(id, builder.build());
+}
 ```
 
 运行效果
@@ -285,7 +285,7 @@ public void notification(View view) {
 ```
 其中，**< parent_activity_name >** 是父Activity元素的**android:name**值
 
--  同样添加对 Android 4.1 及更高版本的支持。为此，将 **android:parentActivityName** 属性添加到启动的 Activity 的 < activity > 元素中
+- 同样添加对 Android 4.1 及更高版本的支持。为此，将 **android:parentActivityName** 属性添加到启动的 Activity 的 < activity > 元素中
 
 最终的 XML 应如下所示：
 
@@ -319,30 +319,30 @@ public void notification(View view) {
 示例代码：
 
 ```java
-   public void notification(View view) {
-        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
-        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+public void notification(View view) {
+    Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
+    Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle("这是标题");
-        builder.setContentText("这是正文");
-        builder.setSmallIcon(R.drawable.lufei);
-        builder.setLargeIcon(bitmap);
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setAutoCancel(true);
-        
-        Intent resultIntent = new Intent(this, ResultActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(ResultActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+    builder.setContentTitle("这是标题");
+    builder.setContentText("这是正文");
+    builder.setSmallIcon(R.drawable.lufei);
+    builder.setLargeIcon(bitmap);
+    builder.setDefaults(NotificationCompat.DEFAULT_ALL);
+    builder.setAutoCancel(true);
 
-        builder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(id, builder.build());
-    }
+    Intent resultIntent = new Intent(this, ResultActivity.class);
+    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+    stackBuilder.addParentStack(ResultActivity.class);
+    stackBuilder.addNextIntent(resultIntent);
+    PendingIntent resultPendingIntent =
+            stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+    builder.setContentIntent(resultPendingIntent);
+    NotificationManager mNotificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    mNotificationManager.notify(id, builder.build());
+}
 ```
 
 运行效果
@@ -356,9 +356,9 @@ public void notification(View view) {
 取而代之的是，可使用清单文件设置 Activity 任务选项，并通过调用 getActivity() 创建 PendingIntent：
 
  - 在清单文件中，将以下属性添加到 Activity 的 < activity > 元素
-  android:name = "activityclass"  （Activity 的完全限定类名）
-  android:taskAffinity = ""            （与在代码中设置的 FLAG_ACTIVITY_NEW_TASK 标志相结合，这可确保此 Activity 不会进入应用的默认任务。任何具有应用默认关联的现有任务均不受影响）
-  android:excludeFromRecents = "true"   （将新任务从“最新动态”中排除，这样用户就不会在无意中导航回它）
+  android:name = "activityclass" （Activity 的完全限定类名）
+  android:taskAffinity = "" （与在代码中设置的 FLAG_ACTIVITY_NEW_TASK 标志相结合，这可确保此 Activity 不会进入应用的默认任务。任何具有应用默认关联的现有任务均不受影响）
+  android:excludeFromRecents = "true" （将新任务从“最新动态”中排除，这样用户就不会在无意中导航回它）
 
 ```java
         <activity
@@ -367,7 +367,7 @@ public void notification(View view) {
             android:launchMode="singleTask"
             android:taskAffinity="" />
 ```
- -  构建并发出通知：
+ - 构建并发出通知：
      - 创建 Intent设置目标Activity
      - 通过使用 **FLAG_ACTIVITY_NEW_TASK** 和 **FLAG_ACTIVITY_CLEAR_TASK** 标志调用 **setFlags()**，将 Activity 设置为在新的空任务中启动
      - 为 Intent 设置所需的任何其他选项
@@ -377,26 +377,27 @@ public void notification(View view) {
 
 ```java
 public void notification(View view) {
-        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
-        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+    Drawable drawable = ContextCompat.getDrawable(this, R.drawable.lufei);
+    Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle("这是标题");
-        builder.setContentText("这是正文");
-        builder.setSmallIcon(R.drawable.lufei);
-        builder.setLargeIcon(bitmap);
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setAutoCancel(true);
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+    builder.setContentTitle("这是标题");
+    builder.setContentText("这是正文");
+    builder.setSmallIcon(R.drawable.lufei);
+    builder.setLargeIcon(bitmap);
+    builder.setDefaults(NotificationCompat.DEFAULT_ALL);
+    builder.setAutoCancel(true);
 
-        Intent notifyIntent = new Intent(this, ResultActivity.class);
-        notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    Intent notifyIntent = new Intent(this, ResultActivity.class);
+    notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+    PendingIntent resultPendingIntent =
+            PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        builder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(id, builder.build());
-    }
+    builder.setContentIntent(resultPendingIntent);
+    NotificationManager mNotificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    mNotificationManager.notify(id, builder.build());
+}
 ```
 运行结果
 
@@ -412,31 +413,33 @@ public void notification(View view) {
 
 ```java
 public void notification(View view) {
-        final NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    final NotificationManager mNotificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle("这是标题");
-        builder.setContentText("这是正文");
-        builder.setSmallIcon(R.drawable.lufei);
+    final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+    builder.setContentTitle("这是标题");
+    builder.setContentText("这是正文");
+    builder.setSmallIcon(R.drawable.lufei);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int progress = 0; progress <= 100; progress += 5) {
-                    builder.setProgress(100, progress, false);
-                    mNotificationManager.notify(id, builder.build());
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                builder.setContentText("下载完成").setProgress(0, 0, false);
-                mNotificationManager.notify(id, builder.build());
-            }
-        }).start();
- }
+    new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int progress = 0; progress <= 100; progress += 5) {
+                                builder.setProgress(100, progress, false);
+                                mNotificationManager.notify(id, builder.build());
+                                try {
+                                    Thread.sleep(500);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            builder.setContentText("下载完成").setProgress(0, 0, false);
+                            mNotificationManager.notify(id, builder.build());
+                        }
+                    })
+            .start();
+}
 ```
 运行效果
 
@@ -450,32 +453,33 @@ public void notification(View view) {
 
 ```java
 public void notification(View view) {
-        final NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    final NotificationManager mNotificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle("这是标题");
-        builder.setContentText("这是正文");
-        builder.setSmallIcon(R.drawable.lufei);
-        builder.setProgress(0, 0, true);
-        mNotificationManager.notify(id, builder.build());
+    final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+    builder.setContentTitle("这是标题");
+    builder.setContentText("这是正文");
+    builder.setSmallIcon(R.drawable.lufei);
+    builder.setProgress(0, 0, true);
+    mNotificationManager.notify(id, builder.build());
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int progress = 0; progress <= 100; progress += 5) {
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                builder.setContentText("下载完成").setProgress(0, 0, false);
-                mNotificationManager.notify(id, builder.build());
-            }
-        }).start();
-    }
-
+    new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int progress = 0; progress <= 100; progress += 5) {
+                                try {
+                                    Thread.sleep(300);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            builder.setContentText("下载完成").setProgress(0, 0, false);
+                            mNotificationManager.notify(id, builder.build());
+                        }
+                    })
+            .start();
+}
 ```
 运行效果
 
@@ -521,17 +525,17 @@ public void notification(View view) {
 
 ```java
 public void notification(View view) {
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setSmallIcon(R.drawable.lufei);
+    NotificationManager mNotificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+    builder.setSmallIcon(R.drawable.lufei);
 
-        RemoteViews rv = new RemoteViews(getPackageName(), R.layout.message);
-        rv.setTextViewText(R.id.tv_title, "leavesc");
-        builder.setContent(rv);
+    RemoteViews rv = new RemoteViews(getPackageName(), R.layout.message);
+    rv.setTextViewText(R.id.tv_title, "leavesc");
+    builder.setContent(rv);
 
-        mNotificationManager.notify(id++, builder.build());
-    }
+    mNotificationManager.notify(id++, builder.build());
+}
 ```
 
 运行效果

@@ -6,7 +6,7 @@
 
 ```java
 [core]
-	editor = 'C:/Software/Notepad++/notepad++.exe' -multiInst -notabbar -nosession -noPlugin
+    editor = 'C:/Software/Notepad++/notepad++.exe' -multiInst -notabbar -nosession -noPlugin
 ```
 
 ---
@@ -175,7 +175,6 @@ git merge feature-A
 =======
 222222222222
 >>>>>>> feature-A
-
 ```
 
 提示了冲突的分支和冲突内容，需要我们手动修改该文件内容，然后再提交
@@ -185,7 +184,6 @@ git merge feature-A
 111111111111
 333333333333
 222222222222
-
 ```
 向仓库提交文件
 
@@ -409,7 +407,7 @@ init object
 提示1.txt文件未提交
 提交该文件，并推送到远程仓库
 
-```
+```bash
 git push
 ```
 推送前需要先输入GitHub账户名与密码

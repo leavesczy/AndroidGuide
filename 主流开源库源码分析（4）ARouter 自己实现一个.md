@@ -1,6 +1,6 @@
-> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助 🤣🤣🤣
+> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助
 
-上一篇文章中对 ARouter 的源码进行了一次全面解析，原理懂得了，那么就也需要进行一次实战才行。对于一个优秀的第三方库，开发者除了要学会如何使用外，更有难度的用法就是去了解实现原理、懂得如何改造甚至自己实现。本文就来自己动手实现一个路由框架，自己实现的目的不在于做到和 ARouter 一样功能完善，而只是一个练手项目，目的是在于加深对 ARouter 的原理理解，所以自己的自定义实现就叫 EasyRouter 吧 😂😂
+上一篇文章中对 ARouter 的源码进行了一次全面解析，原理懂得了，那么就也需要进行一次实战才行。对于一个优秀的第三方库，开发者除了要学会如何使用外，更有难度的用法就是去了解实现原理、懂得如何改造甚至自己实现。本文就来自己动手实现一个路由框架，自己实现的目的不在于做到和 ARouter 一样功能完善，而只是一个练手项目，目的是在于加深对 ARouter 的原理理解，所以自己的自定义实现就叫 EasyRouter 吧
 
 EasyRouter 支持同个模块间及跨模块实现 Activity 的跳转，仅需要指定一个字符串 path 即可：
 
@@ -127,7 +127,7 @@ class EasyRouterProcessor : AbstractProcessor() {
         }
     }
 
-	···
+    ···
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> {
         return mutableSetOf(Router::class.java.canonicalName)
@@ -143,7 +143,7 @@ class EasyRouterProcessor : AbstractProcessor() {
 
 }
 ```
-首先需要生成的 `routerMap`这个用于存储路由表信息的 Map 字段，其 key 值即 path，value 值即 path 对应的页面信息
+首先需要生成的 `routerMap` 这个用于存储路由表信息的 Map 字段，其 key 值即 path，value 值即 path 对应的页面信息
 
 ```kotlin
 //生成 routerMap 这个静态常量
@@ -163,7 +163,7 @@ private fun generateSubscriberField(): FieldSpec {
         .build()
 }
 ```
-之后就需要生成静态方法块。拿到 `@Router` 注解包含的 path 属性，及被注解的类对应的 Class 对象，以此来构建一个 RouterBean 对象并存到 `routerMap`中
+之后就需要生成静态方法块。拿到 `@Router` 注解包含的 path 属性，及被注解的类对应的 Class 对象，以此来构建一个 RouterBean 对象并存到 `routerMap` 中
 
 ```kotlin
 //生成静态方法块
@@ -190,7 +190,7 @@ private fun generateInitializerBlock(
     )
 }
 ```
-然后在 `process`方法中完成辅助文件的生成
+然后在 `process` 方法中完成辅助文件的生成
 
 ```kotlin
 override fun process(
@@ -273,4 +273,4 @@ object EasyRouter {
 ```
 # 四、GitHub
 
-由于只是为了加深对 ARouter 的实现原理的理解，所以才来尝试实现 EasyRouter，也不打算实现得多么功能齐全，但对于一些读者来说我觉得还是有参考价值的😂😂 这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)
+由于只是为了加深对 ARouter 的实现原理的理解，所以才来尝试实现 EasyRouter，也不打算实现得多么功能齐全，但对于一些读者来说我觉得还是有参考价值的。这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)

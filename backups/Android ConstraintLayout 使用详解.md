@@ -7,10 +7,10 @@ ConstraintLayout 能够灵活地定位和调整子View的大小，子 View 依�
 ConstraintLayout 最基本的属性控制有以下几个，即 layout_constraintXXX_toYYYOf 格式的属性，即将“View A”的方向 XXX 置于 “View B”的方向 YYY 。当中，View B 可以是父容器即 ConstraintLayout ，用“parent”来表示
 
  - layout_constraintBaseline_toBaselineOf （View A 内部文字与 View B 内部文字对齐）
- - layout_constraintLeft_toLeftOf  （View A 与 View B 左对齐）
+ - layout_constraintLeft_toLeftOf （View A 与 View B 左对齐）
  - layout_constraintLeft_toRightOf （View A 的左边置于 View B 的右边）
  - layout_constraintRight_toLeftOf （View A 的右边置于 View B 的左边）
- - layout_constraintRight_toRightOf 
+ - layout_constraintRight_toRightOf
  - layout_constraintTop_toTopOf
  - layout_constraintTop_toBottomOf
  - layout_constraintBottom_toTopOf
@@ -29,7 +29,7 @@ ConstraintLayout 的这些属性是为控件添加了某个方向的约束力，
 
 例如，看以下代码，根据某个方向的约束的不同，控件会居中或者不会
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -90,7 +90,7 @@ ConstraintLayout 的这些属性是为控件添加了某个方向的约束力，
 
 例如，以下布局中， TextView 应该是处于水平和垂直两个方向居中的
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -120,7 +120,7 @@ ConstraintLayout 的这些属性是为控件添加了某个方向的约束力，
 
 而在以下代码中，黄色方块左侧所占的剩余空间从50%变成了100%，上侧所占的剩余空间从50%变成了10%
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -154,7 +154,7 @@ ConstraintLayout 的这些属性是为控件添加了某个方向的约束力，
 
 例如，在以下布局中，红色方块位于屏幕右上角与黄色方块左下角形成的矩形的中间位置
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -206,7 +206,7 @@ ConstraintLayout 的这些属性是为控件添加了某个方向的约束力，
 
 例如，如果想实现一个固定宽高比的顶部标题栏的话，可以将宽和高设置为 0dp，然后为其设置 app:layout_constraintDimensionRatio 属性，设定宽高比为16：7
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -256,7 +256,7 @@ ConstraintLayout 的这些属性是为控件添加了某个方向的约束力，
 
 ConstraintLayout 也可以像 LinearLayout 一样为子控件设置 layout_weight 属性，从而控件子控件之间的宽高占比
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -320,7 +320,7 @@ ConstraintLayout 也可以像 LinearLayout 一样为子控件设置 layout_weigh
 
 例如，如下代码加入了两条指示线，可以选择使用百分比或实际距离来设置指示线的位置，此外也可以通过 orientation 属性来设置指示线的方向
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -372,7 +372,7 @@ Chain 链比较难描述，它是一种特殊的约束，可以为多个通过 c
 
 例如，以下布局代码所呈现出来的效果，就可以称为一条链条，在这条链的最左侧的元素成为链头，可以在其身上设置一些属性以决定这个链的展示效果
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -437,7 +437,7 @@ Chain 链比较难描述，它是一种特殊的约束，可以为多个通过 c
 
 当参数值为 spread 以及控件宽度非 0 时
 
-```
+```xml
  android:layout_width="wrap_content"
  app:layout_constraintHorizontal_chainStyle="spread"
 ```
@@ -446,7 +446,7 @@ Chain 链比较难描述，它是一种特殊的约束，可以为多个通过 c
 
 当参数值为 spread 以及控件宽度为 0 时
 
-```
+```xml
  android:layout_width="0dp"
  app:layout_constraintHorizontal_chainStyle="spread"
 ```
@@ -455,7 +455,7 @@ Chain 链比较难描述，它是一种特殊的约束，可以为多个通过 c
 
 当参数值为 packed 以及控件宽度非0时
 
-```
+```xml
  android:layout_width="wrap_content"
  app:layout_constraintHorizontal_chainStyle="packed"
 ```
@@ -464,7 +464,7 @@ Chain 链比较难描述，它是一种特殊的约束，可以为多个通过 c
 
 当参数值为 spread_inside 以及控件宽度非0时
 
-```
+```xml
  android:layout_width="wrap_content"
  app:layout_constraintHorizontal_chainStyle="spread_inside"
 ```

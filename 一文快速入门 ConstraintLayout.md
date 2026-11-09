@@ -157,7 +157,7 @@ ConstraintLayout 最基本的属性包含以下几个，即 `layout_constraintXX
 
 在使用其它布局类型时，如果想让控件在不同的屏幕上都保持固定的宽高比是比较麻烦的，但用 ConstraintLayout 就很简单。例如，如果我们想为 Activity 实现一个固定宽高比的顶部标题栏的话，可以将宽度设置为占满屏幕，高设置为 0dp，然后通过 `app:layout_constraintDimensionRatio` 属性设定宽高比为一个固定比例，此时 ConstraintLayout 就会自动根据屏幕的宽度来动态计算标题栏应该具有的高度
 
-此外，要使用`layout_constraintDimensionRatio`属性，需要其宽度或者高度当中有一个值是**可知的**，且剩下的一个是 0dp。所谓的**可知**，即该值是已经具备了明确的约束条件。控件的宽高尺寸比例则通过 “float值” 或者 “宽度 : 高度” 的形式来设置，通过在比例值的前面添加 w 或者 h 来指明比例值是根据宽度还是高度来进行计算
+此外，要使用 `layout_constraintDimensionRatio` 属性，需要其宽度或者高度当中有一个值是**可知的**，且剩下的一个是 0dp。所谓的**可知**，即该值是已经具备了明确的约束条件。控件的宽高尺寸比例则通过 “float值” 或者 “宽度 : 高度” 的形式来设置，通过在比例值的前面添加 w 或者 h 来指明比例值是根据宽度还是高度来进行计算
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -382,9 +382,9 @@ ConstraintLayout 也可以像 LinearLayout 一样为子控件设置 `layout_weig
 
 圆形定位用于将两个 View 以**角度**和**距离**这两个维度来进行定位，以两个 View 的中心点作为定位点
 
-1. app:layout_constraintCircle 		           - 目标 View 的 ID
-2. app:layout_constraintCircleAngle           - 对齐的角度
-3. app:layout_constraintCircleRadius          - 与目标 View 之间的距离（顺时针方向，0~360度）
+1. app:layout_constraintCircle - 目标 View 的 ID
+2. app:layout_constraintCircleAngle - 对齐的角度
+3. app:layout_constraintCircleRadius  - 与目标 View 之间的距离（顺时针方向，0~360度）
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/13a0d5b1164348b28232f0f1d71287d3~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -551,7 +551,7 @@ Barrier 可以使用的属性有：
 
 # 十、Group
 
-Group 用于控制多个控件的可见性，先依靠 `constraint_referenced_ids`来绑定其它 View，之后就可以通过单独控制 Group 的可见性从而来间接改变绑定的 View 的可见性
+Group 用于控制多个控件的可见性，先依靠 `constraint_referenced_ids` 来绑定其它 View，之后就可以通过单独控制 Group 的可见性从而来间接改变绑定的 View 的可见性
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -750,7 +750,7 @@ Flow 中最重要的一个配置选项是 `wrapMode`，它可以决定在内容�
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1b15efcbaf9c4613ab72e037baa11b72~tplv-k3u1fbpfcp-zoom-1.image)
 
-例如，你可以在布局文件中引入五个 CardView，每个 CardView 的方向约束均交由 Flow 来控制，Flow 默认是以水平方向来展示，可以主动设置 `android:orientation="vertical"`改为竖直方向
+例如，你可以在布局文件中引入五个 CardView，每个 CardView 的方向约束均交由 Flow 来控制，Flow 默认是以水平方向来展示，可以主动设置 `android:orientation="vertical"` 改为竖直方向
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -803,11 +803,11 @@ Flow 中最重要的一个配置选项是 `wrapMode`，它可以决定在内容�
 
 该模式下可以同时使用的配置项有：
 
-- flow_horizontalStyle = "spread|spread_inside|packed"   //Chains 链的展示形式
+- flow_horizontalStyle = "spread|spread_inside|packed" //Chains 链的展示形式
 - flow_verticalStyle = "spread|spread_inside|packed"
-- flow_horizontalBias = "*float*"    //只在 style 为 packed 时才生效，用于控制控件在水平方向上的偏移量
+- flow_horizontalBias = "*float*" //只在 style 为 packed 时才生效，用于控制控件在水平方向上的偏移量
 - flow_verticalBias = "*float*"
-- flow_horizontalGap = "*dimension*"   //设置每个控件的左右间距
+- flow_horizontalGap = "*dimension*" //设置每个控件的左右间距
 - flow_verticalGap = "*dimension*"
 - flow_horizontalAlign = "start|end"
 - flow_verticalAlign = "top|bottom|center|baseline
@@ -820,11 +820,11 @@ Flow 中最重要的一个配置选项是 `wrapMode`，它可以决定在内容�
 
 此模式下可以同时使用的配置项有：
 
-- flow_firstHorizontalStyle = "spread|spread_inside|packed"  //第一行 Chains 链的展示形式
-- flow_firstVerticalStyle = "spread|spread_inside|packed" 
-- flow_firstHorizontalBias = "*float*"   //只在 style 为 packed 时才生效，用于控制第一行在水平方向上的偏移量
+- flow_firstHorizontalStyle = "spread|spread_inside|packed" //第一行 Chains 链的展示形式
+- flow_firstVerticalStyle = "spread|spread_inside|packed"
+- flow_firstHorizontalBias = "*float*" //只在 style 为 packed 时才生效，用于控制第一行在水平方向上的偏移量
 - flow_firstVerticalBias = "*float*"
-- flow_lastHorizontalStyle = "spread|spread_inside|packed"  //最后一行 Chains 链的展示形式
+- flow_lastHorizontalStyle = "spread|spread_inside|packed" //最后一行 Chains 链的展示形式
 - flow_lastHorizontalBias = "*float*"
 
 看个例子：
@@ -845,7 +845,7 @@ Flow 中最重要的一个配置选项是 `wrapMode`，它可以决定在内容�
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
 ```
-由于 `flow_firstHorizontalStyle` 值为 `spread_inside`，所以首行会往两侧靠边。由于 `flow_lastHorizontalBias`值为 1，所以最后一行也会直接往右靠拢
+由于 `flow_firstHorizontalStyle` 值为 `spread_inside`，所以首行会往两侧靠边。由于 `flow_lastHorizontalBias` 值为 1，所以最后一行也会直接往右靠拢
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3273a92cf6ba43b896a030914cc9fa48~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -1022,7 +1022,7 @@ Flow 和 Layer 都是 ConstraintHelper 的子类，这两者都属于辅助布�
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b9012626344d4bc8abcaccc825c5abf7~tplv-k3u1fbpfcp-zoom-1.image)
 
-继承 ConstraintHelper，在 `updatePostLayout`方法中遍历其引用的所有控件，然后对每个控件应用 CircularReveal 动画。`updatePostLayout`方法会在执行 onLayout 之前被调用
+继承 ConstraintHelper，在 `updatePostLayout` 方法中遍历其引用的所有控件，然后对每个控件应用 CircularReveal 动画。`updatePostLayout` 方法会在执行 onLayout 之前被调用
 
 ```kotlin
 class CircularRevealHelper @JvmOverloads constructor(
@@ -1076,7 +1076,7 @@ class CircularRevealHelper @JvmOverloads constructor(
 ```
 # 十七、ImageFilterView
 
-ImageFilterView 是放在 ConstraintLayout 的 `utils.widget`包下的一个 View，从包名可以猜测 ImageFilterView 只是 Google 官方提供的一个额外的工具属性的类，和 ConstraintLayout 本身并没有啥关联
+ImageFilterView 是放在 ConstraintLayout 的 `utils.widget` 包下的一个 View，从包名可以猜测 ImageFilterView 只是 Google 官方提供的一个额外的工具属性的类，和 ConstraintLayout 本身并没有啥关联
 
 ImageFilterView 直接继承于 AppCompatImageView，在其基础上扩展了很多用于实现图形变换的功能
 
@@ -1111,7 +1111,7 @@ ImageFilterView 直接继承于 AppCompatImageView，在其基础上扩展了很
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/icon_avatar_normal" />
 
-	//省略其它 ImageFilterView
+    //省略其它 ImageFilterView
 
     <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/seekBar"

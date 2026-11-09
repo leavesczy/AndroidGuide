@@ -1,10 +1,10 @@
-> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助 🤣🤣🤣
+> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助
 
 在使用 OkHttp 或者 Retrofit 的时候，我觉得大部分开发者做得最多的自定义实现就是**拦截器**了。因为 OkHttp 的拦截器真的是太有用了，我们的很多需求：**添加 Header、计算并添加签名信息、网络请求记录** 等都可以通过拦截器来自动完成，只要定义好规则，就可以覆盖到全局的 OkHttp 网络请求
 
-按照我写 **[Android 主流开源库源码分析]** 这系列文章的习惯，我每写一篇关于源码讲解的文章，就会接着写一篇关于该三方库的自定义实现或者是扩展阅读。所以，承接上一篇文章：[Android 主流开源库源码分析（十一）- OkHttp 源码详解](https://juejin.im/post/6895369745445748749)  ，本篇文章就来写关于 OkHttp 的实战内容，来实现一个移动端的可视化抓包工具：[Monitor](https://github.com/leavesczy/Monitor)
+按照我写 **[Android 主流开源库源码分析]** 这系列文章的习惯，我每写一篇关于源码讲解的文章，就会接着写一篇关于该三方库的自定义实现或者是扩展阅读。所以，承接上一篇文章：[Android 主流开源库源码分析（十一）- OkHttp 源码详解](https://juejin.im/post/6895369745445748749) ，本篇文章就来写关于 OkHttp 的实战内容，来实现一个移动端的可视化抓包工具：[Monitor](https://github.com/leavesczy/Monitor)
 
-# 一、Monitor 
+# 一、Monitor
 
 Monitor 适用于使用了 OkHttp / Retrofit 作为网络请求框架的项目，只要添加了 MonitorInterceptor 拦截器，Monitor 就会自动记录并保存所有的网络请求信息且自动弹窗展示
 
@@ -16,7 +16,7 @@ Monitor 适用于使用了 OkHttp / Retrofit 作为网络请求框架的项目�
 
 这里来简单地介绍下 Monitor 的实现思路
 
-其实 Monitor 是我蛮久前写的一个开源库了，刚好和我现在要写的文章主题相符，就趁着这机会做了一次整体重构，完全使用 Kotlin 语言来实现，请放心食用。其核心思路就是通过 Interceptor 拿到 Request 和 Response，记录各项请求信息，存到数据库中进行持久化保存，在实现思路上类似于 squareup 官方的`ogging-interceptor`，只是说 Monitor 会更加直接和方便😋😋
+其实 Monitor 是我蛮久前写的一个开源库了，刚好和我现在要写的文章主题相符，就趁着这机会做了一次整体重构，完全使用 Kotlin 语言来实现，请放心食用。其核心思路就是通过 Interceptor 拿到 Request 和 Response，记录各项请求信息，存到数据库中进行持久化保存，在实现思路上类似于 squareup 官方的 `ogging-interceptor`，只是说 Monitor 会更加直接和方便
 
 debug 版本的 MonitorInterceptor 的大体框架如下所示。HttpInformation 是对 request 和 response 的一个实体封装，也是最终会存到数据库中的实体类。通过 chain 拿到 request，先对本地数据库进行预先占位，在 proceed 后拿到 response，对本次请求结果进行解析，所有信息都存到 HttpInformation 中再来更新数据库，同时弹出 Notification
 

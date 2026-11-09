@@ -1,4 +1,4 @@
-> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助 🤣🤣🤣
+> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助
 
 我们知道，EventBus 在发送了消息后，就会直接回调该消息类型的所有监听方法，回调操作是通过反射 `method.invoke` 来实现的，那么在回调之前也必须先拿到应用内所有的监听方法才行。EventBus 获取监听方法的方式有两种：
 
@@ -12,12 +12,13 @@ implementation "org.greenrobot:eventbus:3.2.0"
 ```
 # 一、注册
 
-EventBus 通过 `EventBus.register(Object)`方法来进行注册的。该方法会对 subscriber 进行解析，通过 SubscriberMethodFinder 的 `findSubscriberMethods` 方法将 subscriber 包含的所有声明了`@Subscribe`注解的方法的签名信息保存到内存中，当有消息被 Post 时就可以直接在内存中查找到目标方法了
+EventBus 通过 `EventBus.register(Object)` 方法来进行注册的。该方法会对 subscriber 进行解析，通过 SubscriberMethodFinder 的 `findSubscriberMethods` 方法将 subscriber 包含的所有声明了 `@Subscribe` 注解的方法的签名信息保存到内存中，当有消息被 Post 时就可以直接在内存中查找到目标方法了
 
 ```java
 public void register(Object subscriber) {
     Class<?> subscriberClass = subscriber.getClass();
-    List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
+    List<SubscriberMethod> subscriberMethods =
+            subscriberMethodFinder.findSubscriberMethods(subscriberClass);
     synchronized (this) {
         for (SubscriberMethod subscriberMethod : subscriberMethods) {
             subscribe(subscriber, subscriberMethod);
@@ -31,20 +32,21 @@ public void register(Object subscriber) {
 public class SubscriberMethod {
     final Method method;
     final ThreadMode threadMode;
-    //消息类型
+    // 消息类型
     final Class<?> eventType;
-    //消息优先级
+    // 消息优先级
     final int priority;
-    //是否属于黏性消息
+    // 是否属于黏性消息
     final boolean sticky;
+
     /** Used for efficient comparison */
     String methodString;
-	
+
     ···
 
 }
 ```
-SubscriberMethodFinder 会将每次的查找结果缓存到 `METHOD_CACHE`中，这对某些会先后经历**多次注册和反注册**操作的 subscriber 来说比较有用，因为每次查找可能需要依靠多次循环遍历和反射操作，会稍微有点消耗性能，但缓存也会占用一部分内存空间
+SubscriberMethodFinder 会将每次的查找结果缓存到 `METHOD_CACHE` 中，这对某些会先后经历**多次注册和反注册**操作的 subscriber 来说比较有用，因为每次查找可能需要依靠多次循环遍历和反射操作，会稍微有点消耗性能，但缓存也会占用一部分内存空间
 
 ```java
 private static final Map<Class<?>, List<SubscriberMethod>> METHOD_CACHE = new ConcurrentHashMap<>();
@@ -70,12 +72,12 @@ List<SubscriberMethod> findSubscriberMethods(Class<?> subscriberClass) {
     }
 }
 ```
-因为`ignoreGeneratedIndex`默认是 false，所以这里直接看 `findUsingInfo(subscriberClass)` 方法
+因为 `ignoreGeneratedIndex` 默认是 false，所以这里直接看 `findUsingInfo(subscriberClass)` 方法
 
 其主要逻辑是：
 
 1. 通过 `prepareFindState()` 方法从对象池 `FIND_STATE_POOL` 中获取空闲的 FindState 对象，如果不存在则初始化一个新的，并在使用过后通过 `getMethodsAndRelease` 方法将对象还给对象池。通过对象池来避免无限制地创建 `FindState` 对象，这也算做是一个优化点。FindState 用于在反射遍历过程中保存各种中间状态值
-2. 在不使用注解处理器的情况下 `findState.subscriberInfo` 和 `subscriberInfoIndexes`默认都是等于 null，所以主要看 `findUsingReflectionInSingleClass` 方法即可，从该方法名可知是通过反射操作来进行解析的，解析结果会被存到 `findState`中
+2. 在不使用注解处理器的情况下 `findState.subscriberInfo` 和 `subscriberInfoIndexes` 默认都是等于 null，所以主要看 `findUsingReflectionInSingleClass` 方法即可，从该方法名可知是通过反射操作来进行解析的，解析结果会被存到 `findState` 中
 3. 因为父类声明的监听方法会被子类所继承，而解析过程是会从子类向其父类依次遍历的，所以在解析完子类后需要通过 `findState.moveToSuperclass()` 方法将下一个查找的 class 对象指向父类
 
 ```java
@@ -84,7 +86,7 @@ private static final int POOL_SIZE = 4;
 private static final FindState[] FIND_STATE_POOL = new FindState[POOL_SIZE];
 
 private List<SubscriberMethod> findUsingInfo(Class<?> subscriberClass) {
-    //步骤1
+    // 步骤1
     FindState findState = prepareFindState();
     findState.initForSubscriber(subscriberClass);
     while (findState.clazz != null) {
@@ -97,10 +99,10 @@ private List<SubscriberMethod> findUsingInfo(Class<?> subscriberClass) {
                 }
             }
         } else {
-            //步骤2
+            // 步骤2
             findUsingReflectionInSingleClass(findState);
         }
-        //步骤3
+        // 步骤3
         findState.moveToSuperclass();
     }
     return getMethodsAndRelease(findState);
@@ -110,7 +112,7 @@ private List<SubscriberMethod> getMethodsAndRelease(FindState findState) {
     List<SubscriberMethod> subscriberMethods = new ArrayList<>(findState.subscriberMethods);
     findState.recycle();
     synchronized (FIND_STATE_POOL) {
-        //回收 findState，尝试将之存到对象池中
+        // 回收 findState，尝试将之存到对象池中
         for (int i = 0; i < POOL_SIZE; i++) {
             if (FIND_STATE_POOL[i] == null) {
                 FIND_STATE_POOL[i] = findState;
@@ -121,7 +123,7 @@ private List<SubscriberMethod> getMethodsAndRelease(FindState findState) {
     return subscriberMethods;
 }
 
-//如果对象池中有可用的对象则取出来使用，否则的话就构建一个新的
+// 如果对象池中有可用的对象则取出来使用，否则的话就构建一个新的
 private FindState prepareFindState() {
     synchronized (FIND_STATE_POOL) {
         for (int i = 0; i < POOL_SIZE; i++) {
@@ -135,7 +137,7 @@ private FindState prepareFindState() {
     return new FindState();
 }
 ```
-这里来主要看下 `findUsingReflectionInSingleClass` 方法是如何完成反射操作的。如果解析到的方法签名不符合要求，则在开启了**严格检查**的情况下直接抛出异常；如果方法签名符合要求，则会将方法签名保存到`subscriberMethods`中
+这里来主要看下 `findUsingReflectionInSingleClass` 方法是如何完成反射操作的。如果解析到的方法签名不符合要求，则在开启了**严格检查**的情况下直接抛出异常；如果方法签名符合要求，则会将方法签名保存到 `subscriberMethods` 中
 
 ```java
 private void findUsingReflectionInSingleClass(FindState findState) {
@@ -193,7 +195,7 @@ private void findUsingReflectionInSingleClass(FindState findState) {
     }
 }
 ```
-`findUsingReflectionInSingleClass`方法的一个重点是 `findState.checkAdd`方法。如果往简单了想，只要把 subscriber 每个声明了 Subscribe 注解的方法都给保存起来就可以了，可是还需要考虑一些特殊情况：
+`findUsingReflectionInSingleClass` 方法的一个重点是 `findState.checkAdd` 方法。如果往简单了想，只要把 subscriber 每个声明了 Subscribe 注解的方法都给保存起来就可以了，可是还需要考虑一些特殊情况：
 
 1. Java 中的类是具有继承关系的，如果父类声明了 Subscribe 方法，那么就相当于子类也持有了该监听方法，那么子类在 register 后就需要拿到父类的所有 Subscribe 方法
 2. 如果子类继承并重写了父类的 Subscribe 方法，那么子类在 register 后就需要以自己重写后的方法为准，忽略父类的相应方法
@@ -351,7 +353,7 @@ private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
 | BACKGROUND   | 在后台线程中按顺序执行   | 如果事件是在主线程发送的，则提交给 backgroundPoster 处理，否则直接调用消息接收方 |
 | ASYNC        | 提交给空闲的后台线程执行 | 将消息提交到 asyncPoster 进行处理                            |
 
-执行策略的具体细分逻辑是在 EventBus 类的`postToSubscription` 方法完成的
+执行策略的具体细分逻辑是在 EventBus 类的 `postToSubscription` 方法完成的
 
 ```java
 private void postToSubscription(Subscription subscription, Object event, boolean isMainThread) {
@@ -385,7 +387,8 @@ private void postToSubscription(Subscription subscription, Object event, boolean
             asyncPoster.enqueue(subscription, event);
             break;
         default:
-            throw new IllegalStateException("Unknown thread mode: " + subscription.subscriberMethod.threadMode);
+            throw new IllegalStateException(
+                    "Unknown thread mode: " + subscription.subscriberMethod.threadMode);
     }
 }
 ```
@@ -411,12 +414,11 @@ class AsyncPoster implements Runnable, Poster {
     @Override
     public void run() {
         PendingPost pendingPost = queue.poll();
-        if(pendingPost == null) {
+        if (pendingPost == null) {
             throw new IllegalStateException("No pending post available");
         }
         eventBus.invokeSubscriber(pendingPost);
     }
-
 }
 ```
 而 BackgroundPoster 会将任务依次缓存到 PendingPostQueue 中，每次只取出一个任务交由线程池来执行，所以 BackgroundPoster 会保证消息队列在处理时的有序性，但在消息处理的及时性方面相比 AsyncPoster 要低一些
@@ -472,7 +474,7 @@ void invokeSubscriber(Subscription subscription, Object event) {
 ```
 ## 2、发送非黏性消息
 
-`EventBus.getDefault().post(Any)`方法用于发送非黏性消息。EventBus 会通过 ThreadLocal 为每个发送消息的线程维护一个 PostingThreadState 对象，用于为每个线程维护一个消息队列及其它辅助参数
+`EventBus.getDefault().post(Any)` 方法用于发送非黏性消息。EventBus 会通过 ThreadLocal 为每个发送消息的线程维护一个 PostingThreadState 对象，用于为每个线程维护一个消息队列及其它辅助参数
 
 ```java
 /**
@@ -521,9 +523,8 @@ public void post(Object event) {
         }
     }
 }
-
 ```
-每次 post 进来的消息都会先存到消息队列 `eventQueue`中，然后通过 while 循环进行处理，消息处理逻辑是通过 `postSingleEvent`方法来完成的
+每次 post 进来的消息都会先存到消息队列 `eventQueue` 中，然后通过 while 循环进行处理，消息处理逻辑是通过 `postSingleEvent` 方法来完成的
 
 其主要逻辑是：
 
@@ -533,15 +534,15 @@ public void post(Object event) {
 4. 如果发送的消息最终没有找到任何接收者，且 `sendNoSubscriberEvent` 为 true，那么就主动发送一个 NoSubscriberEvent 事件，用于向外通知消息没有找到任何接收者
 5. 监听方法之间可以设定消息处理的优先级高低，高优先级的方法可以通过调用 `cancelEventDelivery` 方法来拦截事件，不再继续向下发送。但只有在 `POSTING` 模式下才能拦截事件，因为只有在这个模式下才能保证监听方法是按照严格的先后顺序被执行的
 
-最终，发送的消息都会通过 `postToSubscription`方法来完成，根据接收者方法不同的处理策略进行处理
+最终，发送的消息都会通过 `postToSubscription` 方法来完成，根据接收者方法不同的处理策略进行处理
 
 ```java
 private void postSingleEvent(Object event, PostingThreadState postingState) throws Error {
     Class<?> eventClass = event.getClass();
-    //用于标记是否有找到消息的接收者
+    // 用于标记是否有找到消息的接收者
     boolean subscriptionFound = false;
     if (eventInheritance) {
-        //步骤2
+        // 步骤2
         List<Class<?>> eventTypes = lookupAllEventTypes(eventClass);
         int countTypes = eventTypes.size();
         for (int h = 0; h < countTypes; h++) {
@@ -549,25 +550,27 @@ private void postSingleEvent(Object event, PostingThreadState postingState) thro
             subscriptionFound |= postSingleEventForEventType(event, postingState, clazz);
         }
     } else {
-        //步骤3
+        // 步骤3
         subscriptionFound = postSingleEventForEventType(event, postingState, eventClass);
     }
     if (!subscriptionFound) {
         if (logNoSubscriberMessages) {
             logger.log(Level.FINE, "No subscribers registered for event " + eventClass);
         }
-        if (sendNoSubscriberEvent && eventClass != NoSubscriberEvent.class &&
-                eventClass != SubscriberExceptionEvent.class) {
-            //步骤4
+        if (sendNoSubscriberEvent
+                && eventClass != NoSubscriberEvent.class
+                && eventClass != SubscriberExceptionEvent.class) {
+            // 步骤4
             post(new NoSubscriberEvent(this, event));
         }
     }
 }
 
-private boolean postSingleEventForEventType(Object event, PostingThreadState postingState, Class<?> eventClass) {
+private boolean postSingleEventForEventType(
+        Object event, PostingThreadState postingState, Class<?> eventClass) {
     CopyOnWriteArrayList<Subscription> subscriptions;
     synchronized (this) {
-        //找到所有监听者
+        // 找到所有监听者
         subscriptions = subscriptionsByEventType.get(eventClass);
     }
     if (subscriptions != null && !subscriptions.isEmpty()) {
@@ -583,7 +586,7 @@ private boolean postSingleEventForEventType(Object event, PostingThreadState pos
                 postingState.subscription = null;
                 postingState.canceled = false;
             }
-            //步骤5
+            // 步骤5
             if (aborted) {
                 break;
             }
@@ -592,13 +595,12 @@ private boolean postSingleEventForEventType(Object event, PostingThreadState pos
     }
     return false;
 }
-
 ```
 ## 3、发送黏性消息
 
 黏性消息的意义是为了使得在消息发出来后，即使是后续再进行 `register` 的 subscriber 也可以收到之前发送的消息，这需要将 `@Subscribe` 注解的 `sticky` 属性设为 true，即表明消息接收方希望接收黏性消息
 
-`EventBus.getDefault().postSticky(Any)`方法就用于发送黏性消息。黏性事件会被保存到 `stickyEvents` 这个 Map 中，key 是 event 的 Class 对象，value 是 event 本身，这也说明对于同一类型的黏性消息来说，只会保存其最后一个消息
+`EventBus.getDefault().postSticky(Any)` 方法就用于发送黏性消息。黏性事件会被保存到 `stickyEvents` 这个 Map 中，key 是 event 的 Class 对象，value 是 event 本身，这也说明对于同一类型的黏性消息来说，只会保存其最后一个消息
 
 ```java
 private final Map<Class<?>, Object> stickyEvents;
@@ -693,11 +695,10 @@ public boolean removeStickyEvent(Object event) {
         }
     }
 }
-
 ```
 # 三、解除注册
 
-解除注册的目的是为了避免内存泄露，EventBus 使用了单例模式，如果不主动解除注册的话，EventBus 就会一直持有 subscriber。解除注册是通过 `unregister`方法来实现的，该方法逻辑也比较简单，只是将 subscriber 以及其关联的所有 method 对象从集合中移除而已
+解除注册的目的是为了避免内存泄露，EventBus 使用了单例模式，如果不主动解除注册的话，EventBus 就会一直持有 subscriber。解除注册是通过 `unregister` 方法来实现的，该方法逻辑也比较简单，只是将 subscriber 以及其关联的所有 method 对象从集合中移除而已
 
 而此处虽然会将关于 subscriber 的信息均给移除掉，但是在 SubscriberMethodFinder 中的静态成员变量 `METHOD_CACHE` 依然会缓存着已经注册过的 subscriber 的信息，这也是为了在某些 subscriber 会先后多次注册 EventBus 时可以做到信息复用，避免多次循环反射
 
@@ -794,11 +795,15 @@ public class MyEventBusIndex implements SubscriberInfoIndex {
     static {
         SUBSCRIBER_INDEX = new HashMap<Class<?>, SubscriberInfo>();
 
-        putIndex(new SimpleSubscriberInfo(MainActivity.class, true, new SubscriberMethodInfo[] {
-            new SubscriberMethodInfo("fun1", String.class),
-            new SubscriberMethodInfo("fun2", String.class, ThreadMode.MAIN, 100, false),
-        }));
-
+        putIndex(
+                new SimpleSubscriberInfo(
+                        MainActivity.class,
+                        true,
+                        new SubscriberMethodInfo[] {
+                            new SubscriberMethodInfo("fun1", String.class),
+                            new SubscriberMethodInfo(
+                                    "fun2", String.class, ThreadMode.MAIN, 100, false),
+                        }));
     }
 
     private static void putIndex(SubscriberInfo info) {
@@ -948,7 +953,7 @@ EventBus 有一个 issues 也反馈了这个问题：[issues](https://github.com
 
 ## 2、移除黏性消息
 
-`removeStickyEvent` 方法会有一个比较让人误解的点：对于通过 `EventBus.getDefault().postSticky(XXX)`方法发送的黏性消息无法通过 `removeStickyEvent` 方法来使现有的监听者拦截该事件
+`removeStickyEvent` 方法会有一个比较让人误解的点：对于通过 `EventBus.getDefault().postSticky(XXX)` 方法发送的黏性消息无法通过 `removeStickyEvent` 方法来使现有的监听者拦截该事件
 
 例如，假设下面的两个方法都已经处于注册状态了，`postSticky` 后，即使在 `fun1` 方法中移除了黏性消息，`fun2` 方法也可以接收到消息。这是因为 `postSticky` 方法最终也是要靠调用 `post` 方法来完成消息发送，而 `post` 方法并不受 `stickyEvents` 的影响
 
@@ -968,9 +973,10 @@ fun fun2(msg: String) {
 ```java
 public void register(Object subscriber) {
     Class<?> subscriberClass = subscriber.getClass();
-    List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
+    List<SubscriberMethod> subscriberMethods =
+            subscriberMethodFinder.findSubscriberMethods(subscriberClass);
     synchronized (this) {
-        //在 for 循环中遍历 method 
+        // 在 for 循环中遍历 method
         for (SubscriberMethod subscriberMethod : subscriberMethods) {
             subscribe(subscriber, subscriberMethod);
         }
@@ -983,7 +989,7 @@ EventBus 的源码解析到这里就结束了，本文所讲的内容应该也�
 
 1. EventBus 包含 register 和 unregister 两个方法用于标记当前 subscriber 是否需要接收消息，内部对应向 CopyOnWriteArrayList 添加和移除元素这两个操作
 2. 每当有 event 被 post 出来时，就需要根据 eventClass 对象找到所有所有声明了 @Subscribe 注解且对这种消息类型进行监听的方法，这些方法都是在 subscriber 进行 register 的时候，从 subscriber 中获取到的
-3. 从 subscriber 中获取所有监听方法的方式有两种。第一种是在运行阶段通过反射来拿到，对应的是没有配置注解处理器的情况。第二种对应的是有配置注解处理器的情况，通过在编译阶段全局扫描  @Subscribe 注解并生成辅助文件，从而在 register 的时候省去效率低下的反射操作。不管是通过什么方式进行获取，拿到所有方法后都会将 methods 按照消息类型 eventType 进行归类，方便后续遍历
+3. 从 subscriber 中获取所有监听方法的方式有两种。第一种是在运行阶段通过反射来拿到，对应的是没有配置注解处理器的情况。第二种对应的是有配置注解处理器的情况，通过在编译阶段全局扫描 @Subscribe 注解并生成辅助文件，从而在 register 的时候省去效率低下的反射操作。不管是通过什么方式进行获取，拿到所有方法后都会将 methods 按照消息类型 eventType 进行归类，方便后续遍历
 4. 每当有消息被发送出来时，就根据 event 对应的 Class 对象找到相应的监听方法，然后通过反射的方式来回调方法。外部可以在初始化 EventBus 的时候选择是否要考虑 event 的继承关系，即在 event 被 Post 出来时，对 event 的父类型进行监听的方法是否需要被回调
 
-EventBus 的实现思路并不算多难，难的是在实现的时候可以方方面面都考虑周全，做到稳定高效，从 2018 年到 2020 年也才发布了两个版本（也许是作者懒得更新？）原理懂了，那么下一篇就进入实战篇，自己来动手实现一个 EventBus 😇😇
+EventBus 的实现思路并不算多难，难的是在实现的时候可以方方面面都考虑周全，做到稳定高效，从 2018 年到 2020 年也才发布了两个版本（也许是作者懒得更新？）原理懂了，那么下一篇就进入实战篇，自己来动手实现一个 EventBus

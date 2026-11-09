@@ -33,11 +33,11 @@ Activity 的用户界面是由层级式视图：衍生自 View 类的对象 — 
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-		
-		
+        
+        
         <activity android:name=".Example">
         </activity>
-		
+        
     </application>
 ```
 
@@ -85,13 +85,13 @@ startActivity(intent);
 
 ## **五、启动 Activity 以获得结果**
 
-一般情况下，我们要从当前Activity跳转到另一个 Activity，采用的方法是通过 **startActivity(Intent)** 来携带数据并实现跳转 
-有时候又需要跳转到的 Activity 能够在回退时返回处理结果给前一个   Activity，这就要用到以下方法了
+一般情况下，我们要从当前Activity跳转到另一个 Activity，采用的方法是通过 **startActivity(Intent)** 来携带数据并实现跳转
+有时候又需要跳转到的 Activity 能够在回退时返回处理结果给前一个 Activity，这就要用到以下方法了
 
 ```java
 public void startActivityForResult(Intent intent, int requestCode)
 ```
-该方法同样是用于实现 Activity 的跳转，不过多了一个 int 类型的请求码 **requestCode** 
+该方法同样是用于实现 Activity 的跳转，不过多了一个 int 类型的请求码 **requestCode**
 **requestCode** 用于标示当 Activity 回退时，处理结果是从哪一个 Activity 传递来的，因为当前 Activity 有可能需要跳转到多个 Activity
 
 此外，Activity 类还包含有以下方法
@@ -104,7 +104,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data)
 因此，我们可以用以下代码实现Activity的跳转
 
 ```java
-		private int REQUEST_CODE = 10;
+        private int REQUEST_CODE = 10;
 
         Intent intent = new Intent(MainActivity.this, Main2Activity.class);
         Bundle bundle = new Bundle();
@@ -117,66 +117,69 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data)
 然后，在 **onActivityResult()** 中处理 Main2Activity 回退后传递而来的数据处理结果，这里用 Log 来输出
 
 ```java
- @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-            Bundle bundle = data.getExtras();
-            Log.e("MainActivity", bundle.getString("responseText"));
-        }
-        super.onActivityResult(requestCode, resultCode, data);
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+        Bundle bundle = data.getExtras();
+        Log.e("MainActivity", bundle.getString("responseText"));
     }
+    super.onActivityResult(requestCode, resultCode, data);
+}
 ```
-其中，需要判断 requestCode 是否与请求码相等 
+其中，需要判断 requestCode 是否与请求码相等
 此外，查看源码可知，resultCode 取值一般为以下三个，用来标示操作结果
 
 ```java
-    /** Standard activity result: operation canceled. */
-    //标示操作取消
-    public static final int RESULT_CANCELED    = 0;
+/** Standard activity result: operation canceled. */
+// 标示操作取消
+public static final int RESULT_CANCELED = 0;
 
-    /** Standard activity result: operation succeeded. */
-    //标示操作成功
-    public static final int RESULT_OK           = -1;
+/** Standard activity result: operation succeeded. */
+// 标示操作成功
+public static final int RESULT_OK = -1;
 
-    /** Start of user-defined activity results. */
-    public static final int RESULT_FIRST_USER   = 1;
+/** Start of user-defined activity results. */
+public static final int RESULT_FIRST_USER = 1;
 ```
-以上都是在 MainActivity 中操作，此外还需要在 Main2Activity 中设置返回结果 
+以上都是在 MainActivity 中操作，此外还需要在 Main2Activity 中设置返回结果
 先取出传递而来的数据 requestText
 
 ```java
-	private String requestText;
+private String requestText;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
-        Intent intent = getIntent();
-        if (intent != null) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                requestText = bundle.getString("requestText");
-            }
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main2);
+    Intent intent = getIntent();
+    if (intent != null) {
+        Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            requestText = bundle.getString("requestText");
         }
-        init();
     }
+    init();
+}
 ```
 通过 **setResult()** 方法设置处理结果为 **RESULT_OK**，并通过 **Intent** 携带处理结果
 
 ```java
-	public void init() {
-        findViewById(R.id.response).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                Bundle bundle = new Bundle();
-                bundle.putString("responseText", "收到第一个Activity的请求内容为：" + requestText);
-                intent.putExtras(bundle);
-                setResult(RESULT_OK, intent);
-                finish();
-            }
-        });
-    }
+public void init() {
+    findViewById(R.id.response)
+            .setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent();
+                            Bundle bundle = new Bundle();
+                            bundle.putString(
+                                    "responseText", "收到第一个Activity的请求内容为：" + requestText);
+                            intent.putExtras(bundle);
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        }
+                    });
+}
 ```
 这样就可以实现当 Activity 回退时，携带处理结果到前一个 Activity 了
 
@@ -251,22 +254,24 @@ com.czy.myapplication E/MainActivity: onResume被调用
 首先新建一个MainActivity，重写其各个回调函数，添加一句Log输出语句，类似如下所示
 
 ```java
- private final String TAG = "MainActivity";
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.e(TAG, "onStart被调用");
-    }
+private final String TAG = "MainActivity";
+
+@Override
+protected void onStart() {
+    super.onStart();
+    Log.e(TAG, "onStart被调用");
+}
 ```
 再在主布局文件中添加一个按钮，用于启动第二个Activity——Main2Activity 。也重写Main2Activity的各大回调函数，与MainActivity类似
 
 ```java
 private final String TAG = "第二个Activity";
-     @Override
-    protected void onStart() {
-        super.onStart();
-        Log.e(TAG, "onStart被调用");
-    }
+
+@Override
+protected void onStart() {
+    super.onStart();
+    Log.e(TAG, "onStart被调用");
+}
 ```
 启动MainActivity，输出语句如下：
 

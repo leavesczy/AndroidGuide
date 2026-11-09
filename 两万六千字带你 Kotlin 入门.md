@@ -1,4 +1,4 @@
-开头先说一下，我不是标题党，本教程真的有两万六千字，以前我也曾写过 Kotlin 的入门教程，但由于隔得比较久了，所以就对原有教程进行了修正，并且补充了 Kotlin 新版本的一些新特性，希望对你有所帮助 🤣🤣
+开头先说一下，我不是标题党，本教程真的有两万六千字，以前我也曾写过 Kotlin 的入门教程，但由于隔得比较久了，所以就对原有教程进行了修正，并且补充了 Kotlin 新版本的一些新特性，希望对你有所帮助
 
 # 一、Hello World
 
@@ -74,7 +74,7 @@ fun main() {
 ```
 Java 语言规定类要放到和包结构**匹配**的文件夹目录结构中，且文件名必须和类名相同。而 kotlin 允许把多个类放到同一个文件中，文件名也可以任意选择。kotlin 也没有文件夹目录施加任何限制，包层级结构不需要遵循同样的目录层级结构 ,但 kotlin 官方还是建议根据包声明把源码文件放到相应的目录中
 
-如果包名出现命名冲突，可以使用  **as  关键字**在本地重命名冲突项来消歧义
+如果包名出现命名冲突，可以使用 **as 关键字**在本地重命名冲突项来消歧义
 
 ```kotlin
 import learn.package1.Point
@@ -106,7 +106,7 @@ fun main() {
 
 声明变量的关键字有两个：
 
-- val（value /  varible+final）——不可变引用。使用 val 声明的变量不能在初始化之后再次赋值，对应的是 Java 中的 final 变量
+- val（value / varible+final）——不可变引用。使用 val 声明的变量不能在初始化之后再次赋值，对应的是 Java 中的 final 变量
 - var（variable）——可变引用。var 变量的值可以被改变，对应的是 Java 中的非 final 变量
 
 不可变变量在赋值之后就不能再去改变它的状态了，因此不可变变量可以说是线程安全的，因为它们无法改变，所有线程访问到的对象都是同一个，因此也不需要去做访问控制。开发者应当尽可能地使用不可变变量，这样可以让代码更加接近函数式编程风格
@@ -196,7 +196,7 @@ println(intValue_2 === intValue_3)
 
 ## 2、字符串
 
-kotlin 与 Java 一样用  String  类型来表示字符串，字符串是不可变的，可以使用索引运算符访问`[]` 来访问包含的单个字符，也可以用  for  循环来迭代字符串，此外也可以用 + 来连接字符串
+kotlin 与 Java 一样用 String 类型来表示字符串，字符串是不可变的，可以使用索引运算符访问 `[]` 来访问包含的单个字符，也可以用 for 循环来迭代字符串，此外也可以用 + 来连接字符串
 
 ```kotlin
 val str = "leavesczy"
@@ -223,7 +223,7 @@ println(price)  //$100.99
 ```
 ## 3、数组
 
-kotlin 中的数组是带有类型参数的类，其元素类型被指定为相应的类型参数，使用  Array  类来表示，  Array  类定义了  get  与  set  函数（按照运算符重载约定这会转变为  [ ]  ）以及  size  属性等
+kotlin 中的数组是带有类型参数的类，其元素类型被指定为相应的类型参数，使用 Array 类来表示， Array 类定义了 get 与 set 函数（按照运算符重载约定这会转变为 [ ] ）以及 size 属性等
 
 创建数组的方法有以下几种：
 
@@ -640,8 +640,8 @@ do {
 kotlin 有三种结构化跳转表达式：
 
 - return 默认从最直接包围它的函数或者匿名函数返回
-- break  终止最直接包围它的循环
-- continue  继续下一次最直接包围它的循环
+- break 终止最直接包围它的循环
+- continue 继续下一次最直接包围它的循环
 
 在 kotlin 中任何表达式都可以用标签（label）来标记，标签的格式为标识符后跟 @ 符号，例如：**abc@ 、fooBar@** 都是有效的标签
 
@@ -766,7 +766,7 @@ fun fun5() {
 ```
 # 六、区间
 
-Ranges 表达式使用一个 **..**  操作符来声明一个闭区间，它被用于定义实现一个 RangTo 方法
+Ranges 表达式使用一个 **..** 操作符来声明一个闭区间，它被用于定义实现一个 RangTo 方法
 
 以下三种声明方式都是等价的
 
@@ -831,7 +831,7 @@ for (i in rangeTo.reversed()) {
 ```
 # 七、修饰符
 
-## 1、final 和  open
+## 1、final 和 open
 
 kotlin 中的类和方法默认都是 final 的，即不可继承的，如果想允许创建一个类的子类，需要使用 open 修饰符来标识这个类，此外，也需要为每一个希望被重写的属性和方法添加 open 修饰符
 
@@ -840,7 +840,7 @@ open class View {
     open fun click() {
 
     }
-	//不能在子类中被重写
+    //不能在子类中被重写
     fun longClick() {
 
     }
@@ -878,7 +878,7 @@ open class Button : View() {
 ```
 ## 2、public
 
-public 修饰符是限制级最低的修饰符，是默认的修饰符。如果一个定义为 public  的成员被包含在一个 private  修饰的类中，那么这个成员在这个类以外也是不可见的
+public 修饰符是限制级最低的修饰符，是默认的修饰符。如果一个定义为 public 的成员被包含在一个 private 修饰的类中，那么这个成员在这个类以外也是不可见的
 
 ## 3、protected
 
@@ -888,11 +888,11 @@ protected 修饰符只能被用在类或者接口中的成员上。在 Java 中�
 
 一个定义为 internal 的包成员，对其所在的整个 module 可见，但对于其它 module 而言就是不可见的了。例如，假设我们想要发布一个开源库，库中包含某个类，我们希望这个类对于库本身是全局可见的，但对于外部使用者来说它不能被引用到，此时就可以选择将其声明为 internal 的来实现这个目的
 
-> 根据 Jetbrains 的定义，一个 module  应该是一个单独的功能性的单位，可以看做是一起编译的 kotlin 文件的集合，它应该是可以被单独编译、运行、测试、debug 的。相当于在 Android Studio 中主工程引用的 module，Eclipse 中在一个 workspace 中的不同的 project
+> 根据 Jetbrains 的定义，一个 module 应该是一个单独的功能性的单位，可以看做是一起编译的 kotlin 文件的集合，它应该是可以被单独编译、运行、测试、debug 的。相当于在 Android Studio 中主工程引用的 module，Eclipse 中在一个 workspace 中的不同的 project
 
 ## 5、private
 
-private  修饰符是限制级最高的修饰符，kotlin 允许在顶层声明中使用 private 可见性，包括类、函数和属性，这表示只在自己所在的文件中可见，所以如果将一个类声明为 private，就不能在定义这个类之外的地方中使用它。此外，如果在一个类里面使用了 private  修饰符，那访问权限就被限制在这个类里面，继承这个类的子类也不能使用它。所以如果类、对象、接口等被定义为 private，那么它们只对被定义所在的文件可见。如果被定义在了类或者接口中，那它们只对这个类或者接口可见
+private 修饰符是限制级最高的修饰符，kotlin 允许在顶层声明中使用 private 可见性，包括类、函数和属性，这表示只在自己所在的文件中可见，所以如果将一个类声明为 private，就不能在定义这个类之外的地方中使用它。此外，如果在一个类里面使用了 private 修饰符，那访问权限就被限制在这个类里面，继承这个类的子类也不能使用它。所以如果类、对象、接口等被定义为 private，那么它们只对被定义所在的文件可见。如果被定义在了类或者接口中，那它们只对这个类或者接口可见
 
 ## 6、总结
 
@@ -907,7 +907,7 @@ private  修饰符是限制级最高的修饰符，kotlin 允许在顶层声明�
 
 ## 1、可空性
 
-在 kotlin 中，类型系统将一个引用分为可以容纳  null （可空引用）或者不能容纳 null（非空引用）两种类型。 例如，String 类型的常规变量不能指向 null 
+在 kotlin 中，类型系统将一个引用分为可以容纳 null （可空引用）或者不能容纳 null（非空引用）两种类型。 例如，String 类型的常规变量不能指向 null
 
 ```kotlin
 var name: String = "leavesczy"
@@ -1128,23 +1128,22 @@ val y: String? = x as? String
 ```java
 public final class Point {
 
-   private final int x;
-   
-   private final int y;
-   
-   public Point(int x, int y) {
-      this.x = x;
-      this.y = y;
-   }
+    private final int x;
 
-   public final int getX() {
-      return this.x;
-   }
+    private final int y;
 
-   public final int getY() {
-      return this.y;
-   }
-   
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public final int getX() {
+        return this.x;
+    }
+
+    public final int getY() {
+        return this.y;
+    }
 }
 ```
 使用 kotlin 来声明 Point 类则只需要一行代码，两者完全等同
@@ -1383,7 +1382,7 @@ data class Point(val x: Int, val y: Int)
 
 - getter、setter（需要是 var）
 - componentN()。按主构造函数的属性声明顺序进行对应
-- copy() 
+- copy()
 - toString()
 - hashCode()
 - equals()
@@ -1398,72 +1397,72 @@ data class Point(val x: Int, val y: Int)
 
 ```java
 public final class Point {
-   private final int x;
-   private final int y;
+    private final int x;
+    private final int y;
 
-   public final int getX() {
-      return this.x;
-   }
+    public final int getX() {
+        return this.x;
+    }
 
-   public final int getY() {
-      return this.y;
-   }
+    public final int getY() {
+        return this.y;
+    }
 
-   public Point(int x, int y) {
-      this.x = x;
-      this.y = y;
-   }
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 
-   public final int component1() {
-      return this.x;
-   }
+    public final int component1() {
+        return this.x;
+    }
 
-   public final int component2() {
-      return this.y;
-   }
+    public final int component2() {
+        return this.y;
+    }
 
-   @NotNull
-   public final Point copy(int x, int y) {
-      return new Point(x, y);
-   }
+    @NotNull
+    public final Point copy(int x, int y) {
+        return new Point(x, y);
+    }
 
-   // $FF: synthetic method
-   // $FF: bridge method
-   @NotNull
-   public static Point copy$default(Point var0, int var1, int var2, int var3, Object var4) {
-      if ((var3 & 1) != 0) {
-         var1 = var0.x;
-      }
+    // $FF: synthetic method
+    // $FF: bridge method
+    @NotNull
+    public static Point copy$default(Point var0, int var1, int var2, int var3, Object var4) {
+        if ((var3 & 1) != 0) {
+            var1 = var0.x;
+        }
 
-      if ((var3 & 2) != 0) {
-         var2 = var0.y;
-      }
+        if ((var3 & 2) != 0) {
+            var2 = var0.y;
+        }
 
-      return var0.copy(var1, var2);
-   }
+        return var0.copy(var1, var2);
+    }
 
-   public String toString() {
-      return "Point(x=" + this.x + ", y=" + this.y + ")";
-   }
+    public String toString() {
+        return "Point(x=" + this.x + ", y=" + this.y + ")";
+    }
 
-   public int hashCode() {
-      return this.x * 31 + this.y;
-   }
+    public int hashCode() {
+        return this.x * 31 + this.y;
+    }
 
-   public boolean equals(Object var1) {
-      if (this != var1) {
-         if (var1 instanceof Point) {
-            Point var2 = (Point)var1;
-            if (this.x == var2.x && this.y == var2.y) {
-               return true;
+    public boolean equals(Object var1) {
+        if (this != var1) {
+            if (var1 instanceof Point) {
+                Point var2 = (Point) var1;
+                if (this.x == var2.x && this.y == var2.y) {
+                    return true;
+                }
             }
-         }
 
-         return false;
-      } else {
-         return true;
-      }
-   }
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
 ```
 通过数据类可以简化很多的通用操作，可以很方便地进行：格式化输出变量值、映射对象到变量、对比变量之间的相等性、复制变量等操作
@@ -1623,7 +1622,7 @@ fun main() {
 ```
 以上代码通过 IDEA 反编译后可以看到其内部的 Java 实现方式
 
-可以看到 Nested 其实就是一个静态类，因此 foo2() 不能访问外部类的非静态成员，也不用先声明 Outer 变量再指向 Nested 类，而是直接通过 Outer  类指向 Nested 类
+可以看到 Nested 其实就是一个静态类，因此 foo2() 不能访问外部类的非静态成员，也不用先声明 Outer 变量再指向 Nested 类，而是直接通过 Outer 类指向 Nested 类
 
 ```kotlin
 public final class Outer {
@@ -1777,12 +1776,12 @@ fun main() {
 ```
 使用 inline 修饰的类就称为内联类，内联类必须含有唯一的一个属性在主构造函数中初始化，在运行时将使用这个唯一属性来表示内联类的实例，从而避免了包装类在运行时的额外开销
 
-例如，通过查看字节码可以看到`sendEmail` 方法会被解释为一个以 long 类型作为入参类型的函数，并不包含任何对象
+例如，通过查看字节码可以看到 `sendEmail` 方法会被解释为一个以 long 类型作为入参类型的函数，并不包含任何对象
 
 ```java
-public static final void sendEmail_G1aXmDY/* $FF was: sendEmail-G1aXmDY*/(long delay) {
-  boolean var4 = false;
-  System.out.println(delay);
+public static final void sendEmail_G1aXmDY /* $FF was: sendEmail-G1aXmDY*/(long delay) {
+    boolean var4 = false;
+    System.out.println(delay);
 }
 ```
 # 十二、接口
@@ -1939,7 +1938,7 @@ fun main() {
 ```
 # 十四、继承
 
-在 kotlin 中所有类都有一个共同的超类 **Any** ，对于没有超类声明的类来说它就是默认超类。需要注意的是， Any  并不是  **java.lang.Object**  ，它除了  **equals()  、 hashCode()  与 toString()**  外没有其他属性或者函数
+在 kotlin 中所有类都有一个共同的超类 **Any** ，对于没有超类声明的类来说它就是默认超类。需要注意的是， Any 并不是 **java.lang.Object** ，它除了 **equals() 、 hashCode() 与 toString()** 外没有其他属性或者函数
 
 要声明一个显式的超类，需要把父类名放到类头的冒号之后
 
@@ -2029,7 +2028,7 @@ fun main() {
 ```
 此外，也可以用一个 var 属性覆盖一个 val 属性，但反之则不行。因为一个 val 属性本质上声明了一个 getter 方法，而将其覆盖为 var 只是在子类中额外声明一个 setter 方法
 
-可以在主构造函数中使用  override  关键字作为属性声明的一部分
+可以在主构造函数中使用 override 关键字作为属性声明的一部分
 
 ```kotlin
 open class Base {
@@ -2115,7 +2114,7 @@ fun main() {
 ```
 如果一个类从它的直接超类和实现的接口中继承了相同成员的多个实现， 则必须覆盖这个成员并提供其自己的实现来消除歧义
 
-为了表示采用从哪个超类型继承的实现，使用由尖括号中超类型名限定的 super 来指定，如  super< BaseClass >
+为了表示采用从哪个超类型继承的实现，使用由尖括号中超类型名限定的 super 来指定，如 super< BaseClass >
 
 ```kotlin
 open class BaseClass {
@@ -2183,10 +2182,9 @@ public class JavaMain {
         names.add("leavesczy");
         names.add("Ye");
     }
-
 }
 ```
-在 kotlin 中可以用以下四种方式来引用变量 names 
+在 kotlin 中可以用以下四种方式来引用变量 names
 
 ```kotlin
 val list1: List<String?> = JavaMain.names
@@ -2655,7 +2653,7 @@ fun main() {
     println(also) //leavesczy
 }
 ```
-## 5、let 
+## 5、let
 
 let 函数接收一个函数类型的参数，该参数又以接收者本身作为参数，最终返回函数的求值结果
 
@@ -2773,7 +2771,7 @@ fun main() {
 ```
 ### 5、foldRight
 
-与 fold  一样，但顺序是从最后一项到第一项
+与 fold 一样，但顺序是从最后一项到第一项
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9)
@@ -2852,7 +2850,7 @@ println(list.none { it > 10 }) //true
 ```
 ### 13、reduce
 
-与 fold  一样，但是没有一个初始值。通过一个函数从第一项到最后一项进行累计
+与 fold 一样，但是没有一个初始值。通过一个函数从第一项到最后一项进行累计
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9)
@@ -2868,7 +2866,7 @@ println(list.reduce { total, next ->
 ```
 ### 14、reduceRight
 
-与 reduce  一样，但是顺序是从最后一项到第一项
+与 reduce 一样，但是顺序是从最后一项到第一项
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9)
@@ -2986,23 +2984,23 @@ println(list.flatMap { listOf(it, it + 1) }) //[1, 2, 3, 4, 5, 6, -1, 0, 7, 8, 9
 ```
 ### 2、groupBy
 
-返回一个根据给定函数分组后的map 
+返回一个根据给定函数分组后的map
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, 2)
 println(list.groupBy { listOf(it) }) //{[1]=[1], [3]=[3], [5]=[5], [-1]=[-1], [7]=[7], [9]=[9], [2]=[2]}
 println(list.groupBy { listOf(it, it + 1) }) //{[1, 2]=[1], [3, 4]=[3], [5, 6]=[5], [-1, 0]=[-1], [7, 8]=[7], [9, 10]=[9], [2, 3]=[2]}
 ```
-### 3、map 
+### 3、map
 
-返回一个每一个元素根据给定的函数转换所组成的List。 
+返回一个每一个元素根据给定的函数转换所组成的List。
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, 2)
 println(list.map { listOf(it) }) //[[1], [3], [5], [-1], [7], [9], [2]]
 println(list.map { listOf(it, it + 1) }) //[[1, 2], [3, 4], [5, 6], [-1, 0], [7, 8], [9, 10], [2, 3]]
 ```
-### 4、mapIndexed 
+### 4、mapIndexed
 
 返回一个每一个元素根据给定的包含元素index的函数转换所组成的List
 
@@ -3011,7 +3009,7 @@ val list = listOf(1, 3, 5, -1, 7, 9, 2)
 println(list.mapIndexed { index, value -> index }) //[0, 1, 2, 3, 4, 5, 6]
 println(list.mapIndexed { index, value -> index * value }) //[0, 3, 10, -3, 28, 45, 12]
 ```
-### 5、mapNotNull 
+### 5、mapNotNull
 
 返回一个每一个非null元素根据给定的函数转换所组成的List
 
@@ -3019,9 +3017,9 @@ println(list.mapIndexed { index, value -> index * value }) //[0, 3, 10, -3, 28, 
 val list = listOf(1, 3, 5, -1, 7, 9, null, 2)
 println(list.mapNotNull { it }) //[1, 3, 5, -1, 7, 9, 2]
 ```
-## 4、元素操作符 
+## 4、元素操作符
 
-### 1、contains 
+### 1、contains
 
 如果指定元素可以在集合中找到，则返回true
 
@@ -3030,7 +3028,7 @@ val list = listOf(1, 3, 5, -1, 7, 9, null, 2)
 println(list.contains(3)) //true
 println(list.contains(13)) //false
 ```
-### 2、elementAt 
+### 2、elementAt
 
 返回给定index对应的元素，如果index数组越界则会抛出 IndexOutOfBoundsException
 
@@ -3039,7 +3037,7 @@ val list = listOf(1, 3, 5, -1, 7, 9, null, 2)
 println(list.elementAt(3)) //-1
 println(list.elementAt(6)) //null
 ```
-### 3、elementAtOrElse 
+### 3、elementAtOrElse
 
 返回给定index对应的元素，如果index数组越界则会根据给定函数返回默认值
 
@@ -3048,7 +3046,7 @@ val list = listOf(1, 3, 5, -1, 7, 9, null, 2)
 println(list.elementAtOrElse(3, { it * 2 }))  //-1
 println(list.elementAtOrElse(16, { it * 2 })) //32
 ```
-### 4、elementAtOrNull 
+### 4、elementAtOrNull
 
 返回给定index对应的元素，如果index数组越界则会返回null
 
@@ -3057,7 +3055,7 @@ val list = listOf(1, 3, 5, -1, 7, 9, null, 2)
 println(list.elementAtOrNull(3))  //-1
 println(list.elementAtOrNull(16)) //null
 ```
-### 5、first 
+### 5、first
 
 返回符合给定函数条件的第一个元素
 
@@ -3065,7 +3063,7 @@ println(list.elementAtOrNull(16)) //null
 val list = listOf(1, 3, 5, -1, 7, 9, 2)
 println(list.first { it % 3 == 0 })  //3
 ```
-### 6、firstOrNull 
+### 6、firstOrNull
 
 返回符合给定函数条件的第一个元素，如果没有符合则返回null
 
@@ -3074,7 +3072,7 @@ val list = listOf(1, 3, 5, -1, 7, 9, 2)
 println(list.firstOrNull { it % 3 == 0 })  //3
 println(list.firstOrNull { it % 8 == 0 })  //null
 ```
-### 7、indexOf 
+### 7、indexOf
 
 返回指定元素的第一个index，如果不存在，则返回 -1
 
@@ -3083,7 +3081,7 @@ val list = listOf(1, 3, 5, -1, 7, 9, 2)
 println(list.indexOf(5))  //2
 println(list.indexOf(12)) //-1
 ```
-### 8、indexOfFirst 
+### 8、indexOfFirst
 
 返回第一个符合给定函数条件的元素的index，如果没有符合则返回 -1
 
@@ -3092,7 +3090,7 @@ val list = listOf(1, 3, 5, 1, 7, 9, 2)
 println(list.indexOfFirst { it % 2 == 0 })   //6
 println(list.indexOfFirst { it % 12 == 0 })  //-1
 ```
-### 9、indexOfLast 
+### 9、indexOfLast
 
 返回最后一个符合给定函数条件的元素的index，如果没有符合则返回 -1
 
@@ -3101,7 +3099,7 @@ val list = listOf(1, 3, 5, 6, 7, 9, 2)
 println(list.indexOfLast { it % 2 == 0 })   //6
 println(list.indexOfLast { it % 12 == 0 })  //-1
 ```
-### 10、last 
+### 10、last
 
 返回符合给定函数条件的最后一个元素
 
@@ -3110,7 +3108,7 @@ val list = listOf(1, 3, 5, 6, 7, 9, 2)
 println(list.last { it % 2 == 0 })   //2
 println(list.last { it % 3 == 0 })   //9
 ```
-### 11、lastIndexOf 
+### 11、lastIndexOf
 
 返回指定元素的最后一个index，如果不存在，则返回 -1
 
@@ -3119,7 +3117,7 @@ val list = listOf(1, 3, 2, 6, 7, 9, 2)
 println(list.lastIndexOf(2))    //6
 println(list.lastIndexOf(12))   //-1
 ```
-### 12、lastOrNull 
+### 12、lastOrNull
 
 返回符合给定函数条件的最后一个元素，如果没有符合则返回null
 
@@ -3128,7 +3126,7 @@ val list = listOf(1, 3, 2, 6, 7, 9, 2)
 println(list.lastOrNull { it / 3 == 3 })    //9
 println(list.lastOrNull { it == 10 })       //null
 ```
-### 13、single 
+### 13、single
 
 返回符合给定函数的单个元素，如果没有符合或者超过一个，则抛出异常
 
@@ -3137,7 +3135,7 @@ val list = listOf(1, 9, 2, 6, 7, 9, 2)
 println(list.single { it % 7 == 0 })  //7
 println(list.single { it == 2 })      //IllegalArgumentException
 ```
-### 14、singleOrNull 
+### 14、singleOrNull
 
 返回符合给定函数的单个元素，如果没有符合或者超过一个，则返回null
 
@@ -3146,9 +3144,9 @@ val list = listOf(1, 9, 2, 6, 7, 9, 2)
 println(list.singleOrNull { it % 7 == 0 })  //7
 println(list.singleOrNull { it == 2 })      //null
 ```
-## 5、生产操作符 
+## 5、生产操作符
 
-### 1、partition 
+### 1、partition
 
 把一个给定的集合分割成两个，第一个集合是由原集合每一项元素匹配给定函数条 件返回 true 的元素组成，第二个集合是由原集合每一项元素匹配给定函数条件返回 false 的元素组成
 
@@ -3158,7 +3156,7 @@ val (list1, list2) = list.partition { it % 2 == 0 }
 println(list1)  //[2, 6, 2]
 println(list2)  //[1, 9, 7, 9]
 ```
-### 2、plus 
+### 2、plus
 
 返回一个包含原集合和给定集合中所有元素的集合，因为函数的名字原因，我们可以使用 + 操作符
 
@@ -3168,7 +3166,7 @@ val list2 = listOf(1, 2, 4, 6, 8, 10)
 println(list1.plus(list2)) //[1, 9, 2, 6, 7, 9, 2, 1, 2, 4, 6, 8, 10]
 println(list1 + list2)  //[1, 9, 2, 6, 7, 9, 2, 1, 2, 4, 6, 8, 10]
 ```
-### 3、zip 
+### 3、zip
 
 返回由 pair 组成的List，每个 pair 由两个集合中相同index的元素组成。这个返回的List的大小由最小的那个集合决定
 
@@ -3192,7 +3190,7 @@ class kotlin.Pair
 (7, 8)
 (9, 10)
 ```
-### 4、unzip 
+### 4、unzip
 
 从包含pair的List中生成包含List的Pair
 
@@ -3208,9 +3206,9 @@ class kotlin.Pair
 [leavesczy, leavesczy_2, leavesczy_3]
 [1, 2, 3]
 ```
-## 6、顺序操作符 
+## 6、顺序操作符
 
-### 1、reverse 
+### 1、reverse
 
 返回一个与指定list相反顺序的list
 
@@ -3219,7 +3217,7 @@ val list1 = listOf(Pair("leavesczy", 1), Pair("leavesczy_2", 2), Pair("leavesczy
 val list2 = list1.reversed()
 println(list2)      //[(leavesczy_3, 3), (leavesczy_2, 2), (leavesczy, 1)]
 ```
-### 2、sort 
+### 2、sort
 
 返回一个自然排序后的list
 
@@ -3232,16 +3230,16 @@ val list3 = listOf("a", "c", "ab", "b", "cdd", "cda")
 val list4 = list3.sorted()
 println(list4) //[a, ab, b, c, cda, cdd]
 ```
-### 3、sortBy 
+### 3、sortBy
 
-返回一个根据指定函数排序后的list 
+返回一个根据指定函数排序后的list
 
 ```kotlin
 val list1 = listOf(2, 4, 1, 9, 5, 10)
 val list2 = list1.sortedBy { it - 3 }
 println(list2) //[1, 2, 4, 5, 9, 10]
 ```
-### 4、sortDescending 
+### 4、sortDescending
 
 返回一个降序排序后的List
 
@@ -3250,7 +3248,7 @@ val list1 = listOf(2, 4, 1, 9, 5, 10)
 val list2 = list1.sortedDescending()
 println(list2) //[10, 9, 5, 4, 2, 1]
 ```
-### 5、sortDescendingBy 
+### 5、sortDescendingBy
 
 返回一个根据指定函数降序排序后的list
 
@@ -3282,7 +3280,7 @@ val status = if (index in 0..10) index else throw IllegalArgumentException("参�
 
 在 kotlin 中 ，try 关键字引入了一个表达式，从而可以把表达式的值赋给一个变量。如果一个 try 代码块执行正常，代码块中最后一个表达式就是结果，如果捕获到了一个异常，则相应 catch 代码块中最后一个表达式就是结果
 
-看以下例子，如果 try 表达式包裹的表达式会抛出异常，则返回值为 null ，否则为 true 
+看以下例子，如果 try 表达式包裹的表达式会抛出异常，则返回值为 null ，否则为 true
 
 ```kotlin
 fun main() {
@@ -3373,7 +3371,7 @@ kotlin 允许为类型提供预定义的操作符实现，这些操作符具有�
 ```kotlin
 operator fun equals(other: Any?): Boolean
 ```
-操作符 ===  和 !==  用来做身份检查（它们分别是 Java 中的 ==  和 !=  ），并且它们不能被重载
+操作符 === 和 !== 用来做身份检查（它们分别是 Java 中的 == 和 != ），并且它们不能被重载
 
 ## 5、比较操作符
 
@@ -3384,7 +3382,7 @@ operator fun equals(other: Any?): Boolean
 | a >= b | a.compareTo(b) >= 0 |
 | a <= b | a.compareTo(b) <= 0 |
 
-所有的比较都转换为对  compareTo  的调用，这个函数需要返回  Int  值
+所有的比较都转换为对 compareTo 的调用，这个函数需要返回 Int 值
 
 ## 6、函数调用
 
@@ -3790,7 +3788,7 @@ fun main() {
     printer.print() //DefaultPrinter print
 }
 ```
-CustomPrinter 的 by 子句表示将会在 CustomPrinter 中存储 printer 变量，并且编译器将为 CustomPrinter 隐式生成 Printer 接口的所有抽象方法，并将这些方法的调用操作转发给 printer 
+CustomPrinter 的 by 子句表示将会在 CustomPrinter 中存储 printer 变量，并且编译器将为 CustomPrinter 隐式生成 Printer 接口的所有抽象方法，并将这些方法的调用操作转发给 printer
 
 此外，CustomPrinter 也可以决定自己实现部分方法或全部自己实现，但重写的成员不会在委托对象的成员中调用 ，委托对象的成员只能访问其自身对接口成员实现
 
@@ -3849,7 +3847,7 @@ class Delegate {
     //第一个参数表示被委托的对象、第二个参数表示被委托对象自身的描述
     operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
     }
-	//第一个参数表示被委托的对象、第二个参数表示被委托对象自身的描述，第三个参数是将要赋予的值
+    //第一个参数表示被委托的对象、第二个参数表示被委托对象自身的描述，第三个参数是将要赋予的值
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
     }
 }
@@ -3920,7 +3918,7 @@ fun main() {
     println(example.lazyValue2) //lazyValue2 computed! leavesczy
 }
 ```
-默认情况下，对于 lazy 属性的求值是带同步锁的（synchronized），即带有 **LazyThreadSafetyMode.SYNCHRONIZED** 参数，此时该值只允许同一时刻只能有一个线程对其进行初始化，并且所有线程会看到相同的初始化值。如果初始化委托的同步锁不是必需的，即如果允许多个线程同时执行，那么可以将  **LazyThreadSafetyMode.PUBLICATION**  作为参数传递给 **lazy()** 函数。 而如果你确定初始化将总是发生在单个线程，那么可以使用 **LazyThreadSafetyMode.NONE** 模式， 此时不会有任何线程安全的保证以及相关的资源开销
+默认情况下，对于 lazy 属性的求值是带同步锁的（synchronized），即带有 **LazyThreadSafetyMode.SYNCHRONIZED** 参数，此时该值只允许同一时刻只能有一个线程对其进行初始化，并且所有线程会看到相同的初始化值。如果初始化委托的同步锁不是必需的，即如果允许多个线程同时执行，那么可以将 **LazyThreadSafetyMode.PUBLICATION** 作为参数传递给 **lazy()** 函数。 而如果你确定初始化将总是发生在单个线程，那么可以使用 **LazyThreadSafetyMode.NONE** 模式， 此时不会有任何线程安全的保证以及相关的资源开销
 
 ## 4、可观察属性
 
@@ -4025,10 +4023,10 @@ annotation class AnnotationName()
 ```
 注解的附加属性可以通过用元注解标注注解类来指定：
 
-- @Target            指定该注解标注的允许范围（类、函数、属性等）
-- @Retention         指定该注解是否要存储在编译后的 class 文件中，如果要保存，则在运行时可以通过反射来获取到该注解值
-- @Repeatable        标明允许在单个元素上多次使用相同的该注解
-- @MustBeDocumented  指定该注解是公有 API 的一部分，并且应该包含在生成的 API 文档中显示的类或方法的签名中
+- @Target 指定该注解标注的允许范围（类、函数、属性等）
+- @Retention 指定该注解是否要存储在编译后的 class 文件中，如果要保存，则在运行时可以通过反射来获取到该注解值
+- @Repeatable 标明允许在单个元素上多次使用相同的该注解
+- @MustBeDocumented 指定该注解是公有 API 的一部分，并且应该包含在生成的 API 文档中显示的类或方法的签名中
 
 ```kotlin
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.FIELD)

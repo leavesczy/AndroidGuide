@@ -1,4 +1,4 @@
-> 目前，多线程编程可以说是在大部分平台和应用上都需要实现的一个基本需求。本系列文章就来对 **Java 平台下的多线程编程知识** 进行讲解，从 **概念入门**、**底层实现** 到 **上层应用** 都会涉及到，预计一共会有五篇文章，希望对你有所帮助 😎😎😎
+> 目前，多线程编程可以说是在大部分平台和应用上都需要实现的一个基本需求。本系列文章就来对 **Java 平台下的多线程编程知识** 进行讲解，从 **概念入门**、**底层实现** 到 **上层应用** 都会涉及到，预计一共会有五篇文章，希望对你有所帮助
 >
 > 本篇文章是第一篇，先来介绍下 Java 多线程的基础概念以及需要面对的挑战，是后续文章的敲门砖
 
@@ -116,7 +116,7 @@ Java 线程的优先级属性本质上只是一个给线程调度器的提示信
 
 5. 限期等待状态-TIMED_WAITING
 
-   TIMED_WAITING 状态和 WAITING 状态类似。区别在于 TIMED_WAITING 状态并非是线程本身完全无限制地进行等待，其等待行为带有指定时间范围的限制，当在指定时间内没有完成该线程所期望的特定操作时，该线程就会转为 RUNNABLE 状态。可以通过  `Object.wait(long)` 方法来使线程切换为 TIMED_WAITING 状态
+   TIMED_WAITING 状态和 WAITING 状态类似。区别在于 TIMED_WAITING 状态并非是线程本身完全无限制地进行等待，其等待行为带有指定时间范围的限制，当在指定时间内没有完成该线程所期望的特定操作时，该线程就会转为 RUNNABLE 状态。可以通过 `Object.wait(long)` 方法来使线程切换为 TIMED_WAITING 状态
 
 6. 终止状态-TERMINATED
 
@@ -128,15 +128,19 @@ Java 线程的优先级属性本质上只是一个给线程调度器的提示信
 
 ## 4、ThreadGroup
 
-线程组（ThreadGroup）用来表示一组相关联的线程，它是 Thread 类包含的一个内部属性，可以通过 `Thread.getThreadGroup()`来获取该值。线程与线程组之间的关系类似于文件系统中文件与文件夹之间的关系，一个线程组可以包含多个线程以及其它线程组
+线程组（ThreadGroup）用来表示一组相关联的线程，它是 Thread 类包含的一个内部属性，可以通过 `Thread.getThreadGroup()` 来获取该值。线程与线程组之间的关系类似于文件系统中文件与文件夹之间的关系，一个线程组可以包含多个线程以及其它线程组
 
 如果在创建线程时没有显示指定线程所属的线程组的话，在默认情况下线程就被归类于其父线程所属的线程组下。从 Thread 类的以下方法就可以看出来：
 
 ```java
-private void init(ThreadGroup g, Runnable target, String name,
-                  long stackSize, AccessControlContext acc,
-                  boolean inheritThreadLocals) {
-    ····
+private void init(
+        ThreadGroup g,
+        Runnable target,
+        String name,
+        long stackSize,
+        AccessControlContext acc,
+        boolean inheritThreadLocals) {
+    ···
 
     Thread parent = currentThread();
     SecurityManager security = System.getSecurityManager();
@@ -144,19 +148,19 @@ private void init(ThreadGroup g, Runnable target, String name,
         /* Determine if it's an applet or not */
 
         /* If there is a security manager, ask the security manager
-           what to do. */
+        what to do. */
         if (security != null) {
-            //默认也是返回 Thread.currentThread().getThreadGroup()
+            // 默认也是返回 Thread.currentThread().getThreadGroup()
             g = security.getThreadGroup();
         }
 
         /* If the security doesn't have a strong opinion of the matter
-           use the parent thread group. */
+        use the parent thread group. */
         if (g == null) {
             g = parent.getThreadGroup();
         }
     }
-    ····
+    ···
 
 }
 ```
@@ -233,10 +237,8 @@ public class Thread implements Runnable {
     }
 
     public UncaughtExceptionHandler getUncaughtExceptionHandler() {
-        return uncaughtExceptionHandler != null ?
-            uncaughtExceptionHandler : group;
+        return uncaughtExceptionHandler != null ? uncaughtExceptionHandler : group;
     }
-    
 }
 ```
 ThreadGroup 默认情况下会将异常交由其父线程组进行处理，而对于不包含父线程组的线程组对象（顶层线程组），则会将异常交由 Thread 类的 `defaultUncaughtExceptionHandler` 进行处理。所以，我们可以通过 Thread 的静态方法 `setDefaultUncaughtExceptionHandler` 方法来为程序设置一个全局的默认异常处理器
@@ -246,44 +248,38 @@ public class ThreadGroup implements Thread.UncaughtExceptionHandler {
 
     public void uncaughtException(Thread t, Throwable e) {
         if (parent != null) {
-            //当有父线程组时，则将异常交由父线程组来处理
+            // 当有父线程组时，则将异常交由父线程组来处理
             parent.uncaughtException(t, e);
         } else {
-            //当父线程组不存在时，则尝试将异常交由 DefaultUncaughtExceptionHandler 来处理
-            Thread.UncaughtExceptionHandler ueh =
-                Thread.getDefaultUncaughtExceptionHandler();
+            // 当父线程组不存在时，则尝试将异常交由 DefaultUncaughtExceptionHandler 来处理
+            Thread.UncaughtExceptionHandler ueh = Thread.getDefaultUncaughtExceptionHandler();
             if (ueh != null) {
                 ueh.uncaughtException(t, e);
             } else if (!(e instanceof ThreadDeath)) {
-                System.err.print("Exception in thread \""
-                                 + t.getName() + "\" ");
+                System.err.print("Exception in thread \"" + t.getName() + "\" ");
                 e.printStackTrace(System.err);
             }
         }
     }
-    
 }
 
 public class Thread implements Runnable {
 
     private static volatile UncaughtExceptionHandler defaultUncaughtExceptionHandler;
-    
-    public static UncaughtExceptionHandler getDefaultUncaughtExceptionHandler(){
+
+    public static UncaughtExceptionHandler getDefaultUncaughtExceptionHandler() {
         return defaultUncaughtExceptionHandler;
     }
-    
-    //设置全局默认的异常处理器
+
+    // 设置全局默认的异常处理器
     public static void setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler eh) {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            sm.checkPermission(
-                new RuntimePermission("setDefaultUncaughtExceptionHandler")
-                    );
+            sm.checkPermission(new RuntimePermission("setDefaultUncaughtExceptionHandler"));
         }
 
-         defaultUncaughtExceptionHandler = eh;
-     }
-    
+        defaultUncaughtExceptionHandler = eh;
+    }
 }
 ```
 所以，当线程由于异常而终止时，UncaughtExceptionHandler 实例的选择优先级从高到低分别是：
@@ -300,7 +296,6 @@ public class Thread implements Runnable {
 public interface ThreadFactory {
 
     Thread newThread(Runnable r);
-    
 }
 ```
 ThreadFactory 提供了将要执行的任务 Runnable 与要创建的 Thread 相关联的方法，即我们可以通过 ThreadFactory 来标明 Thread 要执行的具体任务、为 Thread 设置一个有具体含义的名字、设置 Thread 的运行优先级等
@@ -316,21 +311,14 @@ static class DefaultThreadFactory implements ThreadFactory {
 
     DefaultThreadFactory() {
         SecurityManager s = System.getSecurityManager();
-        group = (s != null) ? s.getThreadGroup() :
-                              Thread.currentThread().getThreadGroup();
-        namePrefix = "pool-" +
-                      poolNumber.getAndIncrement() +
-                     "-thread-";
+        group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+        namePrefix = "pool-" + poolNumber.getAndIncrement() + "-thread-";
     }
 
     public Thread newThread(Runnable r) {
-        Thread t = new Thread(group, r,
-                              namePrefix + threadNumber.getAndIncrement(),
-                              0);
-        if (t.isDaemon())
-            t.setDaemon(false);
-        if (t.getPriority() != Thread.NORM_PRIORITY)
-            t.setPriority(Thread.NORM_PRIORITY);
+        Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
+        if (t.isDaemon()) t.setDaemon(false);
+        if (t.getPriority() != Thread.NORM_PRIORITY) t.setPriority(Thread.NORM_PRIORITY);
         return t;
     }
 }
@@ -399,7 +387,7 @@ load(shop.goodsCount , r1) //指令1，将变量 shop.goodsCount 的值从内存
 increment(r1) //指令2，将寄存器 r1 的值加1
 store(shop.goodsCount , r1) //指令3，将寄存器 r1 的内容写入变量 shop.goodsCount 所对应的内存空间
 ```
-多个 Producer 线程可能会同时各自执行上述指令。例如，假设当前 goodsCount 是十，Producer1 和 Producer2 同时执行到指令1，两个线程将 goodsCount 读到各自处理器的寄存器上，即每个线程会各自拥有一份副本数据，然后对各自寄存器的值进行自增加一的操作，当执行到指令三时，由于 goodsCount  所在的内存空间是特定的，所以两个 Producer 线程对内存空间上 goodsCount 的值的回传会存在相互覆盖的情况。即原本最终结果应该是**递增加二**的行为最终却只有**递增加一**
+多个 Producer 线程可能会同时各自执行上述指令。例如，假设当前 goodsCount 是十，Producer1 和 Producer2 同时执行到指令1，两个线程将 goodsCount 读到各自处理器的寄存器上，即每个线程会各自拥有一份副本数据，然后对各自寄存器的值进行自增加一的操作，当执行到指令三时，由于 goodsCount 所在的内存空间是特定的，所以两个 Producer 线程对内存空间上 goodsCount 的值的回传会存在相互覆盖的情况。即原本最终结果应该是**递增加二**的行为最终却只有**递增加一**
 
 以上是多线程编程中经常会遇到的一个现象，即竞态。竞态是指计算的正确性依赖于相对时间顺序或者线程的交错。竞态并不一定就会导致计算结果不正确，它只是不排除计算结果时而正确时而错误的可能
 
@@ -462,8 +450,8 @@ class Shop(var goodsCount: Int, var clerk: Int) {
 
 总的来说，Java 中有两种方式来提供原子性：
 
--  第一种是使用锁（Lock）。锁具有排他性，它能够保障共享变量在任意一个时刻只能够被一个线程访问。这就排除了多个线程在同一时刻访问同一个共享变量而导致干扰与冲突的可能，从而消除了竞态
--  第二种是利用处理器提供的 CAS 指令。CAS 指令实现原子性的方式与锁在本质上是相同的，差别在于锁通常是在软件这一层面实现的，而 CAS 是直接在硬件（处理器和内存）这一层次实现的，可以被看做“硬件锁”
+- 第一种是使用锁（Lock）。锁具有排他性，它能够保障共享变量在任意一个时刻只能够被一个线程访问。这就排除了多个线程在同一时刻访问同一个共享变量而导致干扰与冲突的可能，从而消除了竞态
+- 第二种是利用处理器提供的 CAS 指令。CAS 指令实现原子性的方式与锁在本质上是相同的，差别在于锁通常是在软件这一层面实现的，而 CAS 是直接在硬件（处理器和内存）这一层次实现的，可以被看做“硬件锁”
 
 Java 语言规范规定了：**在 Java 语言中，64 位以外的任何类型的变量的读写操作都是原子操作**。而对于 long 和 double 等 64 位的数据类型的读写操作并不强制规定 Java 虚拟机必须保证其原子性，可以由 Java 虚拟机自己选择是否要实现。因此在多线程并发读写同一 long/double 型共享变量的情况下，一个线程可能会读取到其它线程更新该变量的“中间结果”。而之所以会有中间结果，是因为对于 64 位的存储空间的写操作，虚拟机可能会将其拆解为两个步骤来实现，比如先写低 32 位再写高 32 位，从而导致外部线程读取到一个中间结果值。但这个问题也不需要特意关注，因为目前商用 Java 虚拟机几乎都选择将 64 位数据的读写操作实现为原子操作。此外，Java 语言规范也特别规定了用 volatile 关键字修饰的 long/double 型变量的读写操作具有原子性。
 
@@ -495,7 +483,7 @@ Java 语言规范规定了：**在 Java 语言中，64 位以外的任何类型�
 
 ## 3、不安全的线程安全类
 
-上文有提到如何定义一个类是否是线程安全的，Java 也提供了很多被称为线程安全的类，例如 `java.util.Vector。`Vector 类内部的 `add()`、`removeAt()` 和 `size()` 等很多方法都使用了 synchronize 进行修饰，保证了在多线程环境下的安全性，但这种同步保障也无法阻止开发者在逻辑层面上写出不安全的代码
+上文有提到如何定义一个类是否是线程安全的，Java 也提供了很多被称为线程安全的类，例如 `java.util.Vector。` Vector 类内部的 `add()`、`removeAt()` 和 `size()` 等很多方法都使用了 synchronize 进行修饰，保证了在多线程环境下的安全性，但这种同步保障也无法阻止开发者在逻辑层面上写出不安全的代码
 
 例如，对于以下代码。即使 `add()` 和 `removeAt()` 两个方法由于 Vector 类内部的同步处理，保障了两个方法一定是串行执行的，但由于方法调用端缺少了额外的同步处理，导致调用端可能会读取到一个过时的 `vector.size` 值，最终导致索引越界抛出 **ArrayIndexOutOfBoundsException**
 

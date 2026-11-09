@@ -9,7 +9,7 @@
 
 我们项目中使用的 ImageView 的类型又可以分为两种：
 
-- 系统内置的`android.widget.ImageView`。一般是在 XML 文件中通过 `<ImageView/>` 标签来进行使用
+- 系统内置的 `android.widget.ImageView`。一般是在 XML 文件中通过 `<ImageView/>` 标签来进行使用
 - 开发者自定义的 ImageView 子类。一般也是在 XML 文件使用
 
 因此，基本的实现思路就是：通过定义一个统一的 ImageView 供项目全局使用，用于替代系统内置的 ImageView 和各个自定义子类的直接父类，当 `setImageDrawable` 和 `setImageBitmap` 两个方法被调用时，就对 Drawable 的尺寸和大小进行检测，当检测到属于大图时就按照实际的业务情况进行数据上报

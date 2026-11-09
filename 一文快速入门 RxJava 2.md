@@ -11,23 +11,26 @@ RxJava 有以下三个最基本的元素：
 创建被观察者
 
 ```java
-		Observable<Integer> observable = Observable.create(new ObservableOnSubscribe<Integer>() {
-            @Override
-            public void subscribe(ObservableEmitter<Integer> e) {
-                Log.e(TAG, "subscribe");
-                Log.e(TAG, "currentThread name: " + Thread.currentThread().getName());
-                e.onNext(1);
-                e.onNext(2);
-                e.onNext(3);
-                e.onComplete();
-            }
-        });
+Observable<Integer> observable =
+        Observable.create(
+                new ObservableOnSubscribe<Integer>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<Integer> e) {
+                        Log.e(TAG, "subscribe");
+                        Log.e(TAG, "currentThread name: " + Thread.currentThread().getName());
+                        e.onNext(1);
+                        e.onNext(2);
+                        e.onNext(3);
+                        e.onComplete();
+                    }
+                });
 ```
 
 创建观察者
 
 ```java
-		Observer<Integer> observer = new Observer<Integer>() {
+Observer<Integer> observer =
+        new Observer<Integer>() {
             @Override
             public void onSubscribe(Disposable d) {
                 Log.e(TAG, "onSubscribe");
@@ -53,13 +56,13 @@ RxJava 有以下三个最基本的元素：
 完成观察者与被观察者之间的订阅关系
 
 ```java
-	 observable.subscribe(observer);
+     observable.subscribe(observer);
 ```
 
 也可以以链式调用的方式来完成订阅
 
 ```java
-		Observable.create(new ObservableOnSubscribe<Integer>() {
+        Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
             public void subscribe(ObservableEmitter<Integer> e) {
                 Log.e(TAG, "subscribe");
@@ -118,28 +121,30 @@ RxJava 有以下三个最基本的元素：
 
 ## 1、create()
 
-用于创建一个 `Observable`。一个正确的 `Observable` 必须尝试调用观察者的 `onCompleted` 方法或者 `onError` 方法**有且仅有一次**，而且此后不能再调用`Observable` 的任何其它方法
+用于创建一个 `Observable`。一个正确的 `Observable` 必须尝试调用观察者的 `onCompleted` 方法或者 `onError` 方法**有且仅有一次**，而且此后不能再调用 `Observable` 的任何其它方法
 
 ```java
-		Observable<Integer> observable = Observable.create(new ObservableOnSubscribe<Integer>() {
-            @Override
-            public void subscribe(ObservableEmitter<Integer> e) {
-                Log.e(TAG, "subscribe");
-                Log.e(TAG, "currentThread name: " + Thread.currentThread().getName());
-                e.onNext(1);
-                e.onNext(2);
-                e.onNext(3);
-                e.onComplete();
-            }
-        });
+Observable<Integer> observable =
+        Observable.create(
+                new ObservableOnSubscribe<Integer>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<Integer> e) {
+                        Log.e(TAG, "subscribe");
+                        Log.e(TAG, "currentThread name: " + Thread.currentThread().getName());
+                        e.onNext(1);
+                        e.onNext(2);
+                        e.onNext(3);
+                        e.onComplete();
+                    }
+                });
 ```
 
 ## 2、just()
 
-创建一个 `Observable`并发送事件，发送的事件总数不可以超出十个
+创建一个 `Observable` 并发送事件，发送的事件总数不可以超出十个
 
 ```java
-		Observable.just(1, 2, 3).subscribe(new Observer<Integer>() {
+        Observable.just(1, 2, 3).subscribe(new Observer<Integer>() {
             @Override
             public void onSubscribe(Disposable d) {
                 Log.e(TAG, "onSubscribe");
@@ -170,12 +175,12 @@ RxJava 有以下三个最基本的元素：
     onComplete
 ```
 
-## 3、fromArray 
+## 3、fromArray
 
 和 `just()` 类似，但 `fromArray` 可以传入多于十个的变量，并且可以传入一个数组
 
 ```java
-	    Integer[] arrays = new Integer[]{1, 2, 3};
+        Integer[] arrays = new Integer[]{1, 2, 3};
         Observable.fromArray(arrays).subscribe(new Observer<Integer>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -217,7 +222,7 @@ RxJava 有以下三个最基本的元素：
 这里的 `Future` 是指 `java.util.concurrent` 中的 `Future`，`Future` 的作用是增加了 `cancel()` 等方法操作 `Callable`，它可以通过 `get()` 方法来获取 `Callable` 返回的值
 
 ```java
-		final FutureTask<Integer> futureTask = new FutureTask<>(new Callable<Integer>() {
+        final FutureTask<Integer> futureTask = new FutureTask<>(new Callable<Integer>() {
             @Override
             public Integer call() {
                 return 12;
@@ -241,7 +246,7 @@ RxJava 有以下三个最基本的元素：
 用于发送一个 `List` 集合数据给观察者
 
 ```java
-	    List<Integer> integerList = new ArrayList<>();
+        List<Integer> integerList = new ArrayList<>();
         integerList.add(1);
         integerList.add(2);
         integerList.add(3);
@@ -261,7 +266,7 @@ RxJava 有以下三个最基本的元素：
     //全局变量
     private Integer value = 100;
 
-	Observable<Integer> observable = Observable.defer(new Callable<ObservableSource<? extends Integer>>() {
+    Observable<Integer> observable = Observable.defer(new Callable<ObservableSource<? extends Integer>>() {
             @Override
             public ObservableSource<? extends Integer> call() {
                 return Observable.just(value);
@@ -309,7 +314,7 @@ RxJava 有以下三个最基本的元素：
 每隔一段时间就发送一个事件，传递的值从 0 开始并不断增 1
 
 ```java
-	Observable.interval(2, TimeUnit.SECONDS)
+    Observable.interval(2, TimeUnit.SECONDS)
         .subscribe(new Consumer<Long>() {
             @Override
             public void accept(Long aLong) {
@@ -323,7 +328,7 @@ RxJava 有以下三个最基本的元素：
 可以指定发送事件的开始值和数量，其他与 `interval()` 的功能一样
 
 ```java
-			Observable.intervalRange(2, 3, 4, 5, TimeUnit.SECONDS)
+            Observable.intervalRange(2, 3, 4, 5, TimeUnit.SECONDS)
                 .subscribe(new Observer<Long>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -362,7 +367,7 @@ RxJava 有以下三个最基本的元素：
 发送指定范围的事件序列
 
 ```java
-			Observable.range(2, 5)
+            Observable.range(2, 5)
                 .subscribe(new Consumer<Integer>() {
                     @Override
                     public void accept(Integer integer) {
@@ -384,7 +389,7 @@ RxJava 有以下三个最基本的元素：
 作用与 `range()` 一样，只是数据类型是 `Long`
 
 ```java
-       		 Observable.rangeLong((2, 5)
+             Observable.rangeLong((2, 5)
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) {
@@ -398,7 +403,7 @@ RxJava 有以下三个最基本的元素：
 `empty()` 直接发送 `onComplete()` 事件
 
 ```java
-		Observable.empty().subscribe(new Observer<Object>() {
+        Observable.empty().subscribe(new Observer<Object>() {
             @Override
             public void onSubscribe(Disposable d) {
                 Log.e(TAG, "onSubscribe");
@@ -461,7 +466,7 @@ Observable.error(new Throwable("Hello")).subscribe(new Observer<Object>() {
 ```
 
 ```java
-	onSubscribe
+    onSubscribe
     onError: Hello
 ```
 
@@ -472,7 +477,7 @@ Observable.error(new Throwable("Hello")).subscribe(new Observer<Object>() {
 `map()` 用于将被观察者发送的数据类型转变成其他的类型
 
 ```java
-	Observable.just(1, 2, 3)
+    Observable.just(1, 2, 3)
         .map(new Function<Integer, String>() {
             @Override
             public String apply(Integer integer) {
@@ -536,7 +541,7 @@ Observable.error(new Throwable("Hello")).subscribe(new Observer<Object>() {
 
 `concatMap()` 和 `flatMap()` 基本一样，只不过 `concatMap()` 转发出来的事件是有序的，而 `flatMap()` 是无序的
 
-还是用 `flatMap()`的例子来看
+还是用 `flatMap()` 的例子来看
 
 ```java
 Observable.fromIterable(listArrayList).flatMap(new Function<List<String>, ObservableSource<String>>() {
@@ -568,10 +573,10 @@ Observable.fromIterable(listArrayList).flatMap(new Function<List<String>, Observ
 
 ## 4、buffer()
 
-从需要发送的事件当中获取指定数量的事件，并将这些事件放到缓冲区当中一并发出。`buffer` 有两个参数，参数一`count`用于指点缓冲区大小，参数二 `skip`用指定当缓冲区满了时，发送下一次事件序列的时候要跳过多少元素
+从需要发送的事件当中获取指定数量的事件，并将这些事件放到缓冲区当中一并发出。`buffer` 有两个参数，参数一 `count` 用于指点缓冲区大小，参数二 `skip` 用指定当缓冲区满了时，发送下一次事件序列的时候要跳过多少元素
 
 ```java
-			Observable.just(1, 2, 3, 4, 5, 6)
+            Observable.just(1, 2, 3, 4, 5, 6)
                 .buffer(2, 2)
                 .subscribe(new Observer<List<Integer>>() {
                     @Override
@@ -618,7 +623,7 @@ Observable.fromIterable(listArrayList).flatMap(new Function<List<String>, Observ
 用于将数据进行分组，每个分组都会返回一个被观察者。`groupBy()` 方法的返回值用于指定分组名，每返回一个新值就代表会创建一个分组
 
 ```java
- 			Observable.just(1, 2, 3, 4, 5, 6, 7)
+            Observable.just(1, 2, 3, 4, 5, 6, 7)
                 .groupBy(new Function<Integer, String>() {
                     @Override
                     public String apply(Integer integer) {
@@ -700,7 +705,7 @@ Observable.fromIterable(listArrayList).flatMap(new Function<List<String>, Observ
 `scan()` 操作符对原始 `Observable` 发射的第一条数据应用一个函数，然后将那个函数的结果作为自己的第一项数据发射。它将函数的结果同第二项数据一起填充给这个函数来产生它自己的第二项数据。它持续进行这个过程来产生剩余的数据序列
 
 ```java
-		Observable.just(1, 5, 8, 12).scan(new BiFunction<Integer, Integer, Integer>() {
+        Observable.just(1, 5, 8, 12).scan(new BiFunction<Integer, Integer, Integer>() {
             @Override
             public Integer apply(Integer integer, Integer integer2) {
                 Log.e(TAG, "integer : " + integer);
@@ -735,7 +740,7 @@ Observable.fromIterable(listArrayList).flatMap(new Function<List<String>, Observ
 用于将多个观察者组合在一起，然后按照参数的传入顺序发送事件，`concat()` 最多只可以发送4个事件
 
 ```java
-		Observable.concat(Observable.just(1, 2),
+        Observable.concat(Observable.just(1, 2),
                 Observable.just(3, 4),
                 Observable.just(5, 6),
                 Observable.just(7, 8)).subscribe(new Consumer<Integer>() {
@@ -764,7 +769,7 @@ accept: 8
 这个方法与 `concat()` 作用基本一样，只是 `concat()` 是串行发送事件，而 `merge()` 并行发送事件
 
 ```java
-	Observable.merge(Observable.interval(1, TimeUnit.SECONDS).map(new Function<Long, String>() {
+    Observable.merge(Observable.interval(1, TimeUnit.SECONDS).map(new Function<Long, String>() {
                     @Override
                     public String apply(Long aLong) {
                         return "Test_A_" + aLong;
@@ -800,9 +805,9 @@ Test_B_5
 
 `mergeArray()` 可以发送 4 个以上的被观察者
 
-## 3、concatArrayDelayError()  &  mergeArrayDelayError()
+## 3、concatArrayDelayError() & mergeArrayDelayError()
 
-在 `concatArray()` 和 `mergeArray()` 两个方法当中，如果其中有一个被观察者发送了一个 `Error` 事件，那么就会停止发送事件，如果想 `onError()` 事件延迟到所有被观察者都发送完事件后再执行的话，可以使用  `concatArrayDelayError()` 和 `mergeArrayDelayError()`
+在 `concatArray()` 和 `mergeArray()` 两个方法当中，如果其中有一个被观察者发送了一个 `Error` 事件，那么就会停止发送事件，如果想 `onError()` 事件延迟到所有被观察者都发送完事件后再执行的话，可以使用 `concatArrayDelayError()` 和 `mergeArrayDelayError()`
 
 首先使用 `concatArray()` 来验证其发送 `onError()` 事件是否会中断其他被观察者的发送事件
 
@@ -861,7 +866,7 @@ onError: Normal Exception
 `zip()` 操作符返回一个 `Obversable`，它使用这个函数按顺序结合两个或多个 Observables 发射的数据项，然后它发射这个函数返回的结果。它按照严格的顺序应用这个函数。它只发射与发射数据项最少的那个 Observable 一样多的数据
 
 ```java
-		Observable.zip(Observable.just(1, 2, 3, 4), Observable.just(5, 6, 7, 8, 9),
+        Observable.zip(Observable.just(1, 2, 3, 4), Observable.just(5, 6, 7, 8, 9),
                 new BiFunction<Integer, Integer, String>() {
                     @Override
                     public String apply(Integer integer, Integer integer2) throws Exception {
@@ -998,7 +1003,7 @@ Observable.just(1, 2, 3, 4)
 accept : [1, 2, 3, 4]
 ```
 
-## 8、startWith()  &  startWithArray()
+## 8、startWith() & startWithArray()
 
 在发送事件之前追加事件，`startWith()` 追加一个事件，`startWithArray()` 可以追加多个事件，追加的事件会先发出
 
@@ -1962,7 +1967,7 @@ Observable.create(new ObservableOnSubscribe<Integer>() {
 
 ## 10、elementAt() & elementAtOrError()
 
-`elementAt()` 可以指定取出事件序列中事件，但是输入的 `index` 超出事件序列的总数的话就不会触发任何调用，想触发异常信息的话就用 `elementAtOrError()` 
+`elementAt()` 可以指定取出事件序列中事件，但是输入的 `index` 超出事件序列的总数的话就不会触发任何调用，想触发异常信息的话就用 `elementAtOrError()`
 
 ```java
         Observable.just(1, 2, 3, 4, 5).elementAt(5).subscribe(new Consumer<Integer>() {
@@ -2054,7 +2059,7 @@ Observable.just(1, 2, 3, 4, 5, 1, 2).takeWhile(new Predicate<Integer>() {
 订阅原始的 `Observable`，但是忽略它的发射物，直到指定的某个条件变为 false 时才开始发射原始 Observable
 
 ```java
-			Observable.just(1, 2, 4, 1, 3, 4, 5, 1, 5)
+            Observable.just(1, 2, 4, 1, 3, 4, 5, 1, 5)
                 .skipWhile(new Predicate<Integer>() {
                     @Override
                     public boolean test(Integer integer) throws Exception {
@@ -2245,4 +2250,3 @@ Observable.intervalRange(1, 6, 0, 1, TimeUnit.SECONDS)
 ```java
 10-06 08:40:04.754 15945-15945/leavesc.hello.rxjavademo E/MainActivity: accept: 100
 ```
-

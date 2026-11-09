@@ -72,7 +72,7 @@ object DeviceUtils {
 
 以上两个隐私行为在字节码层面上属于不同的字节码指令：
 
-- MethodInsnNode。属于调用方法的指令，对应 `TelephonyManager.getDeviceId()` 
+- MethodInsnNode。属于调用方法的指令，对应 `TelephonyManager.getDeviceId()`
 - FieldInsnNode。属于调用成员变量的指令，对应 `Build.BRAND`
 
 静态扫描要做的，就是在编译阶段遍历所有的 Class 文件，只要判断到文件中包含这两个字节码指令，就将 **隐私操作所在的类路径、调用者的方法签名信息、隐私操作的签名信息** 记录到文本中
@@ -221,7 +221,7 @@ class PrivacySentryTransform : BaseTransform() {
 
 动态记录要做的是：在应用运行时记录每次触发隐私行为的时间点和调用链信息，根据触发时间来判断该隐私行为是否过量执行，根据调用链信息来辅助判断具体是哪一块业务需要来获取隐私数据。这就要求我们除了要读取 Class 文件外，还要对其进行修改，插入一些日志信息和逻辑代码
 
-以 `getBrand()` 方法为例，动态记录要做到的就是：在方法被调用时，自动生成日志信息并将日志写入到应用内部的某个文件中，日志中要包含调用的时间点、 `Build.BRAND`的签名信息、`getBrand()` 方法的调用链
+以 `getBrand()` 方法为例，动态记录要做到的就是：在方法被调用时，自动生成日志信息并将日志写入到应用内部的某个文件中，日志中要包含调用的时间点、 `Build.BRAND` 的签名信息、`getBrand()` 方法的调用链
 
 ```kotlin
 object DeviceUtils {
@@ -249,7 +249,7 @@ object DeviceUtils {
 
 我们可以依靠 Throwable 来实现该目的。我们知道，当应用抛出异常时，异常信息中就会包含具体的异常点，以及导致该异常的连锁调用链。我们可以根据该思路，在 `getBrand()` 方法中主动生成一个 Throwable 对象并获取其堆栈信息，从而来间接获取方法的调用链
 
-大致效果就如下所示，在 Transform 阶段，自动为 DeviceUtils 生成一个 `writeToFile()`方法，并在 Build.BRAND 被调用前执行 `writeToFile()` 方法，以此来实现动态记录
+大致效果就如下所示，在 Transform 阶段，自动为 DeviceUtils 生成一个 `writeToFile()` 方法，并在 Build.BRAND 被调用前执行 `writeToFile()` 方法，以此来实现动态记录
 
 ```kotlin
 object DeviceUtils {
@@ -286,7 +286,7 @@ object DeviceUtils {
 有了实现思路后，后续的编码就很简单了，分为两步：
 
 - 为每个包含隐私行为的类自动生成 `writeToFile(log: String, throwable: Throwable)` 方法
-- 在每个代表隐私行为的字节码指令之前插入一个方法调用指令，该指令就负责去调用 `writeToFile`方法
+- 在每个代表隐私行为的字节码指令之前插入一个方法调用指令，该指令就负责去调用 `writeToFile` 方法
 
 在静态扫描的基础上，过 `generateWriteToFileMethod` 方法来生成 `writeToFile` 方法，每当扫描到一个目标指令后，再通过 `insertRuntimeLog` 方法来向其插入调用 `writeToFile` 方法的指令
 
@@ -365,7 +365,7 @@ class PrivacySentryTransform(private val config: PrivacySentryConfig) : BaseTran
 }
 ```
 
-最终，每当 DeviceUtils 中的两个方法被执行时，在 `externalCacheDir`目录下就会自动生成一个 PrivacySentry.txt 文件，当中就记录了隐私方法的具体调用时间和调用链。根据该调用链，我们就可以快速定位是哪一块业务执行了敏感操作
+最终，每当 DeviceUtils 中的两个方法被执行时，在 `externalCacheDir` 目录下就会自动生成一个 PrivacySentry.txt 文件，当中就记录了隐私方法的具体调用时间和调用链。根据该调用链，我们就可以快速定位是哪一块业务执行了敏感操作
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/51f3920174ed49049874b9684361f262~tplv-k3u1fbpfcp-zoom-1.image)
 

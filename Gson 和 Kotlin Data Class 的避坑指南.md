@@ -1,4 +1,4 @@
-在蛮久前有同事问过我关于一个 Gson 和 Kotlin dataClass 的问题，当时答不上来也没去细究，但一直都放在心底，今天就认真探究下原因，也输出总结了一下，希望能帮助你避开这个坑 😂😂
+在蛮久前有同事问过我关于一个 Gson 和 Kotlin dataClass 的问题，当时答不上来也没去细究，但一直都放在心底，今天就认真探究下原因，也输出总结了一下，希望能帮助你避开这个坑
 
 来看个小例子，猜猜其运行结果会是怎样的
 
@@ -23,24 +23,24 @@ UserBean 是一个 dataClass，其 userName 字段被声明为非 null 类型，
 ```kotlin
 UserBean(userName=null, userAge=26)
 Exception in thread "main" java.lang.NullPointerException: Parameter specified as non-null is null: method temp.TestKt.printMsg, parameter msg
-	at temp.TestKt.printMsg(Test.kt)
-	at temp.TestKt.main(Test.kt:16)
-	at temp.TestKt.main(Test.kt)
+    at temp.TestKt.printMsg(Test.kt)
+    at temp.TestKt.main(Test.kt:16)
+    at temp.TestKt.main(Test.kt)
 ```
 # 一、为啥会抛出 NEP？
 
 `printMsg` 方法接收了参数后实际上什么也没做，为啥会抛出 NPE？
 
-通过 IDEA 将`printMsg`反编译为 Java 方法，可以发现方法内部会对入参进行空校验，当发现为 null 时就会直接抛出 NullPointerException
+通过 IDEA 将 `printMsg` 反编译为 Java 方法，可以发现方法内部会对入参进行空校验，当发现为 null 时就会直接抛出 NullPointerException
 
 ```java
 public static final void printMsg(@NotNull String msg) {
-  Intrinsics.checkNotNullParameter(msg, "msg");
+    Intrinsics.checkNotNullParameter(msg, "msg");
 }
 ```
 这个比较好理解，毕竟 Kotlin 的类型系统会严格区分**可 null** 和**不可为 null** 两种类型，其区分手段之一就是会自动在我们的代码里插入一些类型校验逻辑，即自动加上了非空断言，当发现不可为 null 的参数传入了 null 的话就会马上就抛出 NPE，即使我们并没有用到该参数
 
-当然，这个自动插入的校验逻辑只会在 Kotlin 代码中生成，如果我们是将 `userBean.userName`传给 Java 方法的话，就不会有这个效果，而是会等到我们使用到了该参数时才发生 NPE
+当然，这个自动插入的校验逻辑只会在 Kotlin 代码中生成，如果我们是将 `userBean.userName` 传给 Java 方法的话，就不会有这个效果，而是会等到我们使用到了该参数时才发生 NPE
 
 # 二、Kotlin 的 nullSafe 失效了吗？
 
@@ -50,12 +50,12 @@ public static final void printMsg(@NotNull String msg) {
 
 通过断点，可以发现 UserBean 是在 ReflectiveTypeAdapterFactory 里完成构建的，这里的主要步骤就分为两步：
 
-- 通过 `constructor.construct()`得到一个 UserBean 对象，此时该对象内部的属性值都为默认值
+- 通过 `constructor.construct()` 得到一个 UserBean 对象，此时该对象内部的属性值都为默认值
 - 遍历 JsonReader，根据 Json 内部的 key 值和 UserBean 包含的字段进行对应，对应得上的话就进行赋值
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f8b74fe9e1124f7ca21525923749d3b7~tplv-k3u1fbpfcp-zoom-1.image)
 
-第二步很好理解，那第一步又是具体怎么实现的？再断点看下`constructor.construct()`是如何实现的
+第二步很好理解，那第一步又是具体怎么实现的？再断点看下 `constructor.construct()` 是如何实现的
 
 constructor 的取值途径可以在 ConstructorConstructor 这个类中看到
 
@@ -231,12 +231,12 @@ fun main() {
 ```
 ```kotlin
 Exception in thread "main" com.squareup.moshi.JsonDataException: Non-null value 'userName' was null at $.userName
-	at com.squareup.moshi.internal.Util.unexpectedNull(Util.java:663)
-	at com.squareup.moshi.kotlin.reflect.KotlinJsonAdapter.fromJson(KotlinJsonAdapter.kt:87)
-	at com.squareup.moshi.internal.NullSafeJsonAdapter.fromJson(NullSafeJsonAdapter.java:41)
-	at com.squareup.moshi.JsonAdapter.fromJson(JsonAdapter.java:51)
-	at temp.TestKt.main(Test.kt:21)
-	at temp.TestKt.main(Test.kt)
+    at com.squareup.moshi.internal.Util.unexpectedNull(Util.java:663)
+    at com.squareup.moshi.kotlin.reflect.KotlinJsonAdapter.fromJson(KotlinJsonAdapter.kt:87)
+    at com.squareup.moshi.internal.NullSafeJsonAdapter.fromJson(NullSafeJsonAdapter.java:41)
+    at com.squareup.moshi.JsonAdapter.fromJson(JsonAdapter.java:51)
+    at temp.TestKt.main(Test.kt:21)
+    at temp.TestKt.main(Test.kt)
 ```
 # 四、扩展知识
 
@@ -268,8 +268,8 @@ fun main() {
 ```
 ```kotlin
 Exception in thread "main" java.lang.NullPointerException: Gson().fromJson(json, UserBean::class.java) must not be null
-	at temp.TestKt.main(Test.kt:22)
-	at temp.TestKt.main(Test.kt)
+    at temp.TestKt.main(Test.kt:22)
+    at temp.TestKt.main(Test.kt)
 ```
 以上三个例子会有不同区别的原因是什么呢？
 

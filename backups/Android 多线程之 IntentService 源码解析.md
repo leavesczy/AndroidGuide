@@ -26,74 +26,74 @@ IntentService 总的代码不到一百行，如果你对 HandlerThread 有所了
 IntentService 类是一个抽象类，包含一个抽象方法需要由子类来实现
 
 ```java
-	public abstract class IntentService extends Service
+    public abstract class IntentService extends Service
 ```
 包含的成员变量
 
 ```java
-    private volatile Looper mServiceLooper;
+private volatile Looper mServiceLooper;
 
-    //关联了 mServiceLooper 的 Handler 
-    private volatile ServiceHandler mServiceHandler;
+// 关联了 mServiceLooper 的 Handler
+private volatile ServiceHandler mServiceHandler;
 
-    //IntentService 内部使用的子线程的线程名
-    private String mName;
+// IntentService 内部使用的子线程的线程名
+private String mName;
 
-    //用于决定 onStartCommand() 方法的返回值
-    private boolean mRedelivery;
+// 用于决定 onStartCommand() 方法的返回值
+private boolean mRedelivery;
 ```
 构造函数
 
 ```java
-    //传入子线程名
-    public IntentService(String name) {
-        super();
-        mName = name;
-    }
+// 传入子线程名
+public IntentService(String name) {
+    super();
+    mName = name;
+}
 ```
 当 IntentService 第一次被启动时，`onCreate()` 方法就会调用
 
 就如同我们在 **Activity** 中使用 **HandlerThread** 来完成耗时任务一样，在 **IntentService** 内部一样是将 **HandlerThread** 作为工作线程，因为 **mServiceHandler** 持有了 **HandlerThread** 的 **Looper** 对象，因此 **mServiceHandler** 就作为 **IntentService** 向 **HandlerThread** 发送 **Message** 的桥梁
 
 ```java
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        HandlerThread thread = new HandlerThread("IntentService[" + mName + "]");
-        //触发 HandlerThread 创建 Looper 对象
-        thread.start();
-        //获取 Looper 对象，以此来构建可以向子线程发送 Message 的 Handler
-        mServiceLooper = thread.getLooper();
-        mServiceHandler = new ServiceHandler(mServiceLooper);
-    }
+@Override
+public void onCreate() {
+    super.onCreate();
+    HandlerThread thread = new HandlerThread("IntentService[" + mName + "]");
+    // 触发 HandlerThread 创建 Looper 对象
+    thread.start();
+    // 获取 Looper 对象，以此来构建可以向子线程发送 Message 的 Handler
+    mServiceLooper = thread.getLooper();
+    mServiceHandler = new ServiceHandler(mServiceLooper);
+}
 ```
 这里再看下 ServiceHandler 的类声明
 
-当中，消息队列中的 Message 依次被传递给 `handleMessage(Message)` 方法进行处理，该方法是运行于子线程的，而耗时任务就交由抽象方法 `onHandleIntent(Intent)` 来完成，该方法需要交由子类来实现，并在该方法返回后调用 `stopSelf(Int)` 来停止 IntentService 
+当中，消息队列中的 Message 依次被传递给 `handleMessage(Message)` 方法进行处理，该方法是运行于子线程的，而耗时任务就交由抽象方法 `onHandleIntent(Intent)` 来完成，该方法需要交由子类来实现，并在该方法返回后调用 `stopSelf(Int)` 来停止 IntentService
 
 可以看到，整个流程就是上面所说的
 
 1. IntentService 是以串行方式处理外部传递来的任务，即只有当上一个任务完成时，新的任务才会被执行
 2. 在处理完所有任务请求后会自动停止，因此不必手动调用 `stopSelf()` 方法
 
-但要注意的是，调用 `stopSelf(Int)`不一定会使 IntentService 停止，因为消息队列中可能还有未处理的消息，这个在后边会介绍
+但要注意的是，调用 `stopSelf(Int)` 不一定会使 IntentService 停止，因为消息队列中可能还有未处理的消息，这个在后边会介绍
 
 ```java
-    private final class ServiceHandler extends Handler {
+private final class ServiceHandler extends Handler {
 
-        public ServiceHandler(Looper looper) {
-            super(looper);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            //将耗时任务转交给 onHandleIntent() 方法来完成
-            //onHandleIntent() 需要由子类来实现
-            onHandleIntent((Intent)msg.obj);
-            //msg.arg1 即 startId
-            stopSelf(msg.arg1);
-        }
+    public ServiceHandler(Looper looper) {
+        super(looper);
     }
+
+    @Override
+    public void handleMessage(Message msg) {
+        // 将耗时任务转交给 onHandleIntent() 方法来完成
+        // onHandleIntent() 需要由子类来实现
+        onHandleIntent((Intent) msg.obj);
+        // msg.arg1 即 startId
+        stopSelf(msg.arg1);
+    }
+}
 ```
 每次启动 IntentService 时，`onStartCommand()` 方法就会被调用，最后是通过 `onStart()` 方法向 **mServiceHandler** 发送 包含此次任务详情的 **Message** 对象
 
@@ -122,36 +122,36 @@ IntentService 类是一个抽象类，包含一个抽象方法需要由子类来
 当中，`onStartCommand()` 方法的返回值可能由 `setIntentRedelivery(boolean)` 方法来决定
 
 ```java
-    //用于决定 onStartCommand() 方法的返回值
-    //如果参数为 true 则返回 START_REDELIVER_INTENT
-    //如果系统在 onStartCommand() 返回后终止服务，则会重建服务，并通过传递给服务的最后一个 Intent 调用 onStartCommand()
-    //任何挂起 Intent 均依次传递。这适用于主动执行应该立即恢复的作业（例如下载文件）的服务
-    //如果参数为 false 则返回 START_NOT_STICKY
-    //如果系统在 onStartCommand() 返回后终止服务，则除非有挂起 Intent 要传递，否则系统不会重建服务
-    //这是最安全的选项，可以避免在不必要时以及应用能够轻松重启所有未完成的作业时运行服务
-    public void setIntentRedelivery(boolean enabled) {
-        mRedelivery = enabled;
-    }
+// 用于决定 onStartCommand() 方法的返回值
+// 如果参数为 true 则返回 START_REDELIVER_INTENT
+// 如果系统在 onStartCommand() 返回后终止服务，则会重建服务，并通过传递给服务的最后一个 Intent 调用 onStartCommand()
+// 任何挂起 Intent 均依次传递。这适用于主动执行应该立即恢复的作业（例如下载文件）的服务
+// 如果参数为 false 则返回 START_NOT_STICKY
+// 如果系统在 onStartCommand() 返回后终止服务，则除非有挂起 Intent 要传递，否则系统不会重建服务
+// 这是最安全的选项，可以避免在不必要时以及应用能够轻松重启所有未完成的作业时运行服务
+public void setIntentRedelivery(boolean enabled) {
+    mRedelivery = enabled;
+}
 ```
 还有其它几个相关方法
 
 ```java
-    @Override
-    public void onDestroy() {
-        //移除所有待发送的 Message
-        mServiceLooper.quit();
-    }
+@Override
+public void onDestroy() {
+    // 移除所有待发送的 Message
+    mServiceLooper.quit();
+}
 
-    @Override
-    @Nullable
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+@Override
+@Nullable
+public IBinder onBind(Intent intent) {
+    return null;
+}
 
-    //此方法需要由子类来实现
-    //在此方式中完成具体的耗时任务
-    @WorkerThread
-    protected abstract void onHandleIntent(@Nullable Intent intent);
+// 此方法需要由子类来实现
+// 在此方式中完成具体的耗时任务
+@WorkerThread
+protected abstract void onHandleIntent(@Nullable Intent intent);
 ```
 IntentService 的源码理解起来不算难，不过这是建立在对 Android 系统中以 Handler、Looper、MessageQueue 组成的异步消息处理机制以及 HandlerThread 有所了解的基础上的，最后就再贴上对 IntentService 的全部源码注释
 

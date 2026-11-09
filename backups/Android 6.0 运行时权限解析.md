@@ -3,8 +3,8 @@
 在Android 6.0开始，App可以直接安装，然后在运行时请求用户授予权限，系统会弹出一个对话框（这个Dialog不能由开发者定制）让用户决定是否授予某个权限给App。
 
 Google将系统权限分为两类
-一类是`Normal Permissions`，这类权限一般不涉及用户隐私，安装即授权，不需要每次使用时都检查权限，比如访问网络、蓝牙、震动等。
-另一类是`Dangerous Permission`，一般是涉及到用户隐私的，需要用户进行授权，比如读写SDCard、发送短信、访问通讯录等。
+一类是 `Normal Permissions`，这类权限一般不涉及用户隐私，安装即授权，不需要每次使用时都检查权限，比如访问网络、蓝牙、震动等。
+另一类是 `Dangerous Permission`，一般是涉及到用户隐私的，需要用户进行授权，比如读写SDCard、发送短信、访问通讯录等。
 
 ### 一、Normal Permissions
 
@@ -198,7 +198,6 @@ defaultConfig {
         android:text="发送短信" />
 
 </LinearLayout>
-
 ```
 
 全部代码如下
@@ -234,40 +233,51 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Button btn_phone = (Button) findViewById(R.id.btn_phone);
         Button btn_sms = (Button) findViewById(R.id.btn_sms);
-        btn_phone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //检查是否已经被授予权限,如果没有则进行申请，有的话则直接打电话
-                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    //判断此时是否可以向用户说明为什么需要申请权限
-                    //说明完之后可以再来调用requestPermissions进行权限申请
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                            Manifest.permission.CALL_PHONE)) {
-                        Toast.makeText(MainActivity.this, "我就是需要权限", Toast.LENGTH_SHORT).show();
-                        ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{Manifest.permission.CALL_PHONE}, REQUEST_CALL_PHONE);
-                    } else {
-                        ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{Manifest.permission.CALL_PHONE}, REQUEST_CALL_PHONE);
+        btn_phone.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 检查是否已经被授予权限,如果没有则进行申请，有的话则直接打电话
+                        if (ContextCompat.checkSelfPermission(
+                                        MainActivity.this, Manifest.permission.CALL_PHONE)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            // 判断此时是否可以向用户说明为什么需要申请权限
+                            // 说明完之后可以再来调用requestPermissions进行权限申请
+                            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                                    MainActivity.this, Manifest.permission.CALL_PHONE)) {
+                                Toast.makeText(MainActivity.this, "我就是需要权限", Toast.LENGTH_SHORT)
+                                        .show();
+                                ActivityCompat.requestPermissions(
+                                        MainActivity.this,
+                                        new String[] {Manifest.permission.CALL_PHONE},
+                                        REQUEST_CALL_PHONE);
+                            } else {
+                                ActivityCompat.requestPermissions(
+                                        MainActivity.this,
+                                        new String[] {Manifest.permission.CALL_PHONE},
+                                        REQUEST_CALL_PHONE);
+                            }
+                        } else {
+                            callPhone();
+                        }
                     }
-                } else {
-                    callPhone();
-                }
-            }
-        });
-        btn_sms.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(MainActivity.this,
-                            new String[]{Manifest.permission.SEND_SMS}, REQUEST_SEND_SMS);
-                } else {
-                    sendSms();
-                }
-            }
-        });
+                });
+        btn_sms.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (ContextCompat.checkSelfPermission(
+                                        MainActivity.this, Manifest.permission.SEND_SMS)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(
+                                    MainActivity.this,
+                                    new String[] {Manifest.permission.SEND_SMS},
+                                    REQUEST_SEND_SMS);
+                        } else {
+                            sendSms();
+                        }
+                    }
+                });
     }
 
     private void callPhone() {
@@ -281,10 +291,11 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "被授予了权限，可以进行发送短信的操作", Toast.LENGTH_SHORT).show();
     }
 
-    //permissions是申请时所包含的所有权限
-    //grantResults是对应权限的处理结果
+    // permissions是申请时所包含的所有权限
+    // grantResults是对应权限的处理结果
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(
+            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case REQUEST_CALL_PHONE:
@@ -310,7 +321,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
-
 ```
 确保此时运行的设备系统版本为6.0或更高版本
 

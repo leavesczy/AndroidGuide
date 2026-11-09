@@ -1,4 +1,4 @@
-你的童年是否有**俄罗斯方块**呢 🤣🤣 本文就来介绍如何通过 Jetpack Compose 实现一个俄罗斯方块 ~~
+你的童年是否有**俄罗斯方块**呢？本文就来介绍如何通过 Jetpack Compose 实现一个俄罗斯方块 ~~
 
 先看下效果图，功能还是挺完善的
 
@@ -8,13 +8,13 @@
 
 Google 官网上是这么介绍 Compose 的：Jetpack Compose 是用于构建原生界面的新款 Android 工具包，它可简化并加快 Android 上的界面开发，使用更少的代码、强大的工具和直观的 Kotlin API，快速让应用生动而精彩
 
-长期以来，Android 的视图层次结构可以表示为一个视图树，视图树中包含着若干个 View 和 ViewGroup。当应用的数据由于用户交互等原因而发生变化时，界面的层次结构就需要进行更新以显示最新数据。最常见的界面更新方式就是使用`findViewById()`等函数遍历视图树，并通过调用 `button.setText(String)`、`container.addChild(View)` 或 `img.setImageBitmap(Bitmap)` 等方法来改变特定节点，而这些方法就会改变 View 的内部状态。但这种手动操纵视图的方式提高了出错的可能性。如果一条数据需要在多个位置呈现，开发者可能一不小心就会忘记更新某个显示它的视图。此外，当两项更新以意外的方式发生冲突时，也很容易造成异常状态。例如，某项更新可能会尝试修改刚刚从界面中移除的节点。一般来说，软件维护复杂性会随着需要更新的视图数量增多而增长
+长期以来，Android 的视图层次结构可以表示为一个视图树，视图树中包含着若干个 View 和 ViewGroup。当应用的数据由于用户交互等原因而发生变化时，界面的层次结构就需要进行更新以显示最新数据。最常见的界面更新方式就是使用 `findViewById()` 等函数遍历视图树，并通过调用 `button.setText(String)`、`container.addChild(View)` 或 `img.setImageBitmap(Bitmap)` 等方法来改变特定节点，而这些方法就会改变 View 的内部状态。但这种手动操纵视图的方式提高了出错的可能性。如果一条数据需要在多个位置呈现，开发者可能一不小心就会忘记更新某个显示它的视图。此外，当两项更新以意外的方式发生冲突时，也很容易造成异常状态。例如，某项更新可能会尝试修改刚刚从界面中移除的节点。一般来说，软件维护复杂性会随着需要更新的视图数量增多而增长
 
 在过去的几年中，整个行业已开始转向声明性界面模型，该模型大大简化了与构建和更新界面关联的工程设计。该技术的工作原理是在概念上从头开始重新生成整个屏幕，然后仅执行必要的更改。此方法可避免手动更新有状态视图层次结构的复杂性。Compose 就是一个适用于 Android 的新式声明性界面工具包，**提供了声明性 API，让开发者可在不以命令方式改变前端视图的情况下呈现应用界面，从而使编写和维护应用界面变得更加容易**
 
 # 可组合函数
 
-Compose 的重点就在于 `@Composable`函数，即**可组合函数**，每个可组合函数可以接收若干入参参数用于参与视图结构的绘制说明，但函数不返回任何值。可组合函数只用于描述视图结构如何绘制以及如何与用户进行交互，但不需要返回视图对象，而是由 Compose 根据开发者的描述来生成具体的视图对象
+Compose 的重点就在于 `@Composable` 函数，即**可组合函数**，每个可组合函数可以接收若干入参参数用于参与视图结构的绘制说明，但函数不返回任何值。可组合函数只用于描述视图结构如何绘制以及如何与用户进行交互，但不需要返回视图对象，而是由 Compose 根据开发者的描述来生成具体的视图对象
 
 本游戏的 icon 就是通过这种方式来生成的。可以看到 `PreviewTetrisIcon()` 函数并不包含返回值，当然这种情况下也不需要入参参数。此外，Compose 的一个优点就是所见即所得，通过添加 `@Preview` 注解就可以预览实现效果，每次修改过后无需编译，只要刷新一下就可以看到修改结果
 
@@ -204,7 +204,7 @@ fun TetrisButton(
 }
 ```
 
-# 游戏屏幕  - TetrisScreen
+# 游戏屏幕 - TetrisScreen
 
 ![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f32b685c86b54b6ead24f9d00e89ed30~tplv-k3u1fbpfcp-watermark.image)
 
@@ -218,7 +218,7 @@ TetrisScreen 比较复杂，需要实现的功能点主要有五个：
 
 Compose 是根据函数的入参参数是否发生了变化来决定是否需要进行界面更新的，所以我们在绘制下落的方块时可以将整个页面视为静态的，仅需要根据当前的坐标值进行绘制即可，然后每隔几百毫秒就改变方块的坐标信息，由此生成新的入参参数，通知 Compose 进行页面更新即可
 
-整个游戏的所有状态信息都保存在一个 TetrisState 对象中，Compose 就通过监听`State<TetrisState>`中值的变化来决定是否需要进行界面更新。整个游戏屏幕就被定义为一个 10 x 24 的二维数组，即 brickArray，当数组值等于一时，就对应实心方块，否则就是空心方块。Tetris 就对应处于下落状态中的方块
+整个游戏的所有状态信息都保存在一个 TetrisState 对象中，Compose 就通过监听 `State<TetrisState>` 中值的变化来决定是否需要进行界面更新。整个游戏屏幕就被定义为一个 10 x 24 的二维数组，即 brickArray，当数组值等于一时，就对应实心方块，否则就是空心方块。Tetris 就对应处于下落状态中的方块
 
 ```kotlin
 data class TetrisState(
@@ -345,7 +345,7 @@ private val allShapes = listOf(
 )
 ```
 
-之后在每次生成 Tetris 对象时，都随机从 allShapes 中取值。并且每个 Tetris 对象的初始偏移量 offset 的 Y 值固定是 -4，即默认处于屏幕之外，当方块不断移动时，其 Offset 就会变成 `Location(0, -3)`、`Location(1, -2)` .... `Location(2, 10)`等各种值，通过改变 X 值来实现左右移动、改变 Y 值来实现下移
+之后在每次生成 Tetris 对象时，都随机从 allShapes 中取值。并且每个 Tetris 对象的初始偏移量 offset 的 Y 值固定是 -4，即默认处于屏幕之外，当方块不断移动时，其 Offset 就会变成 `Location(0, -3)`、`Location(1, -2)` .... `Location(2, 10)` 等各种值，通过改变 X 值来实现左右移动、改变 Y 值来实现下移
 
 ```kotlin
 operator fun invoke(): Tetris {
@@ -586,7 +586,7 @@ private fun TetrisState.onFall(): TetrisState? {
 }
 ```
 
-前文说了，每种方块类型都包含有多种旋转结果，所以 Rotate 事件就需要将方块改变为其它旋转形状。而由于当旋转过后方块的坐标系可能会超出当前屏幕的范围，所以还需要依靠 `adjustOffset()`方法将方块的坐标系迁移回屏幕内
+前文说了，每种方块类型都包含有多种旋转结果，所以 Rotate 事件就需要将方块改变为其它旋转形状。而由于当旋转过后方块的坐标系可能会超出当前屏幕的范围，所以还需要依靠 `adjustOffset()` 方法将方块的坐标系迁移回屏幕内
 
 ```kotlin
 private fun TetrisState.onRotate(): TetrisState? {
@@ -606,7 +606,7 @@ private fun TetrisState.onRotate(): TetrisState? {
 }
 ```
 
-当方块无法再下落，或者是已经超出了屏幕时，则需要依靠 `finalize()`方法将方块的坐标值写入到屏幕背景 brickArray 中，并重置游戏状态
+当方块无法再下落，或者是已经超出了屏幕时，则需要依靠 `finalize()` 方法将方块的坐标值写入到屏幕背景 brickArray 中，并重置游戏状态
 
 ```kotlin
 private fun TetrisState.finalize(): TetrisState {
@@ -647,6 +647,6 @@ private fun TetrisState.finalize(): TetrisState {
 
 # 项目地址
 
-游戏的大体实现思路就如上所述，表达能力所限，有些地方没法讲得太清楚，实现细节欢迎查阅源码了解 😂😂
+游戏的大体实现思路就如上所述，表达能力所限，有些地方没法讲得太清楚，实现细节欢迎查阅源码了解
 
 Github 地址：https://github.com/leavesczy/compose_tetris

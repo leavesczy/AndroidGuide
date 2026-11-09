@@ -43,7 +43,7 @@ view.setOnClickListener {
 
 我在通过 ASM 实现双击防抖功能的过程中，最大的难点就在于处理 lambda 表达式了，通过常规的 **定位包名全路径和方法签名信息** 没法直接对其进行处理，当中涉及到了原生 Java 平台和 Android 平台两者对 Java 8 的实现区别，以及一点点关于 Android 编译流程的知识点
 
-本文要介绍的就是我在实现字节码插桩过程中总结出来的一些知识点，希望对你有所帮助 🤣🤣
+本文要介绍的就是我在实现字节码插桩过程中总结出来的一些知识点，希望对你有所帮助
 
 # Java 8 的 Lambda
 
@@ -55,15 +55,15 @@ view.setOnClickListener {
 public class Demo {
 
     void test() {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("leavesC");
-            }
-        };
+        Runnable runnable =
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("leavesC");
+                    }
+                };
         runnable.run();
     }
-
 }
 ```
 
@@ -75,7 +75,7 @@ javac Demo.java
 
 最终会生成两个 class 文件：`Demo.class`、`Demo$1.class`
 
-可以看到 `Demo$1`实现了 Runnable 接口，也即所谓的匿名内部类了。上述代码中声明的 Runnable 变量指向的就是该具体的实现类，从`Demo.class` 第十一行也可以看到最终 new 出来的对象指向的也是 `Demo$1.class`
+可以看到 `Demo$1` 实现了 Runnable 接口，也即所谓的匿名内部类了。上述代码中声明的 Runnable 变量指向的就是该具体的实现类，从 `Demo.class` 第十一行也可以看到最终 new 出来的对象指向的也是 `Demo$1.class`
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/91939d14f74747a1ac5c8bf8cbf96885~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -88,18 +88,17 @@ public class Demo {
         Runnable runnable = () -> System.out.println("leavesC");
         runnable.run();
     }
-
 }
 ```
 
-此时生成的就只会有一个`Demo.class`文件
+此时生成的就只会有一个 `Demo.class` 文件
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/98a14defb8564f0784f5b5b5603fcdcf~tplv-k3u1fbpfcp-zoom-1.image)
 
 前后两份字节码文件主要的差异点在于：
 
 - 非 lambda 方式下，声明的 Runnable 变量最终会指向一个具体的接口实现类，也即我们常说的匿名内部类，在字节码中也可以看到有明确的生成该匿名内部类对象的过程，对应 new、dup、aload_0、invokespecial 等指令。Runnable 所要执行的代码块是在 `Demo$1.class` 的 run 方法中
-- lambda 方式下，声明 Runnable 变量这个操作对应的是 invokedynamic、astore_1 等指令。Runnable 所要执行的代码块是在自动生成的私有静态方法`lambda$test$0()` 中
+- lambda 方式下，声明 Runnable 变量这个操作对应的是 invokedynamic、astore_1 等指令。Runnable 所要执行的代码块是在自动生成的私有静态方法 `lambda$test$0()` 中
 
 从这可以推导出一个结论：**在编译阶段，lambda 表达式不会生成相应的实现类，lambda 语法的实现机制有别于以前的匿名内部类**
 
@@ -125,7 +124,7 @@ javap -verbose Demo.class
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/44a6fc859fe64e88a677edbb8a755c8e~tplv-k3u1fbpfcp-zoom-1.image)
 
-在执行了第十七行的 `invokedynamic` 指令后，就会存储栈顶值，也即 this，然后将其作为参数来调用 Runnable 接口的 `run()`方法。这说明了通过 `invokedynamic` 指令能够获取到一个 Runnable 对象
+在执行了第十七行的 `invokedynamic` 指令后，就会存储栈顶值，也即 this，然后将其作为参数来调用 Runnable 接口的 `run()` 方法。这说明了通过 `invokedynamic` 指令能够获取到一个 Runnable 对象
 
 ```java
 0: invokedynamic #2,  0              // InvokeDynamic #0:run:()Ljava/lang/Runnable;
@@ -140,7 +139,7 @@ javap -verbose Demo.class
 此外，标明的入参参数有三个：
 
 - ()V。原始方法泛型擦除后的方法签名信息，也即 run 方法。由于 run 方法不包含泛型，所以和第三个参数的签名信息一样
-- invokestatic lambdademo/Demo.lambda$test$0:()V。invokestatic 表达的是调用静态方法的操作，后面跟着的是自动生成的私有静态方法`lambda$test$0()`的签名信息，当中就包含了 lambda 表达式原本所要执行的代码块
+- invokestatic lambdademo/Demo.lambda$test$0:()V。invokestatic 表达的是调用静态方法的操作，后面跟着的是自动生成的私有静态方法 `lambda$test$0()` 的签名信息，当中就包含了 lambda 表达式原本所要执行的代码块
 - ()V。原始方法泛型擦除前的方法签名信息，也即 run 方法
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a01349c360704724b90d03fcefcdca82~tplv-k3u1fbpfcp-zoom-1.image)
@@ -483,39 +482,39 @@ ButterKnife 会为每个使用了 @OnClick 注解的类自动生成一个辅助�
 
 ```java
 public final class MainActivity_ViewBinding implements Unbinder {
-    
+
     ···
 
     @UiThread
     public MainActivity_ViewBinding(final MainActivity target, View source) {
         this.target = target;
         ···
-        view.setOnClickListener(new DebouncingOnClickListener() {
-            @Override
-            public void doClick(View p0) {
-                target.onClickViewByButterKnife(p0);
-            }
-        });
+        view.setOnClickListener(
+                new DebouncingOnClickListener() {
+                    @Override
+                    public void doClick(View p0) {
+                        target.onClickViewByButterKnife(p0);
+                    }
+                });
     }
-  
 }
 
 public abstract class DebouncingOnClickListener implements View.OnClickListener {
-  private static final Runnable ENABLE_AGAIN = () -> enabled = true;
-  private static final Handler MAIN = new Handler(Looper.getMainLooper());
+    private static final Runnable ENABLE_AGAIN = () -> enabled = true;
+    private static final Handler MAIN = new Handler(Looper.getMainLooper());
 
-  static boolean enabled = true;
+    static boolean enabled = true;
 
-  @Override public final void onClick(View v) {
-    if (enabled) {
-      enabled = false;
-      MAIN.post(ENABLE_AGAIN);
-      doClick(v);
+    @Override
+    public final void onClick(View v) {
+        if (enabled) {
+            enabled = false;
+            MAIN.post(ENABLE_AGAIN);
+            doClick(v);
+        }
     }
-  }
 
-  public abstract void doClick(View v);
-    
+    public abstract void doClick(View v);
 }
 ```
 

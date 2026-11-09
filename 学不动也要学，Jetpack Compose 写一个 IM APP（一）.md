@@ -1,4 +1,4 @@
-在 2019 年的 Google/IO 大会上，亮相了一个全新的 Android 原生 UI 开发框架 Jetpack Compose。与 IOS 的 SwiftUI 一样，Jetpack Compose 也是一个声明式的 UI  框架，随着 Android 和 IOS 两大移动平台相继推出了自己平台专属的声明式 UI 框架，标志着整个行业已开始转向声明性界面模型，该模型大大简化了与构建和更新界面关联的工程设计
+在 2019 年的 Google/IO 大会上，亮相了一个全新的 Android 原生 UI 开发框架 Jetpack Compose。与 IOS 的 SwiftUI 一样，Jetpack Compose 也是一个声明式的 UI 框架，随着 Android 和 IOS 两大移动平台相继推出了自己平台专属的声明式 UI 框架，标志着整个行业已开始转向声明性界面模型，该模型大大简化了与构建和更新界面关联的工程设计
 
 经过两年多的打磨，到了 2021 年七月底，Google 正式发布了 Jetpack Compose 的 1.0 版本，这是 Compose 的稳定版本，可供开发者在生产环境中使用
 
@@ -14,7 +14,7 @@
 
 # 一、compose_chat
 
-技术的世界总是在不断变化的，新的技术总在不断涌现，我数了一下，现在一名 Android 应用开发工程师需要掌握的最基础技能有以下几个，有点 MMP 的感觉 🤣🤣
+技术的世界总是在不断变化的，新的技术总在不断涌现，我数了一下，现在一名 Android 应用开发工程师需要掌握的最基础技能有以下几个，有点 MMP 的感觉
 
 需要掌握的 UI 开发框架：
 
@@ -30,7 +30,7 @@
 - Kotlin
 - xxxxx
 
-实践出真理，学不动也要学 🤣🤣 Jetpack Compose 大概率会成为以后 Android 原生应用开发时的首选技术方案，所以我也做了一次实战演练，花了两个月时间断断续续写了一个完全用 Compose 实现的 IM APP，实现了基本的好友聊天功能
+实践出真理，学不动也要学。Jetpack Compose 大概率会成为以后 Android 原生应用开发时的首选技术方案，所以我也做了一次实战演练，花了两个月时间断断续续写了一个完全用 Compose 实现的 IM APP，实现了基本的好友聊天功能
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/adbeccad79d94d0dbff85bc02d7ccf04~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -38,11 +38,11 @@
 
 ![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/28bcba206ff54bfda826e27c092fd4f8~tplv-k3u1fbpfcp-watermark.image)
 
-本文主要介绍的是 Jetpack Compose 的各种重点概念和功能点，并不会涉及太多 compose_chat 的实际编码内容，但会以 compose_chat 作为讲解时的辅助例子。读者如果想要学习 Jetpack Compose 的话，compose_chat 会是一个很好的入门学习项目，希望对你有所帮助 🤣🤣
+本文主要介绍的是 Jetpack Compose 的各种重点概念和功能点，并不会涉及太多 compose_chat 的实际编码内容，但会以 compose_chat 作为讲解时的辅助例子。读者如果想要学习 Jetpack Compose 的话，compose_chat 会是一个很好的入门学习项目，希望对你有所帮助
 
 # 二、命令式与声明式
 
-长期以来，Android 的视图层次结构都可以表示为一个视图树，若干个 View 和 ViewGroup 以嵌套的关系组成整个视图树，开发者通过 XML 来声明整个视图树的层次结构，再通过 `findViewById()`来拿到每个控件的引用。当状态发生变化需要刷新 UI 时，就通过主动调用控件的特定方法来更新 UI
+长期以来，Android 的视图层次结构都可以表示为一个视图树，若干个 View 和 ViewGroup 以嵌套的关系组成整个视图树，开发者通过 XML 来声明整个视图树的层次结构，再通过 `findViewById()` 来拿到每个控件的引用。当状态发生变化需要刷新 UI 时，就通过主动调用控件的特定方法来更新 UI
 
 整个过程就类似如下所示。通过 TextView 来显示用户名，在用户名发生变化时需要通过主动调用 `TextView.setText` 方法来刷新 UI，开发者直接持有并维护着每个视图结点，想要更新视图都需要开发者直接向控件下发“指令”，这整个过程的复杂度和出错概率随着需要维护的控件数量的增加而增加。这种方式就属于**命令式**
 
@@ -68,7 +68,7 @@ Compose 则是通过声明一系列不包含返回值的**可组合（Composable
 
 <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/434b51ee5b124dde91618759d5c6a116~tplv-k3u1fbpfcp-watermark.image" style="zoom:80%;" />
 
-该按钮只会在 Friendship 页面出现，HomeScreen 依靠`if (screenSelected == ViewScreen.Friendship)`语句来决定其出现时机，只有 if 语句为 true，FloatingActionButton() 函数才会被执行，此时才会显示悬浮按钮
+该按钮只会在 Friendship 页面出现，HomeScreen 依靠 `if (screenSelected == ViewScreen.Friendship)` 语句来决定其出现时机，只有 if 语句为 true，FloatingActionButton() 函数才会被执行，此时才会显示悬浮按钮
 
 这和原生的 View 体系有很大区别，按 View 体系的做法来实现的话，FloatingActionButton 会对应一个控件对象且对象是一直存在的，只是我们选择性地通过 `View.Gone()` 来将其隐藏。而按 Compose 的做法，只有 FloatingActionButton() 函数被执行了悬浮按钮才会存在，否则对于当前屏幕来说，悬浮按钮就相当于从来没有出现过
 
@@ -107,7 +107,7 @@ fun HomeScreen(
 
 # 三、可组合函数
 
-带有 `@Composable`注解的函数即可组合函数，该注解就用于告知 Compose 编译器：此函数旨在将数据转换为界面。例如，Compose 的`Text()` 函数就提供了 TextView 的所有功能，开箱即用，方法签名如下所示
+带有 `@Composable` 注解的函数即可组合函数，该注解就用于告知 Compose 编译器：此函数旨在将数据转换为界面。例如，Compose 的 `Text()` 函数就提供了 TextView 的所有功能，开箱即用，方法签名如下所示
 
 ```kotlin
 @Composable
@@ -169,7 +169,7 @@ Compose 提供的一系列“控件”函数基本已经能够满足我们的日
 
 ![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/76dfa61a8ac544718f0677b6ce9e39ee~tplv-k3u1fbpfcp-watermark.image)
 
-# 四、状态 
+# 四、状态
 
 应用的状态（State）是指可以随时间变化的任何值，其定义十分宽泛，从函数的入参参数到应用的背景色都包括在内
 
@@ -465,7 +465,7 @@ fun HomeScreen(
 
 布局是每个 UI 框架都必须的功能，不管是 View、Flutter、还是 Compose，都必须提供一些开箱即用的布局控件，这里就介绍下 compose_chat 中使用得比较多的 ConstraintLayout 和 LazyColumn
 
-## ConstraintLayout 
+## ConstraintLayout
 
 在以往的 Android View 视图体系下，我们都会尽量避免在布局中进行多层嵌套，因为嵌套层次越深，在测量 View 时需要的次数和时间就会越多，这就会严重影响到应用的运行性能了，因此 Google 官方也建议开发者尽量使用 ConstraintLayout 进行布局，实现扁平化布局。但 Compose 不同，由于 Compose 可以避免多次测量，因此开发者可以根据需要进行深层次嵌套，而不用担心会影响性能。同时 Compose 也提供了自己专属的 constraintlayout-compose，用于实现约束定位
 
@@ -479,7 +479,7 @@ fun HomeScreen(
 
 Compose 中对应 RecyclerView 的是 LazyColumn() 函数，从名字就可以猜出该函数是个竖向滑动列表，且实现了懒加载。实际上 LazyColumn 也的确实现了 Item 的缓存复用机制，重点在使用上要比 RecyclerView 简单很多，因为我们再也不用声明各种繁琐的 Adapter 和 ViewHolder 了
 
-以 compose_chat 为例。在拿到好友列表 friendList 后，通过 for 循环，每个 PersonProfile 就对应 LazyColumn 的一个列表项 item()，在 item() 函数中声明的 FriendshipItem() 即每个列表项要呈现的视图。通过循环调用  item() 函数，就可以完成整个滑动列表数据项的声明了，而且即使存在多种样式的 Item，也通过相同方式来声明即可，就像以下例子中我为列表添加了一个底部间距 Spacer
+以 compose_chat 为例。在拿到好友列表 friendList 后，通过 for 循环，每个 PersonProfile 就对应 LazyColumn 的一个列表项 item()，在 item() 函数中声明的 FriendshipItem() 即每个列表项要呈现的视图。通过循环调用 item() 函数，就可以完成整个滑动列表数据项的声明了，而且即使存在多种样式的 Item，也通过相同方式来声明即可，就像以下例子中我为列表添加了一个底部间距 Spacer
 
 ```kotlin
 @Composable
@@ -511,7 +511,7 @@ fun FriendshipScreen(
 }
 ```
 
-# 九、动画  &  手势操作 
+# 九、动画 & 手势操作
 
 Jetpack Compose 提供了一些功能强大且可扩展的 API，可用于在应用界面中轻松实现各种动画效果。动画在现代移动应用中至关重要，其目的是实现自然流畅、易于理解的用户体验。许多 Jetpack Compose 动画 API 可以提供可组合函数，就像布局和其他界面元素一样；它们由使用 Kotlin 协程挂起函数构建的较低级别 API 提供支持
 
@@ -528,7 +528,7 @@ Jetpack Compose 提供了一些功能强大且可扩展的 API，可用于在应
 
 前文很多地方都有讲到：更新视图的唯一途径就是生成新的入参参数并再次调用可组合函数，动画也是如此。想要让视图以一种连贯且自然的方式进行变换，那么意思也就是说需要有一个值生成器来连贯地改变可组合函数的参数值
 
-ProfileScreen 使用`rememberInfiniteTransition()`来实现这种效果。InfiniteTransition 通过 animateFloat、animateValue、animateColor 等方式来保存子动画，这些动画一进入组合阶段就开始运行，除非被移除，否则不会停止。再为 InfiniteTransition 指定一个初始值和一个结束值，并指定动画以反转的形式来回运行，animateValue 就会在这两个值之间不断地连贯变化，之后将 animateValue 应用到背景图的布局参数上即可实现动画效果
+ProfileScreen 使用 `rememberInfiniteTransition()` 来实现这种效果。InfiniteTransition 通过 animateFloat、animateValue、animateColor 等方式来保存子动画，这些动画一进入组合阶段就开始运行，除非被移除，否则不会停止。再为 InfiniteTransition 指定一个初始值和一个结束值，并指定动画以反转的形式来回运行，animateValue 就会在这两个值之间不断地连贯变化，之后将 animateValue 应用到背景图的布局参数上即可实现动画效果
 
 ```kotlin
 val animateValue by rememberInfiniteTransition().animateFloat(
@@ -553,9 +553,9 @@ NetworkImage(
 )
 ```
 
-## 手势操作 
+## 手势操作
 
-Compose 中的 Modifier 十分强大，不仅仅是用于进行布局，像点击事件、手势操作等一样需要依靠其来完成，pointerInput 函数就用于识别用户的手势操作，Modifier 同时提供了 offset 函数用于控制控件的偏移量，通过结合 pointerInput 和 offset  两个函数来动态改变控件的偏移量，就可以实现拖拽用户头像了
+Compose 中的 Modifier 十分强大，不仅仅是用于进行布局，像点击事件、手势操作等一样需要依靠其来完成，pointerInput 函数就用于识别用户的手势操作，Modifier 同时提供了 offset 函数用于控制控件的偏移量，通过结合 pointerInput 和 offset 两个函数来动态改变控件的偏移量，就可以实现拖拽用户头像了
 
 拖拽 OutlinedAvatar 的过程中系统会不断回调 onDrag 函数，在回调里通过用户的拖拽值不断改变 offsetX 和 offsetY 两个值，就可以不断触发 OutlinedAvatar 进行重组，以此实现拖拽效果。当用户松手时，onDragEnd 函数会被回调，再通过 Animatable 将 OutlinedAvatar 的偏移量重置为零，这样就可以实现自动移回原位的效果了
 
@@ -682,7 +682,7 @@ fun MaterialTheme(
 }
 ```
 
-Compose 中提供的各种“控件”函数默认都会来读取 LocalColors 中的颜色值来绘制自身，例如 Surface 默认就以 `MaterialTheme.colors.surface`作为背景色
+Compose 中提供的各种“控件”函数默认都会来读取 LocalColors 中的颜色值来绘制自身，例如 Surface 默认就以 `MaterialTheme.colors.surface` 作为背景色
 
 ```kotlin
 @Composable
@@ -758,7 +758,7 @@ fun ChatTheme(
 }
 ```
 
-Compose 的主题切换也依赖于可组合函数的重组操作。以 compose_chat  为例，HomeScreen 内部整体是包裹在 ChatTheme 中的，当切换了应用主题，即改变了 appTheme 时，就会触发 ChatTheme 和 HomeScreen 进行重组，重组过程就会读取到最新的主题配置，从而实现了主题切换
+Compose 的主题切换也依赖于可组合函数的重组操作。以 compose_chat 为例，HomeScreen 内部整体是包裹在 ChatTheme 中的，当切换了应用主题，即改变了 appTheme 时，就会触发 ChatTheme 和 HomeScreen 进行重组，重组过程就会读取到最新的主题配置，从而实现了主题切换
 
 ```kotlin
 @Composable
@@ -775,7 +775,7 @@ fun HomeScreen(
 }
 ```
 
-可以看出来，Compose 的主题切换是完全依赖于内存读写的，避免了原生 Android 方式还需要通过  IO 流去读取 XML 文件的情况，在执行效率上相对会高很多，而且在定义主题时也十分方便，仅需要多声明一种 Colors 对象即可实现，类型安全且有助于减少代码量
+可以看出来，Compose 的主题切换是完全依赖于内存读写的，避免了原生 Android 方式还需要通过 IO 流去读取 XML 文件的情况，在执行效率上相对会高很多，而且在定义主题时也十分方便，仅需要多声明一种 Colors 对象即可实现，类型安全且有助于减少代码量
 
 # 十一、结尾
 

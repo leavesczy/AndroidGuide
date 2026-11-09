@@ -1,6 +1,6 @@
 Bitmap 应该是很多应用中最占据内存空间的一类资源了，Bitmap 也是导致应用 OOM 的常见原因之一。例如，Pixel 手机的相机拍摄的照片最大可达 4048 * 3036 像素（1200 万像素），如果使用的位图配置为 ARGB_8888（Android 2.3 及更高版本的默认设置），将单张照片加载到内存大约需要 48MB 内存（4048 * 3036 * 4 字节），如此庞大的内存需求可能会立即耗尽应用的所有可用内存
 
-本篇文章就来讲下 Bitmap 一些比较有用的知识点，希望对你有所帮助 🤣🤣
+本篇文章就来讲下 Bitmap 一些比较有用的知识点，希望对你有所帮助
 
 全文可以概括为以下几个问题：
 
@@ -48,7 +48,7 @@ dpi 决定了应用在显示 drawable 时是选择哪一个文件夹内的切图
 
 # 2、内存大小的计算公式
 
-先将一张大小为 1920 x 1080 px 的图片保存到 `drawable-xxhdpi` 文件夹内，然后将其显示在一个宽高均为 180dp 的 ImageView 上，该 Bitmap 所占用的内存就通过 `bitmap.byteCount`来获取
+先将一张大小为 1920 x 1080 px 的图片保存到 `drawable-xxhdpi` 文件夹内，然后将其显示在一个宽高均为 180dp 的 ImageView 上，该 Bitmap 所占用的内存就通过 `bitmap.byteCount` 来获取
 
 ```kotlin
 val options = BitmapFactory.Options()
@@ -78,7 +78,7 @@ BitmapMainActivity: bitmap byteCount: 8294400
 - 由于模拟器的 density 等于 3，所以 ImageView 的宽高都是 540 px
 - Bitmap 的宽高还是保持其原有大小，即1920 x 1080 px
 - ARGB_8888 代表的是该 Bitmap 的编码格式，该格式下一个像素点需要占用 4 byte
-- `inDensity` 代表的是系统最终选择的 drawable 文件夹类型，等于 480 说明取的是 `drawable-xxhdpi`文件夹下的图片
+- `inDensity` 代表的是系统最终选择的 drawable 文件夹类型，等于 480 说明取的是 `drawable-xxhdpi` 文件夹下的图片
 - `inTargetDensity` 代表的是当前设备的 dpi
 - 8294400 就是 Bitmap 所占用的内存大小，单位是 byte
 
@@ -88,9 +88,9 @@ BitmapMainActivity: bitmap byteCount: 8294400
 
 上面之所以很容易就逆推出了 Bitmap 所占内存大小的计算公式，是因为所有条件都被我故意设定为最优情况了，才使得计算过程这么简单。而实际上 Bitmap 所占内存大小和其所在的 drawable 文件夹是有很大关系的，虽然计算公式没变
 
-现在的大部分应用为了达到最优的显示效果，会为应用准备多套切图放在不同的 drawable 文件夹下，而`BitmapFactory.decodeResource` 方法在解码 Bitmap 的时候，就会自动根据当前设备的 dpi 和 drawable 文件夹类型来判断是否需要对图片进行缩放显示
+现在的大部分应用为了达到最优的显示效果，会为应用准备多套切图放在不同的 drawable 文件夹下，而 `BitmapFactory.decodeResource` 方法在解码 Bitmap 的时候，就会自动根据当前设备的 dpi 和 drawable 文件夹类型来判断是否需要对图片进行缩放显示
 
-将图片从 `drawable-xxhdpi`迁移到 `drawable-xhdpi`文件夹，然后再打印日志信息
+将图片从 `drawable-xxhdpi` 迁移到 `drawable-xhdpi` 文件夹，然后再打印日志信息
 
 ```kotlin
 BitmapMainActivity: imageView width: 540
@@ -103,9 +103,9 @@ BitmapMainActivity: inTargetDensity: 480
 BitmapMainActivity: bitmap byteCount: 18662400
 ```
 
-可以看到，Bitmap 的宽高都发生了变化，`inDensity` 等于 320 也说明了选取的是`drawable-xhdpi`文件夹内的图片，Bitmap 所占内存居然增加了一倍多
+可以看到，Bitmap 的宽高都发生了变化，`inDensity` 等于 320 也说明了选取的是 `drawable-xhdpi` 文件夹内的图片，Bitmap 所占内存居然增加了一倍多
 
-模拟器的 dpi 是 480，拿到了 dpi 为 320 的`drawable-xhdpi`文件夹下的图片，在系统的理解中该文件夹存放的都是小图标，是为小屏幕手机准备的，现在要在大屏幕手机上展示的话就需要对其进行放大，放大的比例就是 480 / 320 = 1.5 倍，因此 Bitmap 的宽就会变为 1920 * 1.5 = 2880 px，高就会变为 1080 * 1.5 = 1620 px，最终占用的内存空间大小就是 2880 * 1620 * 4 = 18662400
+模拟器的 dpi 是 480，拿到了 dpi 为 320 的 `drawable-xhdpi` 文件夹下的图片，在系统的理解中该文件夹存放的都是小图标，是为小屏幕手机准备的，现在要在大屏幕手机上展示的话就需要对其进行放大，放大的比例就是 480 / 320 = 1.5 倍，因此 Bitmap 的宽就会变为 1920 * 1.5 = 2880 px，高就会变为 1080 * 1.5 = 1620 px，最终占用的内存空间大小就是 2880 * 1620 * 4 = 18662400
 
 所以说，对于同一台手机，Bitmap 在不同 drawable 文件夹下对其最终占用的内存大小是有很大关系的，虽然计算公式没变，但是由于系统会进行自动缩放，导致 Bitmap 的最终宽高都发生了变化，从而影响到了其占用的内存空间大小。同理，对于同个 drawable 文件夹下的同一张图片，在不同的手机屏幕上也可能会占用不同的内存空间，因为不同的手机的 dpi 大小可能是不一样的，BitmapFactory 进行缩放的比例也就不一样
 
@@ -119,12 +119,16 @@ BitmapMainActivity: bitmap byteCount: 18662400
 
 BitmapFactory 提供了很多个方法用于加载 Bitmap 对象：`decodeFile、decodeResourceStream、decodeResource、decodeByteArray、decodeStream` 等多个，但只有 `decodeResourceStream` 和 `decodeResource` 这两个方法才会根据 dpi 进行自动缩放。如果是从磁盘或者 assert 目录加载图片的话是不会进行自动缩放的，毕竟这些来源也不具备 dpi 信息，Bitmap 的分辨率也只能保持其原有大小
 
-`decodeResource` 方法也会调用到`decodeResourceStream`方法，`decodeResourceStream`方法如果判断到`inDensity` 和 `inTargetDensity` 两个属性外部没有主动赋值的话，就会根据实际情况进行赋值
+`decodeResource` 方法也会调用到 `decodeResourceStream` 方法，`decodeResourceStream` 方法如果判断到 `inDensity` 和 `inTargetDensity` 两个属性外部没有主动赋值的话，就会根据实际情况进行赋值
 
 ```java
 @Nullable
-public static Bitmap decodeResourceStream(@Nullable Resources res, @Nullable TypedValue value,
-        @Nullable InputStream is, @Nullable Rect pad, @Nullable Options opts) {
+public static Bitmap decodeResourceStream(
+        @Nullable Resources res,
+        @Nullable TypedValue value,
+        @Nullable InputStream is,
+        @Nullable Rect pad,
+        @Nullable Options opts) {
     validate(opts);
     if (opts == null) {
         opts = new Options();
@@ -132,15 +136,15 @@ public static Bitmap decodeResourceStream(@Nullable Resources res, @Nullable Typ
     if (opts.inDensity == 0 && value != null) {
         final int density = value.density;
         if (density == TypedValue.DENSITY_DEFAULT) {
-            //如果 density 没有赋值的话（等于0），那么就使用基准值 160 dpi
+            // 如果 density 没有赋值的话（等于0），那么就使用基准值 160 dpi
             opts.inDensity = DisplayMetrics.DENSITY_DEFAULT;
         } else if (density != TypedValue.DENSITY_NONE) {
-            //在这里进行赋值，density 就等于 drawable 对应的 dpi
+            // 在这里进行赋值，density 就等于 drawable 对应的 dpi
             opts.inDensity = density;
         }
-    }  
+    }
     if (opts.inTargetDensity == 0 && res != null) {
-        //如果没有主动设置 inTargetDensity 的话，inTargetDensity 就等于设备的 dpi
+        // 如果没有主动设置 inTargetDensity 的话，inTargetDensity 就等于设备的 dpi
         opts.inTargetDensity = res.getDisplayMetrics().densityDpi;
     }
     return decodeStream(is, pad, opts);
@@ -207,7 +211,7 @@ BitmapMainActivity: inTargetDensity: 480
 BitmapMainActivity: bitmap byteCount: 2073600
 ```
 
-可以看出来，inSampleSize 属性应该设置多少是需要根据 **Bitmap 的实际宽高**和 **ImageView 的实际宽高**这两个条件来一起决定的。我们在正式加载 Bitmap 前要先获取到 Bitmap 的实际宽高大小，这可以通过 inJustDecodeBounds 属性来实现。设置 inJustDecodeBounds  为 true 后 `decodeResource`方法只会去读取 Bitmap 的宽高属性而不会去进行实际加载，这个操作是比较轻量级的。然后通过每次循环对半折减，计算出 inSampleSize 需要设置为多少才能尽量接近到 ImageView 的实际宽高，之后将 inJustDecodeBounds 设置为 false 去实际加载 Bitmap
+可以看出来，inSampleSize 属性应该设置多少是需要根据 **Bitmap 的实际宽高**和 **ImageView 的实际宽高**这两个条件来一起决定的。我们在正式加载 Bitmap 前要先获取到 Bitmap 的实际宽高大小，这可以通过 inJustDecodeBounds 属性来实现。设置 inJustDecodeBounds 为 true 后 `decodeResource` 方法只会去读取 Bitmap 的宽高属性而不会去进行实际加载，这个操作是比较轻量级的。然后通过每次循环对半折减，计算出 inSampleSize 需要设置为多少才能尽量接近到 ImageView 的实际宽高，之后将 inJustDecodeBounds 设置为 false 去实际加载 Bitmap
 
 需要注意的是，inSampleSize 使用的最终值将是向下舍入为最接近的 2 的幂，BitmapFactory 内部会自动会该值进行校验修正
 

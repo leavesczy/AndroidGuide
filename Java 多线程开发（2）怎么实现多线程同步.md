@@ -1,4 +1,4 @@
-> 目前，多线程编程可以说是在大部分平台和应用上都需要实现的一个基本需求。本系列文章就来对 **Java 平台下的多线程编程知识** 进行讲解，从 **概念入门**、**底层实现** 到 **上层应用** 都会涉及到，预计一共会有五篇文章，希望对你有所帮助 😎😎😎
+> 目前，多线程编程可以说是在大部分平台和应用上都需要实现的一个基本需求。本系列文章就来对 **Java 平台下的多线程编程知识** 进行讲解，从 **概念入门**、**底层实现** 到 **上层应用** 都会涉及到，预计一共会有五篇文章，希望对你有所帮助
 >
 > 本篇文章是第二篇，介绍实现多线程同步的各类方案，涉及多种多线程同步机制，是开发者在语言层面上对多线程运行所做的规则设定
 
@@ -56,7 +56,7 @@ public class Test {
 
 }
 ```
-`synchronize` 关键字修饰的代码块就被称为同步块。当中，`lock`被称为锁句柄。锁句柄是对一个对象的引用，锁句柄对应的监视器就称为相应同步块的引导锁
+`synchronize` 关键字修饰的代码块就被称为同步块。当中，`lock` 被称为锁句柄。锁句柄是对一个对象的引用，锁句柄对应的监视器就称为相应同步块的引导锁
 
 ```java
 public class Test {
@@ -64,29 +64,23 @@ public class Test {
     private final Object lock = new Object();
 
     public void funName1() {
-        //同步块
+        // 同步块
         synchronized (lock) {
-
         }
     }
-
 }
 ```
 锁句柄如果为当前对象（this），那就相当于同步实例方法，如下两个同步方法是等价的
 
 ```java
 public class Test {
-    
+
     public void funName1() {
         synchronized (this) {
-
         }
     }
 
-    public synchronized void funName2() {
-
-    }
-
+    public synchronized void funName2() {}
 }
 ```
 同步静态方法则相当于以当前类对象为引导锁的同步块，如下两个同步方法是等价的
@@ -106,9 +100,9 @@ public class Test {
 
 }
 ```
-作为锁句柄的变量通常使用 `private final`修饰，这是因为锁句柄的变量一旦被改变，会导致执行同一个同步块的多个线程实际上使用不同的锁，从而导致竞态
+作为锁句柄的变量通常使用 `private final` 修饰，这是因为锁句柄的变量一旦被改变，会导致执行同一个同步块的多个线程实际上使用不同的锁，从而导致竞态
 
-对于内部锁来说，线程在执行临界区内代码之前必须获得该临界区的引导锁，执行完后就会自动释放引导锁，引导锁的申请和释放是由 Java 虚拟机代为执行的，这也是 `synchronized`被称为内部锁的原因。且由于 Java 编译器对同步块代码的特殊处理，即使临界区抛出异常，内部锁也会被自动释放，所以内部锁不会导致锁泄漏
+对于内部锁来说，线程在执行临界区内代码之前必须获得该临界区的引导锁，执行完后就会自动释放引导锁，引导锁的申请和释放是由 Java 虚拟机代为执行的，这也是 `synchronized` 被称为内部锁的原因。且由于 Java 编译器对同步块代码的特殊处理，即使临界区抛出异常，内部锁也会被自动释放，所以内部锁不会导致锁泄漏
 
 ## 2、显式锁
 
@@ -120,17 +114,17 @@ Lock 的使用方式较为灵活，可以在方法 A 内申请锁，在方法 B 
 private Lock lock = new ReentrantLock(false);
 
 private void funName() {
-    //申请锁
+    // 申请锁
     lock.lock();
     try {
-        //action
+        // action
     } finally {
-        //释放锁
+        // 释放锁
         lock.unlock();
     }
 }
 ```
-ReentrantLock 既支持公平调度策略也支持非公平调度策略，通过其一个参数的构造函数来指定，传值为 true 表示公平锁，false 表示非公平锁， 默认使用非公平调度策略。此外，由于虚拟机并不会自动为我们释放锁，所以为了避免锁泄漏，一般会将 `Lock.unlock()`方法放在 `finally` 中执行，以保证临界区内的代码不管是正常结束还是异常退出，相应的锁释放操作都会被执行
+ReentrantLock 既支持公平调度策略也支持非公平调度策略，通过其一个参数的构造函数来指定，传值为 true 表示公平锁，false 表示非公平锁， 默认使用非公平调度策略。此外，由于虚拟机并不会自动为我们释放锁，所以为了避免锁泄漏，一般会将 `Lock.unlock()` 方法放在 `finally` 中执行，以保证临界区内的代码不管是正常结束还是异常退出，相应的锁释放操作都会被执行
 
 ## 3、内部锁和显式锁的比较
 
@@ -158,7 +152,7 @@ ReentrantLock 既支持公平调度策略也支持非公平调度策略，通过
 其优点主要有以下几点：
 
 1. 相对内部锁在使用上更具灵活性，可以跨方法来完成锁的申请和释放操作
-2. 功能相对内部锁要丰富许多。例如，可以通过 `Lock.isLocked()`判断当前线程是否已经持有该锁、通过 `Lock.tryLock()` 尝试申请锁以避免由于锁被其它线程持有而导致当前线程被暂停、通过 `Lock.tryLock(long,TimeUnit)` 在指定时间范围内尝试申请锁、`Lock.lockInterruptibly()` 支持线程中断
+2. 功能相对内部锁要丰富许多。例如，可以通过 `Lock.isLocked()` 判断当前线程是否已经持有该锁、通过 `Lock.tryLock()` 尝试申请锁以避免由于锁被其它线程持有而导致当前线程被暂停、通过 `Lock.tryLock(long,TimeUnit)` 在指定时间范围内尝试申请锁、`Lock.lockInterruptibly()` 支持线程中断
 3. 同时支持公平调度策略和非公平调度策略
 
 ## 4、读写锁
@@ -202,7 +196,7 @@ public class Test {
     public void reader() {
         readLock.lock();
         try {
-            //在此区域读取共享变量
+            // 在此区域读取共享变量
         } finally {
             readLock.unlock();
         }
@@ -211,12 +205,11 @@ public class Test {
     public void writer() {
         writeLock.lock();
         try {
-            //在此区域更新共享变量
+            // 在此区域更新共享变量
         } finally {
             writeLock.unlock();
         }
     }
-
 }
 ```
 读写锁在原子性、可见性和有序性保障方面，它所起的作用和普通的排他锁是一样的，但由于读写锁内部实现比内部锁和其它显式锁要复杂很多，因此读写锁适合于在以下条件同时得以满足的场景下使用：
@@ -322,7 +315,7 @@ class PrinterWriteThread(private val printer: Printer) : Thread() {
 ```kotlin
 fun main() {
     val printer: Printer = SynchronizedPrinter()
-	//val printer: Printer = ReadWriteLockPrinter()
+    //val printer: Printer = ReadWriteLockPrinter()
 
     val threadNum = 10
 
@@ -450,11 +443,11 @@ synchronized(someObject){
     someObject.notify()
 }
 ```
-由于只有在持有一个对象的内部锁的情况下才能够执行该对象的 `notify()` 方法，所以 `Object.notify()` 方法也总是放在相应对象内部锁所引导的临界区之内。也正因为如此， `Object.wait()` 在暂停其执行线程的同时也必须释放 Object 的内部锁，否则通知线程就永远也无法来唤醒等待线程。和 `Object.wait()` 不同，`Object.notify()` 方法本身并不会释放内部锁，只有在其所在的临界区代码执行结束后才会被释放。因此，为了使得等待线程在被唤醒后能够尽快获得相应的内部锁，我们要尽量将 `Object.notify()` 代码放在靠近临界区结束的地方，否则如果 `Object.notify()`唤醒了等待线程而通知线程又迟迟不释放内部锁，就有可能导致等待线程再次经历上下文切换，从而浪费系统资源
+由于只有在持有一个对象的内部锁的情况下才能够执行该对象的 `notify()` 方法，所以 `Object.notify()` 方法也总是放在相应对象内部锁所引导的临界区之内。也正因为如此， `Object.wait()` 在暂停其执行线程的同时也必须释放 Object 的内部锁，否则通知线程就永远也无法来唤醒等待线程。和 `Object.wait()` 不同，`Object.notify()` 方法本身并不会释放内部锁，只有在其所在的临界区代码执行结束后才会被释放。因此，为了使得等待线程在被唤醒后能够尽快获得相应的内部锁，我们要尽量将 `Object.notify()` 代码放在靠近临界区结束的地方，否则如果 `Object.notify()` 唤醒了等待线程而通知线程又迟迟不释放内部锁，就有可能导致等待线程再次经历上下文切换，从而浪费系统资源
 
 调用 `Object.notify()` 所唤醒的线程仅是 Object 对象上的任意一个等待线程，所以被唤醒的线程有可能并不是我们真正想要唤醒的线程。因此，有时我们需要改用 `Object.notifyAll()` 方法，该方法可以唤醒 Object 上的所有等待线程。被唤醒的线程就都有了抢夺相应 Object 对象的内部锁的机会。而如果被唤醒的线程在占用处理器继续运行后且申请到内部锁之前，有其它线程（被唤醒的等待线程之一或者是新到来的线程）先持有了内部锁，那么这个被唤醒的线程可能又会再次被暂停，等待再次被唤醒的机会，而这个过程会导致上下文切换
 
-wait/notify 机制也被应用于 Thread 类内部。例如，`Thread.join()` 方法提供了在某个线程运行结束前暂停该方法调用者线程的功能，内部也使用到 `wait()` 方法来暂停调用者线程，等到线程终止后 JVM 内部就会通过 `notifyAll()`方法来唤醒所有等待线程
+wait/notify 机制也被应用于 Thread 类内部。例如，`Thread.join()` 方法提供了在某个线程运行结束前暂停该方法调用者线程的功能，内部也使用到 `wait()` 方法来暂停调用者线程，等到线程终止后 JVM 内部就会通过 `notifyAll()` 方法来唤醒所有等待线程
 
 ```java
 public final synchronized void join(long millis) throws InterruptedException {
@@ -582,7 +575,7 @@ wait/notify 存在过早唤醒、可能多次线程上下文切换次数、无�
 
 Condition 接口定义的 await()、singal()、singalAll() 等方法相当于 Object.wait()、Object.notify()、Object.notifyAll()。Object.wait()/notify() 方法要求其执行线程必须持有相应对象的内部锁，类似的，Condition.await()/singal() 也要求其执行线程必须持有创建该 Condition 实例的显式锁
 
-使用 Condition  实现等待和通知，其代码模板如以下伪代码所示。`Lock.newCondition()` 方法的返回值就是一个 Condition 实例。每个 Condition 实例内部都维护了一个用于存储等待线程的队列，`Condition.await()` 方法的执行线程会被暂停并存入等待队列中。`Condition.notify()` 方法会分别使等待队列中的一个线程被唤醒，而用同一个 Lock 创建的其它 Condition 实例中的等待线程并不会收到影响。这就使得我们可以精准唤醒目标线程，避免过早唤醒，减少线程上下文切换的次数
+使用 Condition 实现等待和通知，其代码模板如以下伪代码所示。`Lock.newCondition()` 方法的返回值就是一个 Condition 实例。每个 Condition 实例内部都维护了一个用于存储等待线程的队列，`Condition.await()` 方法的执行线程会被暂停并存入等待队列中。`Condition.notify()` 方法会分别使等待队列中的一个线程被唤醒，而用同一个 Lock 创建的其它 Condition 实例中的等待线程并不会收到影响。这就使得我们可以精准唤醒目标线程，避免过早唤醒，减少线程上下文切换的次数
 
 ```kotlin
 class ConditionDemo {
@@ -763,7 +756,7 @@ TakeThread get value : 8
 ```
 ## 2、CountDownLatch
 
-有时候会存在某个线程需要等待其它线程完成特定操作后才能继续运行的需求，此时使用 `Object.wait()` 和 `Object.notify()`也可以满足需求，但是使用上会比较繁琐，此时可以考虑通过 CountDownLatch 来实现
+有时候会存在某个线程需要等待其它线程完成特定操作后才能继续运行的需求，此时使用 `Object.wait()` 和 `Object.notify()` 也可以满足需求，但是使用上会比较繁琐，此时可以考虑通过 CountDownLatch 来实现
 
 CountDownLatch 可用来实现一个或多个线程等待其它线程完成特定操作后才继续运行的功能，这组操作被称为先决条件。CountDownLatch 内部会维护一个用于标记需要等待完成的先决条件的数量的计数器，当每个先决条件完成时，先决条件的执行线程就通过调用 `CountDownLatch.countDown()` 来使计算器减一。而 `CountDownLatch.await()` 就相当于一个受保护方法，其保护条件为“计算器值为零”，当计算器值不为零时，调用了 `CountDownLatch.await()` 方法的执行线程都会被暂停。当所有先决条件都完成时，即当“计算器值为零”的保护条件成立时，CountDownLatch 上的所有等待线程就都会被唤醒，继续运行
 
@@ -875,10 +868,10 @@ ServiceB执行完毕
 等待所有 Services 执行完毕
 ServiceA执行完毕
 Exception in thread "Thread-2" java.lang.RuntimeException: ServiceC failed
-	at thread.ServiceC.doTask(CountDownLatchTest.kt:93)
-	at thread.AbstractService$start$1.invoke(CountDownLatchTest.kt:55)
-	at thread.AbstractService$start$1.invoke(CountDownLatchTest.kt:46)
-	at kotlin.concurrent.ThreadsKt$thread$thread$1.run(Thread.kt:30)
+    at thread.ServiceC.doTask(CountDownLatchTest.kt:93)
+    at thread.AbstractService$start$1.invoke(CountDownLatchTest.kt:55)
+    at thread.AbstractService$start$1.invoke(CountDownLatchTest.kt:46)
+    at kotlin.concurrent.ThreadsKt$thread$thread$1.run(Thread.kt:30)
 ServiceB执行完毕
 执行结果： false
 ```
@@ -1010,12 +1003,13 @@ ThreadLocal 不太一样，ThreadLocal 也是用于多线程环境，但其实�
 public static void main(String[] args) throws InterruptedException {
     ThreadLocal<String> threadLocal = new ThreadLocal<>();
     threadLocal.set("业志陈");
-    Thread subThread = new Thread() {
-        @Override
-        public void run() {
-            System.out.println("subThread :" + threadLocal.get());
-        }
-    };
+    Thread subThread =
+            new Thread() {
+                @Override
+                public void run() {
+                    System.out.println("subThread :" + threadLocal.get());
+                }
+            };
     subThread.start();
     subThread.join();
     System.out.println("mainThread: " + threadLocal.get());
@@ -1035,13 +1029,13 @@ ThreadLocal 是一个泛型类，其对外部开放的方法主要就是 `get()�
 
 ```java
 public T get() {
-    Thread t = Thread . currentThread ();
-    ThreadLocalMap map = getMap (t);
+    Thread t = Thread.currentThread();
+    ThreadLocalMap map = getMap(t);
     if (map != null) {
-        ThreadLocalMap.Entry e = map . getEntry (this);
+        ThreadLocalMap.Entry e = map.getEntry(this);
         if (e != null) {
             @SuppressWarnings("unchecked")
-            T result =(T) e . value;
+            T result = (T) e.value;
             return result;
         }
     }
@@ -1049,13 +1043,11 @@ public T get() {
 }
 
 private T setInitialValue() {
-    T value = initialValue ();
-    Thread t = Thread . currentThread ();
-    ThreadLocalMap map = getMap (t);
-    if (map != null)
-        map.set(this, value);
-    else
-        createMap(t, value);
+    T value = initialValue();
+    Thread t = Thread.currentThread();
+    ThreadLocalMap map = getMap(t);
+    if (map != null) map.set(this, value);
+    else createMap(t, value);
     return value;
 }
 
@@ -1068,34 +1060,30 @@ ThreadLocalMap getMap(Thread t) {
 }
 
 void createMap(Thread t, T firstValue) {
-    t.threadLocals = new ThreadLocalMap (this, firstValue);
+    t.threadLocals = new ThreadLocalMap(this, firstValue);
 }
 ```
-`set(T)` 和 `remove()`两个方法也是以当前 ThreadLocal 作为 key，对 ThreadLocalMap 进行赋值操作和移除操作
+`set(T)` 和 `remove()` 两个方法也是以当前 ThreadLocal 作为 key，对 ThreadLocalMap 进行赋值操作和移除操作
 
 ```java
 public void set(T value) {
     Thread t = Thread.currentThread();
     ThreadLocalMap map = getMap(t);
-    if (map != null)
-        map.set(this, value);
-    else
-        createMap(t, value);
+    if (map != null) map.set(this, value);
+    else createMap(t, value);
 }
 
- public void remove() {
-     ThreadLocalMap m = getMap(Thread.currentThread());
-     if (m != null)
-         m.remove(this);
- }
+public void remove() {
+    ThreadLocalMap m = getMap(Thread.currentThread());
+    if (m != null) m.remove(this);
+}
 ```
 可以看到，ThreadLocal 的主要实现逻辑还是在于 ThreadLocalMap，每个 Thread 都有自己单独的一个 ThreadLocalMap 对象，ThreadLocal 就以自身作为 key 来存储在 ThreadLocalMap 中，每个 ThreadLocal 就用于为本线程维护一个特定的值，从而使得不同线程间即使是使用同个 ThreadLocal 对象也可以单独维护一个特定的值
 
 ```java
 public class Thread implements Runnable {
-    
+
     ThreadLocal.ThreadLocalMap threadLocals = null;
-    
 }
 ```
 由于一个线程可以关联多个 ThreadLocal，所以 ThreadLocalMap 就以数组的形式 `Entry[]` 来存储 ThreadLocal
@@ -1151,7 +1139,7 @@ public class Thread implements Runnable {
     
     //向此线程发起中断请求
     public void interrupt() {
-    	...
+        ...
     }
     
     //在获取中断标记的同时将中断标记置为 false
@@ -1197,22 +1185,19 @@ public final class Singleton {
 
     private static Singleton instance = null;
 
-    private Singleton() {
-
-    }
+    private Singleton() {}
 
     public static Singleton getInstance() {
-        if (instance == null) { //操作1
-            instance = new Singleton(); //操作2
+        if (instance == null) { // 操作1
+            instance = new Singleton(); // 操作2
         }
         return instance;
     }
-
 }
 ```
 ## 2、双重检查锁定
 
-对于上述的在单线程环境下可以正常使用的单例模式，在多线程环境下就很容易出现问题。`getInstance()`方法本身是基于 **check-then-act** 操作来判断是否需要初始化共享变量的，该操作并不是一个原子操作。在 instance 还为 null 时，假设有两个线程 T1 和 T2 同时执行到操作1，接着在 T1 执行操作2之前 T2 已经执行完操作2，在下一时刻，当 T1 执行到操作2的时候，即使 instance 当前已经不为 null，但是 T1 此时依然会多创建一个实例，这就导致了多个实例的创建
+对于上述的在单线程环境下可以正常使用的单例模式，在多线程环境下就很容易出现问题。`getInstance()` 方法本身是基于 **check-then-act** 操作来判断是否需要初始化共享变量的，该操作并不是一个原子操作。在 instance 还为 null 时，假设有两个线程 T1 和 T2 同时执行到操作1，接着在 T1 执行操作2之前 T2 已经执行完操作2，在下一时刻，当 T1 执行到操作2的时候，即使 instance 当前已经不为 null，但是 T1 此时依然会多创建一个实例，这就导致了多个实例的创建
 
 首先，我们最先想到的可能是通过加锁来避免这种情况
 
@@ -1226,14 +1211,14 @@ public static Singleton getInstance() {
     return instance;
 }
 ```
-上述方式实现的单例模式固然是线程安全的，但是这也意味着 `getInstance()`方法的任何一个执行线程都需要申请锁，为了避免无谓的锁开销，人们又想到以下这种方法，即双重检查锁定。在执行临界区代码前先判断 instance 是否为 null，如果不为 null ，则直接返回 instance 变量，否则才执行临界区代码来完成 instance 变量的初始化
+上述方式实现的单例模式固然是线程安全的，但是这也意味着 `getInstance()` 方法的任何一个执行线程都需要申请锁，为了避免无谓的锁开销，人们又想到以下这种方法，即双重检查锁定。在执行临界区代码前先判断 instance 是否为 null，如果不为 null ，则直接返回 instance 变量，否则才执行临界区代码来完成 instance 变量的初始化
 
 ```java
 public static Singleton getInstance() {
-    if (instance == null) { //操作1
+    if (instance == null) { // 操作1
         synchronized (Singleton.class) {
-            if (instance == null) { //操作2
-                instance = new Singleton(); //操作3
+            if (instance == null) { // 操作2
+                instance = new Singleton(); // 操作3
             }
         }
     }
@@ -1268,9 +1253,7 @@ public final class Singleton {
 
     private static volatile Singleton instance = null;
 
-    private Singleton() {
-
-    }
+    private Singleton() {}
 
     public static Singleton getInstance() {
         if (instance == null) {
@@ -1286,7 +1269,6 @@ public final class Singleton {
     public static void main(String[] args) {
         Singleton singleton = Singleton.getInstance();
     }
-
 }
 ```
 ## 3、静态内部类
@@ -1328,14 +1310,9 @@ public class SingletonExample {
     }
 
     public enum Singleton {
-
         INSTANCE;
 
-        void doSomething() {
-
-        }
-
+        void doSomething() {}
     }
-
 }
 ```

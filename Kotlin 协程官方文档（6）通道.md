@@ -1,5 +1,5 @@
 > 最近一直在了解关于 **Kotlin协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
-> 
+>
 > 协程官方文档：[coroutines-guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/coroutines-guide.md)
 
 Deferred 值提供了在协程之间传递单个值的方便方法，而通道（Channels）提供了一种传输值流的方法
@@ -201,7 +201,7 @@ fun CoroutineScope.filter(numbers: ReceiveChannel<Int>, prime: Int) = produce<In
 29
 ```
 
-注意，你可以使用标准库中的 iterator 协程构造器来构建相同的管道。将 product 替换为 iterator，send 替换为 yield，receive 替换为 next，ReceiveChannel 替换为 iterator，并去掉协程作用域。你也不需要再使用 runBlocking 。但是，使用如上所示的通道的管道的好处是，如果在 Dispatchers.Default 上下文中运行它，它实际上可以利用多个 CPU 来执行代码  
+注意，你可以使用标准库中的 iterator 协程构造器来构建相同的管道。将 product 替换为 iterator，send 替换为 yield，receive 替换为 next，ReceiveChannel 替换为 iterator，并去掉协程作用域。你也不需要再使用 runBlocking 。但是，使用如上所示的通道的管道的好处是，如果在 Dispatchers.Default 上下文中运行它，它实际上可以利用多个 CPU 来执行代码
 
 但无论如何，如上所述的替代方案也是一个非常不切实际的来寻找素数的方法。实际上，管道确实涉及一些其他挂起调用（如对远程服务的异步调用），并且这些管道不能使用 sequence/iterator 来构建，因为它们不允许任意挂起，而 product 是完全异步的
 
@@ -274,9 +274,9 @@ Processor #1 received 9
 Processor #3 received 10
 ```
 
-请注意，取消 producer 协程会关闭其通道，从而最终终止 processor  协程正在执行的通道上的迭代
+请注意，取消 producer 协程会关闭其通道，从而最终终止 processor 协程正在执行的通道上的迭代
 
-另外，请注意我们如何使用 for 循环在通道上显式迭代以在 launchProcessor 代码中执行 fan-out。与 consumeEach 不同，这个 for 循环模式在多个协程中使用是完全安全的。如果其中一个 processor  协程失败，则其他处理器仍将处理通道，而通过 consumeEach  写入的处理器总是在正常或异常完成时消费（取消）底层通道
+另外，请注意我们如何使用 for 循环在通道上显式迭代以在 launchProcessor 代码中执行 fan-out。与 consumeEach 不同，这个 for 循环模式在多个协程中使用是完全安全的。如果其中一个 processor 协程失败，则其他处理器仍将处理通道，而通过 consumeEach 写入的处理器总是在正常或异常完成时消费（取消）底层通道
 
 # 七、扇入
 
@@ -332,7 +332,7 @@ BAR!
 
 到目前为止显示的通道都没有缓冲区。无缓冲通道在发送方和接收方同时调用发送和接收操作时传输元素。如果先调用 send，则在调用 receive 之前会将其挂起；如果先调用 receive ，则在调用 send 之前会将其挂起
 
-Channel() 工厂函数和 produce 构建器都采用可选的参数 ```capacity```  来指定缓冲区大小。 缓冲用于允许发送者在挂起之前发送多个元素，类似于具有指定容量的 BlockingQueue，它在缓冲区已满时才阻塞
+Channel() 工厂函数和 produce 构建器都采用可选的参数 ```capacity``` 来指定缓冲区大小。 缓冲用于允许发送者在挂起之前发送多个元素，类似于具有指定容量的 BlockingQueue，它在缓冲区已满时才阻塞
 
 查看以下代码的效果：
 

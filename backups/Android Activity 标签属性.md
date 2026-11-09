@@ -8,11 +8,11 @@ Activity 是 Android 系统四大应用组件之一，用户可与 Activity 提�
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-		
-		
+        
+        
         <activity android:name=".Example">
         </activity>
-		
+        
     </application>
 ```
 
@@ -226,7 +226,7 @@ Activity 逻辑父项的类名称。此处的名称必须与为相应 **< activi
 系统会读取该属性，以确定当用户按下操作栏中的“向上”按钮时应该启动哪一个 Activity。 系统还可以利用这些信息通过 **TaskStackBuilder** 合成 Activity 的返回栈
 该属性是在 API 级别 16 引入的，要支持 API 级别 4 - 16，还可以使用为 "**android.support.PARENT_ACTIVITY**" 指定值的 **< meta-data >** 元素来声明父 Activity。例如：
 
-```
+```xml
 <activity
     android:name="com.example.app.ChildActivity"
     android:label="@string/title_child_activity"
@@ -326,7 +326,7 @@ Activity 的主窗口与包含屏幕软键盘的窗口的交互方式。 该属�
 
  该设置必须是下表所列的值之一，或者是一个“state...”值加上一个“adjust...”值的组合。 在任一组中设置多个值（例如，多个“state...”值）都会产生未定义结果。各值之间使用垂直条“ | ”分隔
 
-```
+```xml
 <activity android:windowSoftInputMode="stateVisible|adjustResize" . . . >
 ```
 |       属性值       |                             说明                             |

@@ -46,14 +46,14 @@ void main() {
 
 ```dart
 void main() {
-  int intValue;
-  print(intValue); //null
+    int intValue;
+    print(intValue); //null
 
-  intValue = 10;
-  print(intValue); //10
+    intValue = 10;
+    print(intValue); //10
 
-  var varIntValue = 20;
-  print(varIntValue); //20
+    var varIntValue = 20;
+    print(varIntValue); //20
 }
 ```
 
@@ -62,17 +62,17 @@ dart 是强类型语言，无法将一个已声明具体变量类型的变量赋
 例如，以下代码会导致报错，因为无法将一个 double 值赋值到一个 int 类型变量上
 
 ```dart
-  int intValue = 20;
-  intValue = 20.0; //error
+    int intValue = 20;
+    intValue = 20.0; //error
 ```
 
 但由于 `int` 和 `double` 类都是 **num 类的子类**，所以以下操作是合法的
 
 ```dart
-  num numValue = 10;
-  print(numValue.runtimeType); //int
-  numValue = 10.22;
-  print(numValue.runtimeType); //double
+    num numValue = 10;
+    print(numValue.runtimeType); //int
+    numValue = 10.22;
+    print(numValue.runtimeType); //double
 ```
 
 ## 2、dynamic
@@ -80,10 +80,10 @@ dart 是强类型语言，无法将一个已声明具体变量类型的变量赋
 `dynamic` 类似于 Java 中的 `Object`，`dynamic` 对象可以用来指向任意类型变量，非 null 的 dynamic 变量会有具体的运行时类型
 
 ```dart
-  dynamic value = "leavesczy";
-  print(value.runtimeType); //String
-  value = 12121;
-  print(value.runtimeType); //int
+    dynamic value = "leavesczy";
+    print(value.runtimeType); //String
+    value = 12121;
+    print(value.runtimeType); //int
 ```
 
 ## 3、final 和 const
@@ -96,18 +96,18 @@ const 变量代表的是编译时常量，例如字面量就是一种编译时�
 
 ```dart
 void main() {
-  const URL = "https://github.com/leavesczy/AndroidGuide";
-  var booleValue = true;
-  final name = getName(booleValue);
-  print(name);
+    const URL = "https://github.com/leavesczy/AndroidGuide";
+    var booleValue = true;
+    final name = getName(booleValue);
+    print(name);
 }
 
 String getName(boolValue) {
-  if (boolValue) {
-    return "leavesczy";
-  } else {
-    return "leavesczy =_=";
-  }
+    if (boolValue) {
+        return "leavesczy";
+    } else {
+        return "leavesczy =_=";
+    }
 }
 ```
 
@@ -119,25 +119,25 @@ dart 的数字类型有 int 和 double 两种，这两种都是 num 类的子类
 
 ```dart
 void main() {
-  var intValue = 100;
-  print(intValue.runtimeType); //int
+    var intValue = 100;
+    print(intValue.runtimeType); //int
 
-  var doubleValue = 100.0;
-  print(doubleValue.runtimeType); //double
+    var doubleValue = 100.0;
+    print(doubleValue.runtimeType); //double
 
-  num numValue = 100;
-  print(numValue.runtimeType); //int
-  numValue = 100.0;
-  print(numValue.runtimeType); //double
+    num numValue = 100;
+    print(numValue.runtimeType); //int
+    numValue = 100.0;
+    print(numValue.runtimeType); //double
 }
 ```
 
 一些常见的数字类型转换方法
 
 ```dart
-  print(num.parse("2000"));
-  print(int.parse("200"));
-  print(double.parse("121"));
+    print(num.parse("2000"));
+    print(int.parse("200"));
+    print(double.parse("121"));
 ```
 
 ## 2、string
@@ -145,18 +145,18 @@ void main() {
 除了可以通过单引号或者双引号来声明一个字符串外，也可以通过相邻的字符串字面量来声明一个组合字符串（相当于使用 + 把字符串相加为一个整体），此时可以混用**单引号**和**双引号**，但建议只用单引号
 
 ```dart
-  var stringValue = "leavesczy";
-  var stringValue2 = 'leavesczy =_=';
-  var stringValue3 = "分段 "
-      "换行了也可以"
-      '又换了一行';
-  print(stringValue3); //分段 换行了也可以又换了一行
+    var stringValue = "leavesczy";
+    var stringValue2 = 'leavesczy =_=';
+    var stringValue3 = "分段 "
+            "换行了也可以"
+            '又换了一行';
+    print(stringValue3); //分段 换行了也可以又换了一行
 ```
 
 此外，也可以使用带有单引号或双引号的三重引号，此时包含的转义字符是有效的
 
 ```dart
-var stringValue='''\n 换行符
+var stringValue = '''\n 换行符
   \t 制表符
   ''';
 ```
@@ -164,7 +164,7 @@ var stringValue='''\n 换行符
 也可以用 **r前缀** 创建一个原始字符串，包含的转义字符将会失效
 
 ```dart
-  var stringValue=r'''
+var stringValue = r'''
   \n 换行符
   \t 制表符
   ''';
@@ -181,17 +181,17 @@ list 也是最常见的数据类型之一，dart 通过方括号来声明 list �
 由于 dart 具有类型推导功能，因此 listValue 自动被赋予为 **List< int >** 类型，因此在声明 listValue 后就无法为其添加其他类型变量的值了
 
 ```dart
-  var listValue = [1, 2, 3];
-  // listValue.add("4"); error
-  print(listValue.runtimeType); //List<int>
+    var listValue = [1, 2, 3];
+    // listValue.add("4"); error
+    print(listValue.runtimeType); //List<int>
 ```
 
 如果想要为 List 添加不同数据类型的变量，则需要直接指明数据类型为 Object
 
 ```dart
-  var listValue = <Object>[1, 2, 3];
-  listValue.add("4");
-  print(listValue.runtimeType); //List<Object>
+    var listValue = <Object>[1, 2, 3];
+    listValue.add("4");
+    print(listValue.runtimeType); //List<Object>
 ```
 
 大多数时候为了限制 List 的可存储数据类型，在使用时就直接指明数据类型
@@ -203,17 +203,17 @@ var intList = <int>[1, 2, 3, 4];
 如果在声明 List 时调用了其指定集合大小的构造函数，则集合大小就是固定的了，列表的长度不能在运行时更改
 
 ```dart
-  var list = List<int>(2);
-  list.add(2); //error，会导致抛出 Unsupported operation: Cannot add to a fixed-length list
+    var list = List<int>(2);
+    list.add(2); //error，会导致抛出 Unsupported operation: Cannot add to a fixed-length list
 ```
 
 要创建一个编译时常量列表，则在列表字面量之前添加 const 关键字
 
 ```dart
-  var constantList = const [1, 2, 3];
-  //error，可正常编译，但会导致运行时抛出异常
-  //constantList[0] = 2;
-  //constantList.add(2);
+var constantList = const [1, 2, 3];
+//error，可正常编译，但会导致运行时抛出异常
+//constantList[0] = 2;
+//constantList.add(2);
 ```
 
 ## 5、set
@@ -222,9 +222,9 @@ Set 是一种不包含重复数据的数据集合，使用方式上和 List 基�
 
 ```dart
 void main() {
-  var list = [1, 2, 2, 3, 4, 5, 5];
-  var set = Set.from(list);
-  print(set); //{1, 2, 3, 4, 5}
+    var list = [1, 2, 2, 3, 4, 5, 5];
+    var set = Set.from(list);
+    print(set); //{1, 2, 3, 4, 5}
 }
 ```
 
@@ -234,11 +234,11 @@ map 是一个关联键和值的数据类型，键和值可以是任何类型的�
 
 ```dart
 void main() {
-  var mapValue = {"name": "leavesczy", "age": 24};
-  mapValue["url"] = "https://github.com/leavesczy";
-  print(mapValue); //{name: leavesczy, age: 24, url: https://github.com/leavesczy}
-  print(mapValue.length); //3
-  print(mapValue.runtimeType); //_InternalLinkedHashMap<String, Object>
+    var mapValue = {"name": "leavesczy", "age": 24};
+    mapValue["url"] = "https://github.com/leavesczy";
+    print(mapValue); //{name: leavesczy, age: 24, url: https://github.com/leavesczy}
+    print(mapValue.length); //3
+    print(mapValue.runtimeType); //_InternalLinkedHashMap<String, Object>
 }
 ```
 
@@ -251,9 +251,9 @@ var mapValue = <String, String>{"name": "leavesczy"};
 与 list 类似，要创建一个编译时常量的 map 需要在 map 的字面量前加上 const 关键字
 
 ```dart
-  var mapValue = const {"name": "leavesczy", "age": 24};
-  //error，可正常编译，但会导致运行时抛出异常
-  mapValue["name"] = "hi";
+    var mapValue = const {"name": "leavesczy", "age": 24};
+    //error，可正常编译，但会导致运行时抛出异常
+    mapValue["name"] = "hi";
 ```
 
 # 四、函数
@@ -266,18 +266,18 @@ dart 是一种真正的面向对象语言，所以即使函数也是对象，即
 
 ```dart
 void main() {
-  printMsg("leavesczy");
+    printMsg("leavesczy");
 
-  printMsg2(100);
-  printMsg2("leavesczy");
+    printMsg2(100);
+    printMsg2("leavesczy");
 }
 
 void printMsg(String msg) {
-  print(msg);
+    print(msg);
 }
 
 void printMsg2(msg) {
-  print(msg);
+    print(msg);
 }
 ```
 
@@ -291,11 +291,11 @@ void printMsg3(msg) => print(msg);
 
 ```dart
 void main() {
-  print(printValue(121) == null); //true
+    print(printValue(121) == null); //true
 }
 
 printValue(value) {
-  print("value is: $value");
+    print("value is: $value");
 }
 ```
 
@@ -308,7 +308,7 @@ void main() {
   var printUserFun = printName;
   printUserFun("leavesczy"); //name: leavesczy
 
-  var list = ["leavesczy", "叶"]; 
+  var list = ["leavesczy", "叶"];
   list.forEach(printName); //name: leavesczy   name: 叶
 
   var sayHelloFun = (String name) => print("$name , hello");
@@ -326,12 +326,12 @@ void printName(String name) {
 
 ```dart
 void main() {
-  printUser("leavesczy"); //name: leavesczy, age: null
-  printUser("leavesczy", 25); //name: leavesczy, age: 25
+    printUser("leavesczy"); //name: leavesczy, age: null
+    printUser("leavesczy", 25); //name: leavesczy, age: 25
 }
 
 void printUser(String name, [int age]) {
-  print("name: $name, age: $age");
+    print("name: $name, age: $age");
 }
 ```
 
@@ -341,17 +341,17 @@ void printUser(String name, [int age]) {
 
 ```dart
 void main() {
-  printUser("leavesczy"); //name: leavesczy, age: null
-  printUser("leavesczy", age: 25); //name: leavesczy, age: 25
-  printUser2("leavesczy", age: 25); //name: leavesczy, age: 25
+    printUser("leavesczy"); //name: leavesczy, age: null
+    printUser("leavesczy", age: 25); //name: leavesczy, age: 25
+    printUser2("leavesczy", age: 25); //name: leavesczy, age: 25
 }
 
 void printUser(String name, {int age}) {
-  print("name: $name, age: $age");
+    print("name: $name, age: $age");
 }
 
 void printUser2(String name, {age: int}) {
-  print("name: $name, age: $age");
+    print("name: $name, age: $age");
 }
 ```
 
@@ -361,19 +361,19 @@ void printUser2(String name, {age: int}) {
 
 ```dart
 void main() {
-  printUser("leavesczy"); //name: leavesczy, age: 30
-  printUser("leavesczy", 25); //name: leavesczy, age: 25
+    printUser("leavesczy"); //name: leavesczy, age: 30
+    printUser("leavesczy", 25); //name: leavesczy, age: 25
 
-  printUser2("leavesczy"); //name: leavesczy, age: 30
-  printUser2("leavesczy", age: 25); //name: leavesczy, age: 25
+    printUser2("leavesczy"); //name: leavesczy, age: 30
+    printUser2("leavesczy", age: 25); //name: leavesczy, age: 25
 }
 
 void printUser(String name, [int age = 30]) {
-  print("name: $name, age: $age");
+    print("name: $name, age: $age");
 }
 
 void printUser2(String name, {int age = 30}) {
-  print("name: $name, age: $age");
+    print("name: $name, age: $age");
 }
 ```
 
@@ -383,13 +383,13 @@ void printUser2(String name, {int age = 30}) {
 
 ```dart
 void main() {
-  var printFunction = printUser;
-  printFunction("leavesczy");
-  print(printFunction); //Closure: (String, [int]) => void from Function 'printUser': static.
+    var printFunction = printUser;
+    printFunction("leavesczy");
+    print(printFunction); //Closure: (String, [int]) => void from Function 'printUser': static.
 }
 
 void printUser(String name, [int age = 30]) {
-  print("name: $name, age: $age");
+    print("name: $name, age: $age");
 }
 ```
 
@@ -398,9 +398,9 @@ void printUser(String name, [int age = 30]) {
 ```dart
 void main() {
   var list = {1, 2, 3};
-//  value is: 1
-//  value is: 2
-//  value is: 3
+  //  value is: 1
+  //  value is: 2
+  //  value is: 3
   list.forEach(printValue);
 }
 
@@ -416,9 +416,9 @@ void printValue(value) {
 ```dart
 void main() {
   var list = {1, 2, 3};
-//  value is: 1
-//  value is: 2
-//  value is: 3
+  //  value is: 1
+  //  value is: 2
+  //  value is: 3
   list.forEach((element) {
     print("value is: $element");
   });
@@ -433,13 +433,14 @@ void main() {
 ```dart
 void main() {
   var list = {1, 2, 3};
-//  value is: 2
-//  value is: 3
-//  value is: 4
+  //  value is: 2
+  //  value is: 3
+  //  value is: 4
   list.forEach((element) {
     int add(int value1, int value2) {
       return value1 + value2;
     }
+
     print("value is: ${add(element, 1)}");
   });
 }
@@ -451,52 +452,52 @@ dart 提供了一些比较简便的运算符来简化操作，大部分和 Java 
 
 ```dart
 void main() {
-  //is 用于判断变量是否是指定的数据类型
-  //is! 含义是 is 取反
-  var strValue = "leavesczy";
-  print(strValue is String); //true
-  print(strValue is int); //false
-  print(strValue is! String); //false
+    //is 用于判断变量是否是指定的数据类型
+    //is! 含义是 is 取反
+    var strValue = "leavesczy";
+    print(strValue is String); //true
+    print(strValue is int); //false
+    print(strValue is! String); //false
 
-  // ~/ 用于除法运算时取整，/ 则不取整
-  print(10 / 3); //3.3333333333333335
-  print(10 ~/ 3); //3
+    // ~/ 用于除法运算时取整，/ 则不取整
+    print(10 / 3); //3.3333333333333335
+    print(10 ~/ 3); //3
 
-  //as 用于强制类型转换
-  num numValue = 10;
-  int intValue = numValue as int;
+    //as 用于强制类型转换
+    num numValue = 10;
+    int intValue = numValue as int;
 
-  //如果 ??= 左边的变量值为 null ,则将其赋值为右边的值
-  var name = null;
-  var age = 25;
-  name ??= "leavesczy";
-  age ??= 30;
-  print("name：$name"); //name：leavesczy
-  print("age: $age"); //age: 25
+    //如果 ??= 左边的变量值为 null ,则将其赋值为右边的值
+    var name = null;
+    var age = 25;
+    name ??= "leavesczy";
+    age ??= 30;
+    print("name：$name"); //name：leavesczy
+    print("age: $age"); //age: 25
 
-  //如果 ?. 左边的变量值不为 null，则右边的操作生效
-  //用于避免发生空指针异常
-  var area = null;
-  print(area?.runtimeType); //null
+    //如果 ?. 左边的变量值不为 null，则右边的操作生效
+    //用于避免发生空指针异常
+    var area = null;
+    print(area?.runtimeType); //null
 
-  //级联运算符 .. 用于连续操作某个对象，而无需每次操作时都调用该对象
-  var list = [1, 2, 3, 4, 5];
-  list
-    ..insert(0, 6)
-    ..removeAt(4)
-    ..add(7);
-  print(list); //[6, 1, 2, 3, 5, 7]
+    //级联运算符 .. 用于连续操作某个对象，而无需每次操作时都调用该对象
+    var list = [1, 2, 3, 4, 5];
+    list
+        ..insert(0, 6)
+        ..removeAt(4)
+        ..add(7);
+    print(list); //[6, 1, 2, 3, 5, 7]
 
-  //扩展运算符 ... 和 空值感知扩展运算符 ...?
-  //提供了一种将多个元素插入集合的简洁方法
-  var list1 = [1, 2, 3];
-  var list2 = [0, ...list1];
-  print(list2); //[0, 1, 2, 3]
-  //如果 list3 可能为 null，此时则需要使用空值感知扩展运算符，否则会抛出异常
-  //空值感知扩展运算符只有当 list3 不为 null 时才会执行插值操作
-  var list3 = null;
-  var list4 = [0, ...?list3];
-  print(list4); //[0]
+    //扩展运算符 ... 和 空值感知扩展运算符 ...?
+    //提供了一种将多个元素插入集合的简洁方法
+    var list1 = [1, 2, 3];
+    var list2 = [0, ...list1];
+    print(list2); //[0, 1, 2, 3]
+    //如果 list3 可能为 null，此时则需要使用空值感知扩展运算符，否则会抛出异常
+    //空值感知扩展运算符只有当 list3 不为 null 时才会执行插值操作
+    var list3 = null;
+    var list4 = [0, ...?list3];
+    print(list4); //[0]
 }
 ```
 
@@ -506,73 +507,73 @@ dart 的流程控制的语义和逻辑大多和 Java 相同
 
 ```dart
 void main() {
-  //if
-  int value = 20;
-  if (value < 10) {
-    print("value < 10");
-  } else if (value < 30) {
-    print("value < 30");
-  } else {
-    print("value unknown");
-  }
+    //if
+    int value = 20;
+    if (value < 10) {
+        print("value < 10");
+    } else if (value < 30) {
+        print("value < 30");
+    } else {
+        print("value unknown");
+    }
 
-  //while
-  int score = 10;
-  while (score < 100) {
-    score++;
-  }
+    //while
+    int score = 10;
+    while (score < 100) {
+        score++;
+    }
 
-  //switch
-  String strValue = "leavesczy";
-  switch (strValue) {
-    case "ye":
-      break;
-    case "leavesczy":
-      print(strValue);
-      break;
-    default:
-      print("default");
-      break;
-  }
+    //switch
+    String strValue = "leavesczy";
+    switch (strValue) {
+        case "ye":
+            break;
+        case "leavesczy":
+            print(strValue);
+            break;
+        default:
+            print("default");
+            break;
+    }
 
-  //for
-  var list = [];
-  for (int index = 1; index < 10; index++) {
-    list.add(index.toString());
-  }
-  for (var item in list) {
-    print("循环遍历：$item");
-  }
+    //for
+    var list = [];
+    for (int index = 1; index < 10; index++) {
+        list.add(index.toString());
+    }
+    for (var item in list) {
+        print("循环遍历：$item");
+    }
 }
 ```
 
 此外也有一些比较奇特的操作，可以通过**条件 if** 和**循环 for** 来构建集合
 
 ```dart
-  var hasName = true;
-  var info = {if (hasName) "name": "leavesczy", "age": 24};
-  print(info); //{name: leavesczy, age: 24}
+    var hasName = true;
+    var info = {if (hasName) "name": "leavesczy", "age": 24};
+    print(info); //{name: leavesczy, age: 24}
 ```
 
 ```dart
-  var list = {1, 2, 3};
-  var info = {for (var item in list) "$item", 4};
-  print(info); //{1, 2, 3, 4}
+    var list = {1, 2, 3};
+    var info = {for (var item in list) "$item", 4};
+    print(info); //{1, 2, 3, 4}
 ```
 
 # 七、枚举
 
-枚举用于定义命名常量值，使用`enum`关键字来声明枚举类型
+枚举用于定义命名常量值，使用 `enum` 关键字来声明枚举类型
 
 ```dart
 enum State { RESUME, STOP, PAUSE }
 
 void main() {
-  var state = State.PAUSE;
-  print(state);
-  State.values.forEach((state) {
+    var state = State.PAUSE;
     print(state);
-  });
+    State.values.forEach((state) {
+        print(state);
+    });
 }
 ```
 
@@ -584,17 +585,17 @@ dart 语言可以抛出和捕获异，捕获异常可以避免程序运行崩溃
 
 ```dart
 void throwException() {
-  try {
-    List<String> stringList = new List();
-    stringList.add("value");
-    print('${stringList[1]}');
-  } on RangeError {
-    print("抛出了异常...");
-  }
+    try {
+        List<String> stringList = new List();
+        stringList.add("value");
+        print('${stringList[1]}');
+    } on RangeError {
+        print("抛出了异常...");
+    }
 }
 
 void main() {
-  throwException();
+    throwException();
 }
 ```
 
@@ -602,16 +603,16 @@ void main() {
 
 ```dart
 void throwException() {
-  try {
-    List<String> stringList = new List();
-    stringList.add("value");
-    print('${stringList[1]}');
-  } on RangeError catch (e) {
-    print("${e.message}"); //Invalid value
-    print("${e.runtimeType}"); //RangeError
-  } catch (e) {
-    print("如果异常没有被上方捕获，则会统一被此处捕获");
-  }
+    try {
+        List<String> stringList = new List();
+        stringList.add("value");
+        print('${stringList[1]}');
+    } on RangeError catch (e) {
+        print("${e.message}"); //Invalid value
+        print("${e.runtimeType}"); //RangeError
+    } catch (e) {
+        print("如果异常没有被上方捕获，则会统一被此处捕获");
+    }
 }
 ```
 
@@ -619,13 +620,13 @@ void throwException() {
 
 ```dart
 void throwException() {
-  try {
-    List<String> stringList = new List();
-    stringList.add("value");
-    print('${stringList[1]}');
-  } on RangeError catch (e, s) {
-    print("${s.toString()}");
-  }
+    try {
+        List<String> stringList = new List();
+        stringList.add("value");
+        print('${stringList[1]}');
+    } on RangeError catch (e, s) {
+        print("${s.toString()}");
+    }
 }
 ```
 
@@ -633,18 +634,18 @@ void throwException() {
 
 ```dart
 void throwException() {
-  try {
-    List<String> stringList = new List();
-    stringList.add("value");
-    print('${stringList[1]}');
-  } on RangeError catch (e, s) {
-    print("${s.toString()}");
-    rethrow;
-  }
+    try {
+        List<String> stringList = new List();
+        stringList.add("value");
+        print('${stringList[1]}');
+    } on RangeError catch (e, s) {
+        print("${s.toString()}");
+        rethrow;
+    }
 }
 ```
 
-类似 Java，`finally`用于确保在抛出异常时某些代码也可以被执行
+类似 Java，`finally` 用于确保在抛出异常时某些代码也可以被执行
 
 ```dart
 void throwException() {
@@ -666,9 +667,9 @@ void main() {
   } catch (e) {
     print("main ${e.message}");
   }
-//  throwException Invalid value
-//  finally
-//  main Invalid value
+  //  throwException Invalid value
+  //  finally
+  //  main Invalid value
 }
 ```
 
@@ -676,23 +677,23 @@ void main() {
 
 ```dart
 void throwException() {
-  try {
-    List<String> stringList = new List();
-    stringList.add("value");
-    print('${stringList[1]}');
-  } on RangeError catch (e, s) {
-    throw null;
-    //or throw "发生了异常";
-  }
+    try {
+        List<String> stringList = new List();
+        stringList.add("value");
+        print('${stringList[1]}');
+    } on RangeError catch (e, s) {
+        throw null;
+        //or throw "发生了异常";
+    }
 }
 
 void main() {
-  try {
-    throwException();
-  } catch (e) {
-    print("main ${e}"); //main Throw of null.
-    print("${e.runtimeType}"); //NullThrownError
-  }
+    try {
+        throwException();
+    } catch (e) {
+        print("main ${e}"); //main Throw of null.
+        print("${e.runtimeType}"); //NullThrownError
+    }
 }
 ```
 
@@ -710,7 +711,6 @@ dart 是一门完全面向对象的语言，其关于类的内容和 Java 较为
 
 ```dart
 class Person {
-  
   String name;
 
   int age;
@@ -719,19 +719,18 @@ class Person {
     this.name = name;
     this.age = age;
   }
-
 }
 ```
 
-dart 会自动为 `name` 和 `age` 提供隐式的 `getter` 和 `setter` 方法，且未经初始化的实例变量均为 null 
+dart 会自动为 `name` 和 `age` 提供隐式的 `getter` 和 `setter` 方法，且未经初始化的实例变量均为 null
 
 在 dart 2 中 **new 关键字**成为了可选关键字，因此可以选择省略 **new** 声明，这一点和 kotlin 相同
 
 ```dart
 void main() {
-  var person = Person("leavesczy", 25);
-  print('${person.name} ${person.age}'); //leavesczy 25
-  print('${person.runtimeType}'); //Person
+    var person = Person("leavesczy", 25);
+    print('${person.name} ${person.age}'); //leavesczy 25
+    print('${person.runtimeType}'); //Person
 }
 ```
 
@@ -751,27 +750,27 @@ dart 为用于赋予初始值的构造函数提供了简便写法，以下两种
 此外，dart 也提供了命名构造函数，用于方便调用者生成不同用途或含义的变量
 
 ```dart
-  Person.getDefault() {
-    this.name = "leavesczy";
-    this.age = 25;
-  }
+    Person.getDefault() {
+        this.name = "leavesczy";
+        this.age = 25;
+    }
 ```
 
 也可以在构造函数主体运行之前初始化实例变量
 
 ```dart
-  Person.getDefault()
-      : name = "leavesczy",
-        age = 25 {}
+    Person.getDefault()
+            : name = "leavesczy",
+                age = 25 {}
 ```
 
 因此当想要获取一个默认的 `Person` 实例时就如同在调用 Person 的一个静态方法
 
 ```dart
 void main() {
-  var defaultPerson = Person.getDefault();
-  print('${defaultPerson.name} ${defaultPerson.age}'); //leavesczy 25
-  print('${defaultPerson.runtimeType}'); //Person
+    var defaultPerson = Person.getDefault();
+    print('${defaultPerson.name} ${defaultPerson.age}'); //leavesczy 25
+    print('${defaultPerson.runtimeType}'); //Person
 }
 ```
 
@@ -783,11 +782,9 @@ void main() {
 
 ```dart
 class Man extends Person {
-  
   Man(String name, int age) : super(name, age);
 
   Man.getDefault() : super.getDefault();
-  
 }
 ```
 
@@ -797,48 +794,48 @@ dart 语言的抽象类和 Java 基本一致
 
 ```dart
 abstract class Printer {
-  void print(String msg);
+    void print(String msg);
 }
 
 class HpPrinter extends Printer {
-  @override
-  void print(String msg) {
-    // TODO: implement print
-  }
+    @override
+    void print(String msg) {
+        // TODO: implement print
+    }
 }
 ```
 
 ## 5、接口
 
-dart 没有用来专门声明接口的语法，类声明本身就是 dart 中的接口，实现类使用`implements`关键字来实现接口，实现类必须提供目标接口的所有功能的具体实现，即类必须重新定义它希望实现的接口中的每一个函数
+dart 没有用来专门声明接口的语法，类声明本身就是 dart 中的接口，实现类使用 `implements` 关键字来实现接口，实现类必须提供目标接口的所有功能的具体实现，即类必须重新定义它希望实现的接口中的每一个函数
 
 ```dart
 void main() {
-  var human = Human();
-  human.eat();
-  human.speak();
+    var human = Human();
+    human.eat();
+    human.speak();
 }
 
 class Human implements Eat, Speak {
-  void funA() {}
+    void funA() {}
 
-  @override
-  void eat() {
-    // TODO: implement funB
-  }
+    @override
+    void eat() {
+        // TODO: implement funB
+    }
 
-  @override
-  void speak() {
-    // TODO: implement funC
-  }
+    @override
+    void speak() {
+        // TODO: implement funC
+    }
 }
 
 class Eat {
-  void eat() {}
+    void eat() {}
 }
 
 class Speak {
-  void speak() {}
+    void speak() {}
 }
 ```
 
@@ -848,17 +845,17 @@ mixins 是一个重复使用类中代码的方式
 
 ```dart
 void main() {
-  var c = C();
-  c.funA();
-  c.funB();
+    var c = C();
+    c.funA();
+    c.funB();
 }
 
 class A {
-  void funA() {}
+    void funA() {}
 }
 
 class B {
-  void funB() {}
+    void funB() {}
 }
 
 //使用 with 关键字表示类C是由类A和类B混合构成的

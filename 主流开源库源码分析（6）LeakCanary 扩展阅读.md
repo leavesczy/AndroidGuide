@@ -1,6 +1,6 @@
-> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助 🤣🤣🤣
+> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助
 
-上篇文章对 LeakCanary 进行了一次比较全面的源码解析，按流程来说本篇文章应该是属于实战篇的，可是由于某些原因就不打算写实战内容了（其实就是自己有点菜，写不太出来），就还是来写一篇关于内存泄露相关的扩展阅读吧 😂😂
+上篇文章对 LeakCanary 进行了一次比较全面的源码解析，按流程来说本篇文章应该是属于实战篇的，可是由于某些原因就不打算写实战内容了（其实就是自己有点菜，写不太出来），就还是来写一篇关于内存泄露相关的扩展阅读吧
 
 Java 的一个很显著的优点就在于内存自动回收机制，Java 通过垃圾收集器(Garbage Collection，GC)来自动管理内存的回收过程，而无需开发者来主动释放内存。这种自动化行为有效地节省了开发人员的开发成本，但也让一些开发者误以为 Java 就不存在**内存泄漏**的问题了，或者是误认为内存泄露应该是 GC 或者 JVM 层面来关心和解决的问题。这种想法是不正确的，因为内存泄露大多时候是由于程序本身存在缺陷而导致的，GC 和 JVM 并无法精准理解程序的实现初衷，所以还是需要由开发人员来主动解决问题
 
@@ -47,7 +47,7 @@ Java 的一个很显著的优点就在于内存自动回收机制，Java 通过�
 
 ## 1、Broadcast Receivers
 
-如果在 Activity 中注册了 BroadcastReceiver 而忘记了 **unregister** 的话，BroadcastReceiver 就将一直持有对 Activity 的引用，即使 Activity 已经执行了 `onDestroy` 
+如果在 Activity 中注册了 BroadcastReceiver 而忘记了 **unregister** 的话，BroadcastReceiver 就将一直持有对 Activity 的引用，即使 Activity 已经执行了 `onDestroy`
 
 ```java
 public class BroadcastReceiverLeakActivity extends AppCompatActivity {
@@ -61,22 +61,21 @@ public class BroadcastReceiverLeakActivity extends AppCompatActivity {
     }
 
     private void registerBroadCastReceiver() {
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                //your receiver code goes here!
-            }
-        };
+        broadcastReceiver =
+                new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        // your receiver code goes here!
+                    }
+                };
         registerReceiver(broadcastReceiver, new IntentFilter("SmsMessage.intent.MAIN"));
     }
-    
-    
+
     @Override
     protected void onStart() {
         super.onStart();
         registerBroadCastReceiver();
-    }    
-
+    }
 
     @Override
     protected void onStop() {
@@ -90,7 +89,7 @@ public class BroadcastReceiverLeakActivity extends AppCompatActivity {
          * is still holding a strong reference to it.
          * */
 
-        if(broadcastReceiver != null) {
+        if (broadcastReceiver != null) {
             unregisterReceiver(broadcastReceiver);
         }
     }
@@ -106,8 +105,8 @@ public class BroadcastReceiverLeakActivity extends AppCompatActivity {
 ```java
 public class StaticReferenceLeakActivity extends AppCompatActivity {
 
-    /*  
-     * This is a bad idea! 
+    /*
+     * This is a bad idea!
      */
     private static TextView textView;
     private static Activity activity;
@@ -116,11 +115,10 @@ public class StaticReferenceLeakActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
-        
-        
+
         textView = findViewById(R.id.activity_text);
         textView.setText("Bad Idea!");
-           
+
         activity = this;
     }
 }
@@ -136,28 +134,27 @@ public class StaticReferenceLeakActivity extends AppCompatActivity {
 public class SingletonLeakExampleActivity extends AppCompatActivity {
 
     private SingletonSampleClass singletonSampleClass;
-    
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-    /* 
-     * Option 1: Do not pass activity context to the Singleton class. Instead pass application Context
-     */      
+
+        /*
+         * Option 1: Do not pass activity context to the Singleton class. Instead pass application Context
+         */
         singletonSampleClass = SingletonSampleClass.getInstance(this);
     }
-  
-    
-   @Override
-   protected void onDestroy() {
+
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
 
-    /* 
-     * Option 2: Unregister the singleton class here i.e. if you pass activity context to the Singleton class, 
-     * then ensure that when the activity is destroyed, the context in the singleton class is set to null.
-     */
-     singletonSampleClass.onDestroy();
-   }
+        /*
+         * Option 2: Unregister the singleton class here i.e. if you pass activity context to the Singleton class,
+         * then ensure that when the activity is destroyed, the context in the singleton class is set to null.
+         */
+        singletonSampleClass.onDestroy();
+    }
 }
 ```
 
@@ -196,40 +193,41 @@ public class SingletonSampleClass {
 ```java
 public class InnerClassReferenceLeakActivity extends AppCompatActivity {
 
-  /* 
-   * Mistake Number 1: 
-   * Never create a static variable of an inner class
-   * Fix I:
-   * private LeakyClass leakyClass;
-   */
-  private static LeakyClass leakyClass;
+    /*
+     * Mistake Number 1:
+     * Never create a static variable of an inner class
+     * Fix I:
+     * private LeakyClass leakyClass;
+     */
+    private static LeakyClass leakyClass;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
-        
+
         new LeakyClass(this).redirectToSecondScreen();
 
         /*
          * Inner class is defined here
          * */
-         leakyClass = new LeakyClass(this);
-         leakyClass.redirectToSecondScreen();
+        leakyClass = new LeakyClass(this);
+        leakyClass.redirectToSecondScreen();
     }
-    
-  /* 
-   * Mistake Number 2: 
-   * 1. Never create a inner variable of an inner class
-   * 2. Never pass an instance of the activity to the inner class
-   */       
+
+    /*
+     * Mistake Number 2:
+     * 1. Never create a inner variable of an inner class
+     * 2. Never pass an instance of the activity to the inner class
+     */
     private class LeakyClass {
-        
+
         private Activity activity;
+
         public LeakyClass(Activity activity) {
             this.activity = activity;
         }
-        
+
         public void redirectToSecondScreen() {
             this.activity.startActivity(new Intent(activity, SecondActivity.class));
         }
@@ -246,53 +244,53 @@ public class InnerClassReferenceLeakActivity extends AppCompatActivity {
 ```java
 public class InnerClassReferenceLeakActivity extends AppCompatActivity {
 
-  /* 
-   * Mistake Number 1: 
-   * Never create a static variable of an inner class
-   * Fix I:
-   */
-  private LeakyClass leakyClass;
+    /*
+     * Mistake Number 1:
+     * Never create a static variable of an inner class
+     * Fix I:
+     */
+    private LeakyClass leakyClass;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
-        
+
         new LeakyClass(this).redirectToSecondScreen();
 
         /*
          * Inner class is defined here
          * */
-         leakyClass = new LeakyClass(this);
-         leakyClass.redirectToSecondScreen();
+        leakyClass = new LeakyClass(this);
+        leakyClass.redirectToSecondScreen();
     }
-  
-  
-    /*  
+
+    /*
      * How to fix the above class:
      * Fix memory leaks:
      * Option 1: The class should be set to static
-     * Explanation: Instances of anonymous classes do not hold an implicit reference to their outer class 
+     * Explanation: Instances of anonymous classes do not hold an implicit reference to their outer class
      * when they are "static".
      *
      * Option 2: Use a weakReference of the textview or any view/activity for that matter
-     * Explanation: Weak References: Garbage collector can collect an object if only weak references 
+     * Explanation: Weak References: Garbage collector can collect an object if only weak references
      * are pointing towards it.
      * */
     private static class LeakyClass {
-        
+
         private final WeakReference<Activity> messageViewReference;
+
         public LeakyClass(Activity activity) {
             this.activity = new WeakReference<>(activity);
         }
-        
+
         public void redirectToSecondScreen() {
             Activity activity = messageViewReference.get();
-            if(activity != null) {
-               activity.startActivity(new Intent(activity, SecondActivity.class));
+            if (activity != null) {
+                activity.startActivity(new Intent(activity, SecondActivity.class));
             }
         }
-    }  
+    }
 }
 ```
 
@@ -310,7 +308,6 @@ public class AnonymousClassReferenceLeakActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
 
-
         textView = findViewById(R.id.activity_text);
         textView.setText(getString(R.string.text_inner_class_1));
         findViewById(R.id.activity_dialog_btn).setVisibility(View.INVISIBLE);
@@ -318,14 +315,13 @@ public class AnonymousClassReferenceLeakActivity extends AppCompatActivity {
         /*
          * Runnable class is defined here
          * */
-         new Thread(new LeakyRunnable(textView)).start();
+        new Thread(new LeakyRunnable(textView)).start();
     }
-
-
 
     private static class LeakyRunnable implements Runnable {
 
         private final WeakReference<TextView> messageViewReference;
+
         private LeakyRunnable(TextView textView) {
             this.messageViewReference = new WeakReference<>(textView);
         }
@@ -338,7 +334,7 @@ public class AnonymousClassReferenceLeakActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             TextView textView = messageViewReference.get();
-            if(textView != null) {
+            if (textView != null) {
                 textView.setText("Runnable class has completed its work");
             }
         }
@@ -376,7 +372,7 @@ public class AsyncTaskReferenceLeakActivity extends AppCompatActivity {
      *    is destroyed.
      * Mistake number 3. Never use a direct reference of a view from acitivty inside an asynctask.
      * */
- private class BackgroundTask extends AsyncTask<Void, Void, String> {    
+    private class BackgroundTask extends AsyncTask<Void, Void, String> {
         @Override
         protected String doInBackground(Void... voids) {
 
@@ -421,17 +417,16 @@ public class AsyncTaskReferenceLeakActivity extends AppCompatActivity {
         backgroundTask.execute();
     }
 
-
     /*
      * Fix number 1
      * */
     private static class BackgroundTask extends AsyncTask<Void, Void, String> {
 
         private final WeakReference<TextView> messageViewReference;
+
         private BackgroundTask(TextView textView) {
             this.messageViewReference = new WeakReference<>(textView);
         }
-
 
         @Override
         protected String doInBackground(Void... voids) {
@@ -447,11 +442,11 @@ public class AsyncTaskReferenceLeakActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-          /*
-           * Fix number 3
-           * */          
+            /*
+             * Fix number 3
+             * */
             TextView textView = messageViewReference.get();
-            if(textView != null) {
+            if (textView != null) {
                 textView.setText(s);
             }
         }
@@ -464,7 +459,7 @@ public class AsyncTaskReferenceLeakActivity extends AppCompatActivity {
         /*
          * Fix number 2
          * */
-        if(backgroundTask != null) {
+        if (backgroundTask != null) {
             backgroundTask.cancel(true);
         }
     }
@@ -505,7 +500,7 @@ public class HandlersReferenceLeakActivity extends AppCompatActivity {
 
 如何解决这个问题？
 
-- 永远不要在 Activity 中引用内部类。如果确实需要，我们应该将其设置为静态类。这是因为当 Handler 在主线程上实例化后，它将与 Looper 的 MessageQueue 相关联，发送到 MessageQueue  的 Message 将持有对 Handler 的引用，以便当 Looper 最终处理消息时，framework 可以调用 Handler#handleMessage(message) 方法
+- 永远不要在 Activity 中引用内部类。如果确实需要，我们应该将其设置为静态类。这是因为当 Handler 在主线程上实例化后，它将与 Looper 的 MessageQueue 相关联，发送到 MessageQueue 的 Message 将持有对 Handler 的引用，以便当 Looper 最终处理消息时，framework 可以调用 Handler#handleMessage(message) 方法
 - 通过 weakReference 来引用 Activity
 
 ```java
@@ -621,7 +616,6 @@ public class ThreadReferenceLeakActivity extends AppCompatActivity {
         redirectToNewScreen();
     }
 
-
     private void createThread() {
         leakyThread.start();
     }
@@ -637,15 +631,13 @@ public class ThreadReferenceLeakActivity extends AppCompatActivity {
         leakyThread.interrupt();
     }
 
-
     /*
      * Fix III: Make thread static
      * */
     private static class LeakyThread extends Thread {
         @Override
         public void run() {
-            while (!isInterrupted()) {
-            }
+            while (!isInterrupted()) {}
         }
     }
 }
@@ -668,28 +660,28 @@ public class TimerTaskReferenceLeakActivity extends Activity {
         startTimer();
     }
 
-    /*  
-     * Mistake 1: Cancel Timer is never called 
+    /*
+     * Mistake 1: Cancel Timer is never called
      * even though activity might be completed
      * */
     public void cancelTimer() {
-        if(countDownTimer != null) countDownTimer.cancel();
+        if (countDownTimer != null) countDownTimer.cancel();
     }
 
-    
     private void startTimer() {
-        countDownTimer = new CountDownTimer(1000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                final int secondsRemaining = (int) (millisUntilFinished / 1000);
-                //update UI
-            }
+        countDownTimer =
+                new CountDownTimer(1000, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        final int secondsRemaining = (int) (millisUntilFinished / 1000);
+                        // update UI
+                    }
 
-            @Override
-            public void onFinish() {
-                //handle onFinish
-            }
-        };
+                    @Override
+                    public void onFinish() {
+                        // handle onFinish
+                    }
+                };
         countDownTimer.start();
     }
 }
@@ -712,34 +704,32 @@ public class TimerTaskReferenceLeakActivity extends Activity {
         startTimer();
     }
 
-
     public void cancelTimer() {
-        if(countDownTimer != null) countDownTimer.cancel();
+        if (countDownTimer != null) countDownTimer.cancel();
     }
-
 
     private void startTimer() {
-        countDownTimer = new CountDownTimer(1000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                final int secondsRemaining = (int) (millisUntilFinished / 1000);
-                //update UI
-            }
+        countDownTimer =
+                new CountDownTimer(1000, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        final int secondsRemaining = (int) (millisUntilFinished / 1000);
+                        // update UI
+                    }
 
-            @Override
-            public void onFinish() {
-                //handle onFinish
-            }
-        };
+                    @Override
+                    public void onFinish() {
+                        // handle onFinish
+                    }
+                };
         countDownTimer.start();
     }
-  
-  
+
     /*
-     * Fix 1: Cancel Timer when 
+     * Fix 1: Cancel Timer when
      * activity might be completed
-     * */  
-   @Override
+     * */
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         cancelTimer();

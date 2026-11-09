@@ -7,27 +7,27 @@ Android 3.0（API 11）添加了一个强大的功能就是 Fragment （片段�
 
 为了有效地创建片段，需要了解片段的生命周期
 
- - onAttach                
+ - onAttach
   在片段与 Activity 关联之后调用
- - onCreate                
+ - onCreate
   在创建片段的时候调用
- - onCreateView            
+ - onCreateView
   当为片段创建布局的时间调用，必须返回片段的根布局。如果片段未提供 UI，可以返回 null
- - onActivityCreate        
+ - onActivityCreate
   告诉片段 Activity 的 onCreate() 方法已经完成
- - onStart                 
+ - onStart
   当片段的视图对用户可见时调用
- - onResume                
+ - onResume
   当 Activity 进入到 Resumed 状态的时候，也就意味着活动开始运行了，此时调用本方法
- - onPause                
+ - onPause
   当 Activity 暂停的时候，调用该方法。系统将此方法作为用户离开片段的第一个信号（但并不总是意味着此片段会被销毁）进行调用。 通常应该在此方法内确认在当前用户会话结束后仍然有效的任何更改（因为用户可能不会返回）
- - onStop                  
+ - onStop
   当 Activity 停止的时候调用
- - onDestoryView           
+ - onDestoryView
   调用本方法以允许片段释放用于视图的资源
- - onDestory               
+ - onDestory
   在片段销毁之前调用，以允许片段进行最好的清理工作
- - onDetach                
+ - onDetach
   当片段与 Activity 解除关联的时候调用
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-82215f275d6a1794?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -35,14 +35,14 @@ Android 3.0（API 11）添加了一个强大的功能就是 Fragment （片段�
 片段在 onCreateView() 方法中创建一个视图并返回，方法签名如下
 
 ```java
-	public View onCreateView(LayoutInflater , ViewGroup , Bundle )
+    public View onCreateView(LayoutInflater , ViewGroup , Bundle )
 ```
 第一个参数用来将任意的视图填充到片段中，第二个参数是要附加的片段的父视图，第三个参数是一个 Bundle ，如果它不为空，就包含了之前保存的状态信息
 
 加载视图使用的是如下方法
 
 ```java
-	View inflate(int resource, ViewGroup root, boolean attachToRoot)
+    View inflate(int resource, ViewGroup root, boolean attachToRoot)
 ```
 inflate() 方法带有三个参数：
 
@@ -76,8 +76,8 @@ inflate() 方法带有三个参数：
 然后，在 FragmentManager 调用 **beginTransaction()** 方法来获取 **FragmentTransaction** 对象，从而得以执行片段事务（如添加、移除或替换片段）
 
 ```java
-	FragmentManager fragmentManager = getSupportFragmentManager();
-	FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+FragmentManager fragmentManager = getSupportFragmentManager();
+FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 ```
 
 FragmentTransaction 类提供了方法来完成添加、删除、替换片段等操作。一旦完成了操作，调用 **FragmentTransaction.commit()** 方法来提交修改
@@ -85,33 +85,33 @@ FragmentTransaction 类提供了方法来完成添加、删除、替换片段等
 可以使用如下方法来为活动添加一个片段
 
 ```java
-	FragmentTransaction.add(int containerViewId, Fragment fragment, String tag)
+    FragmentTransaction.add(int containerViewId, Fragment fragment, String tag)
 ```
 containerViewId 参数用于指定要添加的视图的 ID，tag 参数是自定义标签，可用于以下方法中来从而来获取片段
 
 ```java
-	Fragment findFragmentByTag(String tag)
+    Fragment findFragmentByTag(String tag)
 ```
 如果不需要指定 Tag ，可以使用另一个重载方法来添加片段
 
 ```javascript
-	FragmentTransaction add(int containerViewId, Fragment fragment)
+    FragmentTransaction add(int containerViewId, Fragment fragment)
 ```
 要从活动中删除一个片段，可以调用以下方法
 
 ```java
-	FragmentTransaction remove(Fragment fragment)
+    FragmentTransaction remove(Fragment fragment)
 ```
 要使用另一个片段来替换当前片段，可以使用如下方法
 
 ```java
-	FragmentTransaction replace(int containerViewId, Fragment fragment, String tag)
+    FragmentTransaction replace(int containerViewId, Fragment fragment, String tag)
 ```
 
 此外，可以使用片段为 Activity 提供后台行为，而不显示额外 UI，要想添加没有 UI 的片段，可使用如下方法
 
 ```java
-	FragmentTransaction add(Fragment fragment, String tag)
+    FragmentTransaction add(Fragment fragment, String tag)
 ```
 
 为片段提供一个唯一的字符串标记 tag，而不是视图 ID，如果片段没有 UI，则字符串标记将是标识它的唯一方式。该方法会添加片段，但由于它并不与 Activity 布局中的视图关联，因此不会收到对 onCreateView() 的调用。因此不需要实现该方法
@@ -120,7 +120,7 @@ containerViewId 参数用于指定要添加的视图的 ID，tag 参数是自定
 当完成了片段的修改后，需要提交以使修改生效
 
 ```java
-	FragmentTransaction.commit()
+    FragmentTransaction.commit()
 ```
 
 ## **三、管理片段的生命周期**
@@ -177,9 +177,7 @@ public class SelectFragment extends Fragment {
 
     private Callback mListener;
 
-    public SelectFragment() {
-
-    }
+    public SelectFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -187,20 +185,25 @@ public class SelectFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final String[] names = {"Hi", "Hello", "leavesc"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_activated_1, names);
+        ArrayAdapter<String> adapter =
+                new ArrayAdapter<>(
+                        getActivity(), android.R.layout.simple_list_item_activated_1, names);
         View view = inflater.inflate(R.layout.fragment_select, container, false);
         ListView listView = (ListView) view.findViewById(R.id.listView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mListener != null) {
-                    mListener.onItemSelected(position);
-                }
-            }
-        });
+        listView.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(
+                            AdapterView<?> parent, View view, int position, long id) {
+                        if (mListener != null) {
+                            mListener.onItemSelected(position);
+                        }
+                    }
+                });
         listView.setAdapter(adapter);
         return view;
     }
@@ -220,7 +223,6 @@ public class SelectFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
 }
 ```
 
@@ -239,7 +241,6 @@ public class SelectFragment extends Fragment {
         android:layout_height="match_parent" />
 
 </FrameLayout>
-
 ```
 
 然后是右边的片段。提供了一个用于修改 ImageView 图片的方法
@@ -247,14 +248,11 @@ public class SelectFragment extends Fragment {
 ```java
 public class ResultFragment extends Fragment {
 
-
-    public ResultFragment() {
-    }
-
+    public ResultFragment() {}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_result, container, false);
     }
 
@@ -263,9 +261,7 @@ public class ResultFragment extends Fragment {
         ImageView imageView = (ImageView) getView().findViewById(R.id.imageView);
         imageView.setImageResource(images[id]);
     }
-
 }
-
 ```
 
 使用到的布局文件
@@ -283,7 +279,6 @@ public class ResultFragment extends Fragment {
         android:layout_height="match_parent" />
 
 </FrameLayout>
-
 ```
 然后在 Activity 的布局文件中声明即可。使两个片段的宽度以 1：2.5的方式占据整个屏幕空间
 
@@ -312,7 +307,6 @@ public class ResultFragment extends Fragment {
         android:layout_weight="2.5" />
 
 </LinearLayout>
-
 ```
 然后在 Activity 中实现接口即可
 
@@ -327,7 +321,8 @@ public class MainActivity extends AppCompatActivity implements SelectFragment.Ca
 
     @Override
     public void onItemSelected(int id) {
-        ResultFragment resultFragment = (ResultFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_result);
+        ResultFragment resultFragment =
+                (ResultFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_result);
         resultFragment.showResult(id);
     }
 }
@@ -345,9 +340,7 @@ public class BlankFragment extends Fragment {
 
     private String mParam;
 
-    public BlankFragment() {
-
-    }
+    public BlankFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -358,14 +351,13 @@ public class BlankFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_blank, container, false);
         TextView textView = (TextView) view.findViewById(R.id.textView);
         textView.setText(mParam);
         return view;
     }
-
 }
 ```
 使用到的布局文件
@@ -386,10 +378,9 @@ public class BlankFragment extends Fragment {
         android:textColor="#378fe7" />
 
 </FrameLayout>
-
 ```
 
-在主布局中插入三个按钮，FrameLayout 是用于容纳 Fragment 的 ViewGroup 
+在主布局中插入三个按钮，FrameLayout 是用于容纳 Fragment 的 ViewGroup
 
 ```java
 <?xml version="1.0" encoding="utf-8"?>
@@ -438,7 +429,6 @@ public class BlankFragment extends Fragment {
         android:layout_weight="3" />
 
 </LinearLayout>
-
 ```
 然后在 Activity 类当中提供添加、替换、移除片段的方法。当中有一个问题需要注意，如果直接使用 replace() 方法的话，不会造成 Fragment 前后层叠；如果是使用 add() 方法，如果不 hide 前一个片段，就会造成界面前后层叠。所以需要为每个片段设置一个 tag，在需要的时候通过 tag 来获取片段，然后将之 hide
 

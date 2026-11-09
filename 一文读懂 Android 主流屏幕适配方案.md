@@ -1,6 +1,6 @@
-关于 Android 的屏幕适配现在已经有很多成熟的方案了，已经不是一个热门话题了。印象中 2018 年是讨论适配方案最火热的一段时间，那时候字节跳动技术团队发文介绍了其适配方案，之后就带动起了很多位大佬陆续发表文章进行讨论。当时我刚工作不久，在面试时也有被问到过关于屏幕适配的问题，因为对于一些概念认识不清导致回答得并不好 🤣🤣 所以本篇文章就想要从头到尾讲清楚关于屏幕适配的主要知识点，希望对你有所帮助，有错误也希望读者能够指出来 🤣🤣
+关于 Android 的屏幕适配现在已经有很多成熟的方案了，已经不是一个热门话题了。印象中 2018 年是讨论适配方案最火热的一段时间，那时候字节跳动技术团队发文介绍了其适配方案，之后就带动起了很多位大佬陆续发表文章进行讨论。当时我刚工作不久，在面试时也有被问到过关于屏幕适配的问题，因为对于一些概念认识不清导致回答得并不好，所以本篇文章就想要从头到尾讲清楚关于屏幕适配的主要知识点，希望对你有所帮助，有错误也希望读者能够指出来
 
-# 一、ppi   &   dpi
+# 一、ppi & dpi
 
 关于屏幕适配有两个绕不开的概念：ppi 和 dpi，两者在含义上很类似，很容易混淆，但其实是属于不同领域上的概念
 
@@ -53,7 +53,7 @@ px = dp * (dpi / 160)
 
 那么，对于一台 1440 x 2880 px，560 dpi 的真机来说，其宽高即 411 x 822 dp，此时我们在布局文件中就可以直接使用设计稿中给出来的宽度值，使得 ImageView 在这台真机上也占据了屏幕一半宽度。虽然设计稿和真机的屏幕像素并不相同，但由于屏幕像素密度的存在，使得两者的 dp 宽度是一样的，从而令开发者可以只使用同一套 dp 尺寸值就完成设计要求了
 
-既然有了 dp，那我们为什么还需要进行屏幕适配呢？当然也是因为 dp 只适用于大部分正常情况了。以上情况之所以能够完美适配，那也是因为举的例子刚好也是完美的：1440  / 1080 = 560 / 420 = 1.3333，设计稿和真机的 px 宽度和 dp 宽度刚好具有相同比例，此时使用 dp 才能刚好适用
+既然有了 dp，那我们为什么还需要进行屏幕适配呢？当然也是因为 dp 只适用于大部分正常情况了。以上情况之所以能够完美适配，那也是因为举的例子刚好也是完美的：1440 / 1080 = 560 / 420 = 1.3333，设计稿和真机的 px 宽度和 dp 宽度刚好具有相同比例，此时使用 dp 才能刚好适用
 
 再来看一个不怎么完美的例子。以两台真机为例：
 
@@ -93,11 +93,11 @@ public static float applyDimension(int unit, float value, DisplayMetrics metrics
         case COMPLEX_UNIT_SP:
             return value * metrics.scaledDensity;
         case COMPLEX_UNIT_PT:
-            return value * metrics.xdpi * (1.0f/72);
+            return value * metrics.xdpi * (1.0f / 72);
         case COMPLEX_UNIT_IN:
             return value * metrics.xdpi;
         case COMPLEX_UNIT_MM:
-            return value * metrics.xdpi * (1.0f/25.4f);
+            return value * metrics.xdpi * (1.0f / 25.4f);
     }
     return 0;
 }
@@ -112,7 +112,7 @@ public static float applyDimension(int unit, float value, DisplayMetrics metrics
 - 华为 nova5：1080 x 2259 px，480 dpi。正常情况下其 density 为 3，View 占据的屏幕宽度比例是：100 x 3 / 1080 = 0.2777
 - Pixel 2 XL：1440 x 2800 px，560 dpi。正常情况下其 density 为 3.5，View 占据的屏幕宽度比例是：100 x 3.5 / 1440 = 0.2430
 
-采用字节跳动技术团队的方案动态改变 density 进行适配，适配后的 density = 设备真实宽度(单位 px)  / 设计稿的宽度（单位 dp）：
+采用字节跳动技术团队的方案动态改变 density 进行适配，适配后的 density = 设备真实宽度(单位 px) / 设计稿的宽度（单位 dp）：
 
 - 华为 nova5：适配后 density 变成 1080 / 411 = 2.6277，View 占据的屏幕宽度比例是：100 x 2.6277 / 1080 = 0.2433
 - Pixel 2 XL：适配后 density 变成 1440 / 411 = 3.5036，View 占据的屏幕宽度比例是：100 x 3.5036 / 1440 = 0.2433
@@ -154,36 +154,36 @@ override fun onCreate(savedInstanceState: Bundle?) {
 
 ```xml
 <resources>
-	<dimen name="x1">1px</dimen>
-	<dimen name="x2">2px</dimen>
-	···
-	<dimen name="x1080">1080px</dimen>
+    <dimen name="x1">1px</dimen>
+    <dimen name="x2">2px</dimen>
+    ···
+    <dimen name="x1080">1080px</dimen>
 
-	<dimen name="y1">1px</dimen>
-	<dimen name="y2">2px</dimen>
-	···
-	<dimen name="y1920">1920px</dimen>
+    <dimen name="y1">1px</dimen>
+    <dimen name="y2">2px</dimen>
+    ···
+    <dimen name="y1920">1920px</dimen>
 </resources>
 ```
 
 类似地，再来为屏幕尺寸为 1440 x 720 px 的手机生成专属的 dimens 文件，生成规则：
 
 - 将屏幕宽度均分为 1080 份，每份 720 / 1080 = 0.666 px，声明 1080 个 key 值，值从 0.666 px 开始递增，每次递增 0.666 px
-- 将屏幕高度均分为 1920 份，每份 1440 / 1920 =  0.75 px，声明 1920 个 key 值，值从 0.75 px 开始递增，每次递增 0.75 px
+- 将屏幕高度均分为 1920 份，每份 1440 / 1920 = 0.75 px，声明 1920 个 key 值，值从 0.75 px 开始递增，每次递增 0.75 px
 
 最终 dimens 文件就像以下这样：
 
 ```xml
 <resources>
-	<dimen name="x1">0.666px</dimen>
-	<dimen name="x2">1.332px</dimen>
-	···
-	<dimen name="x1080">720px</dimen>
+    <dimen name="x1">0.666px</dimen>
+    <dimen name="x2">1.332px</dimen>
+    ···
+    <dimen name="x1080">720px</dimen>
 
-	<dimen name="y1">0.75px</dimen>
-	<dimen name="y2">1.5px</dimen>
-	···
-	<dimen name="y1920">1440px</dimen>
+    <dimen name="y1">0.75px</dimen>
+    <dimen name="y2">1.5px</dimen>
+    ···
+    <dimen name="y1920">1440px</dimen>
 </resources>
 ```
 
@@ -200,7 +200,7 @@ values-2560x1440
 
 之后，我们就可以直接套用设计稿中的像素尺寸进行开发了，设计稿写的是 100 x 200 px，那么我们在布局文件中就可以直接引用 x100 和 y200。当应用运行在不同分辨率的手机中时，应用会自动去引用相同分辨率的 dimens 文件，此时引用到的实际 px 值具有和设计稿相同的比例大小，这样就实现了适配需求了
 
-需要注意，宽高限定符方案有一个致命缺陷：需要精准命中分辨率才能实现适配。比如 1920 x 1080 px 的手机就一定要引用到 `values-1920x1080`文件夹内的 dimens 文件，否则就只能去引用默认的 values 文件夹，此时引用到的尺寸值就有可能和实际需求有很大出入，从而导致界面变形。而对于市面上层出不穷的各种分辨率，开发者想穷举完其实很麻烦，所以说，宽高限定符方案的**容错率**很低
+需要注意，宽高限定符方案有一个致命缺陷：需要精准命中分辨率才能实现适配。比如 1920 x 1080 px 的手机就一定要引用到 `values-1920x1080` 文件夹内的 dimens 文件，否则就只能去引用默认的 values 文件夹，此时引用到的尺寸值就有可能和实际需求有很大出入，从而导致界面变形。而对于市面上层出不穷的各种分辨率，开发者想穷举完其实很麻烦，所以说，宽高限定符方案的**容错率**很低
 
 # 五、smallestWidth
 

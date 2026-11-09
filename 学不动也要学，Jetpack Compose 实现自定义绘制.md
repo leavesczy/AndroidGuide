@@ -11,7 +11,7 @@
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7b6aaf38932043ea8cf54f2402b5e3fa~tplv-k3u1fbpfcp-zoom-1.image)
 
-# 一、Canvas  &  DrawScope
+# 一、Canvas & DrawScope
 
 在原生的 Android View 体系下，我们要实现一个自定义 View 所需要的基本步骤有：
 
@@ -21,7 +21,7 @@
 - 重写 onDraw 方法，通过 Paint、Path 等向 Canvas 绘制图形，从而实现各种自定义效果
 - 重写 onVisibilityChanged、onAttachedToWindow、onDetachedFromWindow 等方法，在适当的时候开启动画或者停止动画，避免资源浪费和内存泄漏（如果有使用到 Animator 的话）
 
-整个流程的重点就是 `onDraw` 方法了，开发者在这里拿到 Canvas 对象，也即画布，然后通过各种 API 在画布上绘制图形。例如，`canvas.drawLine`就用于绘制直线，`canvas.drawPath` 就用于绘制路径
+整个流程的重点就是 `onDraw` 方法了，开发者在这里拿到 Canvas 对象，也即画布，然后通过各种 API 在画布上绘制图形。例如，`canvas.drawLine` 就用于绘制直线，`canvas.drawPath` 就用于绘制路径
 
 按我自己的理解，通过 Jetpack Compose 实现一个自定义控件所需要的基本步骤有：
 
@@ -30,7 +30,7 @@
 - 对于一些 Jetpack Compose 目前还不支持的绘制功能，可以通过 drawIntoCanvas 方法拿到原生 Android 环境的 Canvas 和 Paint 对象，利用原生 Android 环境的 API 方法来实现部分绘制需求
 - 将上述操作封装为可组合函数，以函数入参参数的形式向外暴露必要的绘制参数，该可组合函数即我们最终实现的自定义 View 了
 
-可以看到，在 Jetpack Compose 体系架构下，实现自定义控件的步骤和原生方式相比有着挺大的差别。最终实现的控件对应的也是一个可组合函数，而非一个类。而且我们不用再多在意控件本身的可见性和生命周期了，因为 Jetpack  Compose 会负责以高效的方式创建和释放对象，即使我们使用到了 Animator，Jetpack Compose 也会在可组合函数的生命周期结束的时候就自动停止动画
+可以看到，在 Jetpack Compose 体系架构下，实现自定义控件的步骤和原生方式相比有着挺大的差别。最终实现的控件对应的也是一个可组合函数，而非一个类。而且我们不用再多在意控件本身的可见性和生命周期了，因为 Jetpack Compose 会负责以高效的方式创建和释放对象，即使我们使用到了 Animator，Jetpack Compose 也会在可组合函数的生命周期结束的时候就自动停止动画
 
 Jetpack Compose 的主要思路也是通过 Canvas 对象来绘制各种图形，通过 `Canvas()` 函数来提供绘制能力。`Canvas()` 是一个可组合函数，通过 DrawScope 来暴露 `drawLine` 和 `drawPath` 等方法。DrawScope 是一个维护自身状态且限定了作用域的绘图环境
 

@@ -1,10 +1,10 @@
-> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助 🤣🤣🤣
+> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助
 
-上一篇文章中对 EventBus 进行了一次全面的源码解析，原理懂得了，那么也需要来进行一次实战才行。对于一个优秀的第三方库，开发者除了要学会如何使用外，更有难度的用法就是去了解实现原理，懂得如何改造甚至是自己实现。本篇文章就来自己动手实现一个 EventBus，不求功能多齐全，就来实现简单的**注册、反注册、发送消息、接收消息**这些功能即可 😇😇
+上一篇文章中对 EventBus 进行了一次全面的源码解析，原理懂得了，那么也需要来进行一次实战才行。对于一个优秀的第三方库，开发者除了要学会如何使用外，更有难度的用法就是去了解实现原理，懂得如何改造甚至是自己实现。本篇文章就来自己动手实现一个 EventBus，不求功能多齐全，就来实现简单的**注册、反注册、发送消息、接收消息**这些功能即可
 
 先来看下最终的实现效果
 
-对于以下两个监听者：EasyEventBusMainActivity 和 EasyEventBusTest，通过标注 `@Event`注解来修饰监听方法，然后使用 EasyEventBus 这个自定义类来进行**注册、反注册和发送消息**
+对于以下两个监听者：EasyEventBusMainActivity 和 EasyEventBusTest，通过标注 `@Event` 注解来修饰监听方法，然后使用 EasyEventBus 这个自定义类来进行**注册、反注册和发送消息**
 
 ```kotlin
 class EasyEventBusMainActivity : BaseActivity() {
@@ -67,7 +67,7 @@ class EasyEventBusTest {
 
 data class HelloBean(val data: String)
 ```
-使用起来和真正的 EvnetBus 差不多 😁😁，虽然实际上是要简陋很多的~~
+使用起来和真正的 EvnetBus 差不多，虽然实际上是要简陋很多的~~
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d9ba6a949d284ba98fe74150a72f764a~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -166,7 +166,7 @@ public class EventBusInject {
     }
 }
 ```
-可以看到，`subscriberIndex`中存储了所有监听方法的签名信息，在应用运行时我们我们只需要通过 `getSubscriberInfo` 方法就可以拿到 `subscriberClass` 的所有监听方法
+可以看到，`subscriberIndex` 中存储了所有监听方法的签名信息，在应用运行时我们我们只需要通过 `getSubscriberInfo` 方法就可以拿到 `subscriberClass` 的所有监听方法
 
 最后，还需要向外提供一个 API 调用入口，即上面贴出来的自定义的 EasyEventBus 这个自定义类，是提供给使用者运行时调用的，在有消息需要发送的时候通过外部传入的 `subscriberClass` 从 EventBusInject 取出所有监听方法进行反射回调
 
@@ -232,7 +232,7 @@ class EasyEventBusProcessor : AbstractProcessor() {
    
 }
 ```
-通过 `collectSubscribers`方法拿到所有的监听方法，保存到 `methodsByClass`中，同时需要对方法签名进行校验：**只能是实例方法，且必须是 public 的，最多且至少包含一个入参参数**
+通过 `collectSubscribers` 方法拿到所有的监听方法，保存到 `methodsByClass` 中，同时需要对方法签名进行校验：**只能是实例方法，且必须是 public 的，最多且至少包含一个入参参数**
 
 ```kotlin
 override fun process(
@@ -485,4 +485,4 @@ object EasyEventBus {
 ```
 # 四、GitHub
 
-文本实现的 EasyEventBus 挺简陋的😂😂因为我的想法也只是通过自己动手来加深对 EventBus 的理解而已，这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)
+文本实现的 EasyEventBus 挺简陋的，因为我的想法也只是通过自己动手来加深对 EventBus 的理解而已，这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)

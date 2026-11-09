@@ -1,4 +1,4 @@
-View 的事件分发机制一直是 Android 开发中比较难啃的一块知识点，想要理顺 MotionEvent 在 ViewGroup 和 View 这两者之间流转的规则十分不容易，整个过程涉及分发、拦截、消费三个过程，每个过程根据返回值的不同在流程就会有很大差别，且 Activity 也会参与进这个过程，不参照源码进行分析的话就很难明白触摸事件的分发规则。在很久前我就想过要来动笔写这一块知识点，熬夜肝了一篇，希望对你有所帮助 🤣🤣
+View 的事件分发机制一直是 Android 开发中比较难啃的一块知识点，想要理顺 MotionEvent 在 ViewGroup 和 View 这两者之间流转的规则十分不容易，整个过程涉及分发、拦截、消费三个过程，每个过程根据返回值的不同在流程就会有很大差别，且 Activity 也会参与进这个过程，不参照源码进行分析的话就很难明白触摸事件的分发规则。在很久前我就想过要来动笔写这一块知识点，熬夜肝了一篇，希望对你有所帮助
 
 # 一、坐标系
 
@@ -66,7 +66,7 @@ motionEvent.getRawY();
 此外，系统内置了一个最小滑动距离值，只有先后两个坐标点之间的距离超出该值，才会认为属于滑动事件
 
 ```kotlin
-ViewConfiguration.get(Context).getScaledTouchSlop()	
+ViewConfiguration.get(Context).getScaledTouchSlop() 
 ```
 
 # 三、事件分发的三个阶段
@@ -81,7 +81,7 @@ ViewConfiguration.get(Context).getScaledTouchSlop()
 public boolean dispatchTouchEvent(MotionEvent ev)
 ```
 
-Android 中的视图（View、ViewGroup、Activity 等）接收到的触摸事件都是通过这个方法来进行分发的，如果事件能够传递给当前视图，则此方法一定会被调用，即视图接收到的触摸事件都需要通过该方法来进行分发。该方法的返回值用于表明该视图或者内嵌视图是否消费了该事件。如果当前视图类型是 ViewGroup，该方法内部会调用 `onInterceptTouchEvent(MotionEvent)`方法来判断是否拦截该事件
+Android 中的视图（View、ViewGroup、Activity 等）接收到的触摸事件都是通过这个方法来进行分发的，如果事件能够传递给当前视图，则此方法一定会被调用，即视图接收到的触摸事件都需要通过该方法来进行分发。该方法的返回值用于表明该视图或者内嵌视图是否消费了该事件。如果当前视图类型是 ViewGroup，该方法内部会调用 `onInterceptTouchEvent(MotionEvent)` 方法来判断是否拦截该事件
 
 ## 拦截
 
@@ -276,9 +276,9 @@ MotionMainActivity: dispatchTouchEvent return: false
 
 ## ViewGroup 拦截事件
 
-如果 ViewGroup 自身拦截且消费了 ACTION_DOWN 事件，即 onInterceptTouchEvent 和 onTouchEvent  两个方法均返回了 true，那么本次事件序列的后续事件就都会交由其进行处理（如果能接收得到的话），不会再调用其 onInterceptTouchEvent 方法来判断是否进行拦截，dispatchTouchEvent 方法会直接调用 onTouchEvent 方法
+如果 ViewGroup 自身拦截且消费了 ACTION_DOWN 事件，即 onInterceptTouchEvent 和 onTouchEvent 两个方法均返回了 true，那么本次事件序列的后续事件就都会交由其进行处理（如果能接收得到的话），不会再调用其 onInterceptTouchEvent 方法来判断是否进行拦截，dispatchTouchEvent 方法会直接调用 onTouchEvent 方法
 
-而如果 ViewGroup 拦截了 ACTION_DOWN 事件，但是 onTouchEvent 方法中又没有消费掉该事件的话，那么本次事件序列的后续事件都不会再被其接收到，而是直接交由父视图进行处理。View  对 ACTION_DOWN 事件的处理逻辑也是如此
+而如果 ViewGroup 拦截了 ACTION_DOWN 事件，但是 onTouchEvent 方法中又没有消费掉该事件的话，那么本次事件序列的后续事件都不会再被其接收到，而是直接交由父视图进行处理。View 对 ACTION_DOWN 事件的处理逻辑也是如此
 
 如果所有的 ViewGroup 和 View 都没有消耗 ACTION_DOWN 事件的话，则后续事件（ACTION_MOVE 和 ACTION_UP 等）都会直接交由 Activity 进行处理， ViewGroup 和 View 没有机会再接触到后续事件
 
@@ -528,24 +528,25 @@ View 的 dispatchTouchEvent 方法逻辑上还比较简单，可以总结为：
 ```java
 public boolean dispatchTouchEvent(MotionEvent event) {
     ···
-    //用于表示当前 View 是否消费了该事件
+    // 用于表示当前 View 是否消费了该事件
     boolean result = false;
     final int actionMasked = event.getActionMasked();
     ···
     if (onFilterTouchEventForSecurity(event)) {
-        //第一步
+        // 第一步
         if ((mViewFlags & ENABLED_MASK) == ENABLED && handleScrollBarDragging(event)) {
             result = true;
         }
-        //第二步
+        // 第二步
         ListenerInfo li = mListenerInfo;
-        if (li != null && li.mOnTouchListener != null
+        if (li != null
+                && li.mOnTouchListener != null
                 && (mViewFlags & ENABLED_MASK) == ENABLED
                 && li.mOnTouchListener.onTouch(this, event)) {
             result = true;
         }
 
-        //第三步
+        // 第三步
         if (!result && onTouchEvent(event)) {
             result = true;
         }
@@ -555,34 +556,35 @@ public boolean dispatchTouchEvent(MotionEvent event) {
 }
 ```
 
-## onTouchEvent 
+## onTouchEvent
 
 onTouchEvent 方法就比较复杂了，我们只看其主干思路即可，可以总结为：
 
 1. 对应第一步。如果当前 View 处于禁用状态 DISABLED 的话，当前 View 是否会消耗触摸事件都由 clickable 来决定，即 CLICKABLE、LONG_CLICKABLE、CONTEXT_CLICKABLE 这三个条件至少有一个满足的话，那么就返回 true。这三个条件分别对应着：可点击、可长按点击、可上下文点击
 2. 对应第二步。如果 TouchDelegate 存在且消耗了触摸事件，那么就返回 true
-3. 对应第三步。如果当前 View 处于 clickable 状态或者 `(viewFlags & TOOLTIP) == TOOLTIP` 成立的话，那么也会消耗当前事件。TOOLTIP 可以通过添加 `android:tooltipText="tips"`来开启，开启后长按 TextView 会显示一个悬浮窗形式的提示文本
+3. 对应第三步。如果当前 View 处于 clickable 状态或者 `(viewFlags & TOOLTIP) == TOOLTIP` 成立的话，那么也会消耗当前事件。TOOLTIP 可以通过添加 `android:tooltipText="tips"` 来开启，开启后长按 TextView 会显示一个悬浮窗形式的提示文本
 4. 对应第四步。在接收到 ACTION_UP 事件的时候，判断是否回调外部设置的 OnClickListener。因此如果外部设置的 OnTouchListener 返回了 true，那么 OnClickListener 就根本没有机会被调用，且如果上层视图消耗了 ACTION_UP 事件或者是当前 View 处于禁用状态 DISABLED 的话，OnClickListener 也不会被调用
 
 ```java
 public boolean onTouchEvent(MotionEvent event) {
     ···
-    final boolean clickable = ((viewFlags & CLICKABLE) == CLICKABLE
-            || (viewFlags & LONG_CLICKABLE) == LONG_CLICKABLE)
-            || (viewFlags & CONTEXT_CLICKABLE) == CONTEXT_CLICKABLE;
+    final boolean clickable =
+            ((viewFlags & CLICKABLE) == CLICKABLE
+                            || (viewFlags & LONG_CLICKABLE) == LONG_CLICKABLE)
+                    || (viewFlags & CONTEXT_CLICKABLE) == CONTEXT_CLICKABLE;
 
     if ((viewFlags & ENABLED_MASK) == DISABLED) {
         ···
-        //第一步
+        // 第一步
         return clickable;
     }
-    //第二步
+    // 第二步
     if (mTouchDelegate != null) {
         if (mTouchDelegate.onTouchEvent(event)) {
             return true;
         }
     }
-    //第三步
+    // 第三步
     if (clickable || (viewFlags & TOOLTIP) == TOOLTIP) {
         ···
         if (!focusTaken) {
@@ -590,7 +592,7 @@ public boolean onTouchEvent(MotionEvent event) {
                 mPerformClick = new PerformClick();
             }
             if (!post(mPerformClick)) {
-                //第四步
+                // 第四步
                 performClickInternal();
             }
         }
@@ -601,7 +603,7 @@ public boolean onTouchEvent(MotionEvent event) {
 }
 ```
 
-所以说，dispatchTouchEvent 内部的确是会调用 onTouchEvent 方法，且如果 View 处于可点击状态的话，那么就会消耗该触摸事件，且 OnClickListener 是在  onTouchEvent 方法中被调用的
+所以说，dispatchTouchEvent 内部的确是会调用 onTouchEvent 方法，且如果 View 处于可点击状态的话，那么就会消耗该触摸事件，且 OnClickListener 是在 onTouchEvent 方法中被调用的
 
 举个例子。TextView 默认是不可点击状态，而 Button 是直接继承于 TextView 的，因此 Button 默认状态也是不可点击且不会消耗任何触摸事件的，而 Button 之所以在我们日常使用过程中会消耗掉触摸事件，是因为往往我们都会为其设置 OnClickListener，此时就会将 Button 的 Clickable 置为 true
 
@@ -731,7 +733,7 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
 该方法的主要流程可以总结为：
 
 1. 对应第一步。如果当前接收到的是 ACTION_DOWN 事件，说明是一次新的事件序列，则清除掉 mFirstTouchTarget 的引用。在每次事件序列中，如果 child 消费了 ACTION_DOWN 事件，那么 ViewGroup 就会通过 mFirstTouchTarget 来指向 child，后续事件就可以通过该引用来直接传递而不需再次进行遍历
-2. 对应第二步。此步骤用来判断是否要拦截事件。如果 if 条件成立，说明当前处理的是**新的一次事件序列**或者是 **ACTION_DOWN 之后的事件且之前的 ACTION_DOWN 已经被 child 消费了**，那么就通过调用 onInterceptTouchEvent 方法来决定是否拦截。而如果 child 主动通过调用 `mParent.requestDisallowInterceptTouchEvent` 请求当前 ViewGroup 不进行拦截的话（既 disallowIntercept 为 true），那么就直接将 intercepted 置为 false，不进行拦截。这就说明了，除非 child 主动要求 ViewGroup 不拦截，否则属于 child  的事件序列父布局都还是有机会进行拦截的
+2. 对应第二步。此步骤用来判断是否要拦截事件。如果 if 条件成立，说明当前处理的是**新的一次事件序列**或者是 **ACTION_DOWN 之后的事件且之前的 ACTION_DOWN 已经被 child 消费了**，那么就通过调用 onInterceptTouchEvent 方法来决定是否拦截。而如果 child 主动通过调用 `mParent.requestDisallowInterceptTouchEvent` 请求当前 ViewGroup 不进行拦截的话（既 disallowIntercept 为 true），那么就直接将 intercepted 置为 false，不进行拦截。这就说明了，除非 child 主动要求 ViewGroup 不拦截，否则属于 child 的事件序列父布局都还是有机会进行拦截的
 3. 在第二步中，需要注意 ACTION_DOWN 事件不受 FLAG_DISALLOW_INTERCEPT 这个标记的控制，即 child 无法主动阻止 ViewGroup 不拦截 ACTION_DOWN 事件，ViewGroup 的 onInterceptTouchEvent 方法依然会被调用
 4. 在第二步中，假设 ViewGroup 在接收到 ACTION_DOWN 的时候进行了拦截，那么 mFirstTouchTarget 就不会被赋值，这也导致了在接收后续事件时 if 语句不成立，这样在整个事件序列中 onInterceptTouchEvent 方法只会执行一次，这也是上文给出的总结内容之一
 5. 对应第三步。ACTION_DOWN 事件会走到这里，由于当前 intercepted 为 false，即不拦截事件，因此此时就会去遍历 children，判断触摸点坐标系是落在哪个 child 内，找得到的话就用 mFirstTouchTarget 指向该 child
@@ -775,28 +777,28 @@ DecorView 的 dispatchTouchEvent 方法会拿到 PhoneWindow 内含的 Window.Ca
 
 ```java
 public class DecorView extends FrameLayout implements RootViewSurfaceTaker, WindowCallbacks {
-    
+
     public boolean superDispatchTouchEvent(MotionEvent event) {
         return super.dispatchTouchEvent(event);
     }
-    
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         final Window.Callback cb = mWindow.getCallback();
         return cb != null && !mWindow.isDestroyed() && mFeatureId < 0
-                ? cb.dispatchTouchEvent(ev) : super.dispatchTouchEvent(ev);
+                ? cb.dispatchTouchEvent(ev)
+                : super.dispatchTouchEvent(ev);
     }
-    
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         ···
     }
-    
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return onInterceptTouchEvent(event);
     }
-    
 }
 ```
 
@@ -804,9 +806,9 @@ Activity 的 dispatchTouchEvent 和 onTouchEvent 两个方法逻辑都比较简�
 
 ```java
 public class Activity {
-    
+
     private Window mWindow;
-    
+
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
             onUserInteraction();
@@ -816,10 +818,9 @@ public class Activity {
         }
         return onTouchEvent(ev);
     }
-    
-    public void onUserInteraction() {
-    }
-    
+
+    public void onUserInteraction() {}
+
     public boolean onTouchEvent(MotionEvent event) {
         if (mWindow.shouldCloseOnTouch(this, event)) {
             finish();
@@ -828,7 +829,6 @@ public class Activity {
 
         return false;
     }
-    
 }
 ```
 
@@ -836,14 +836,13 @@ PhoneWindow 是 Window 这个抽象类的唯一实现类，PhoneWindow 又将对
 
 ```java
 public class PhoneWindow extends Window implements MenuBuilder.Callback {
-    
+
     private DecorView mDecor;
-    
+
     @Override
     public boolean superDispatchTouchEvent(MotionEvent event) {
         return mDecor.superDispatchTouchEvent(event);
     }
-    
 }
 ```
 
@@ -851,28 +850,28 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
 
 ```java
 public class DecorView extends FrameLayout implements RootViewSurfaceTaker, WindowCallbacks {
-    
+
     public boolean superDispatchTouchEvent(MotionEvent event) {
         return super.dispatchTouchEvent(event);
     }
-    
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         final Window.Callback cb = mWindow.getCallback();
         return cb != null && !mWindow.isDestroyed() && mFeatureId < 0
-                ? cb.dispatchTouchEvent(ev) : super.dispatchTouchEvent(ev);
+                ? cb.dispatchTouchEvent(ev)
+                : super.dispatchTouchEvent(ev);
     }
-    
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         ···
     }
-    
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return onInterceptTouchEvent(event);
     }
-    
 }
 ```
 
@@ -1124,8 +1123,7 @@ private static final class TouchTarget {
     public static final int ALL_POINTER_IDS = -1; // all ones
 
     // The touched child view.
-    @UnsupportedAppUsage
-    public View child;
+    @UnsupportedAppUsage public View child;
 
     // The combined bit mask of pointer ids for all pointers captured by the target.
     public int pointerIdBits;
@@ -1134,8 +1132,7 @@ private static final class TouchTarget {
     public TouchTarget next;
 
     @UnsupportedAppUsage
-    private TouchTarget() {
-    }
+    private TouchTarget() {}
 
     public static TouchTarget obtain(@NonNull View child, int pointerIdBits) {
         if (child == null) {
@@ -1148,7 +1145,7 @@ private static final class TouchTarget {
             } else {
                 target = sRecycleBin;
                 sRecycleBin = target.next;
-                 sRecycledCount--;
+                sRecycledCount--;
                 target.next = null;
             }
         }
@@ -1182,8 +1179,8 @@ private static final class TouchTarget {
 当存在上诉情况时，ViewGroup 就会通过 `dispatchTransformedTouchEvent` 方法构造一个 ACTION_CANCEL 事件并将之下发给 View，从而使得 View 即使没有接受到 ACTION_UP 事件也可以知道本次事件序列已经结束了
 
 ```java
-private boolean dispatchTransformedTouchEvent(MotionEvent event, boolean cancel,
-        View child, int desiredPointerIdBits) {
+private boolean dispatchTransformedTouchEvent(
+        MotionEvent event, boolean cancel, View child, int desiredPointerIdBits) {
     final boolean handled;
 
     // Canceling motions is a special case.  We don't need to perform any transformations
@@ -1199,7 +1196,7 @@ private boolean dispatchTransformedTouchEvent(MotionEvent event, boolean cancel,
         event.setAction(oldAction);
         return handled;
     }
-        ···
+    ···
 }
 ```
 

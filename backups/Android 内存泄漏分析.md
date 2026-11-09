@@ -49,19 +49,19 @@
 ```java
 public class HandlerActivity extends AppCompatActivity {
 
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-        }
-    };
+    private Handler handler =
+            new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_handler);
     }
-    
 }
 ```
 在声明Handler对象后，IDE会给开发者一个提示：
@@ -89,23 +89,24 @@ public class HandlerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_handler);
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Log.e(TAG, "Hi");
-                handler.postDelayed(this, 1000);
-            }
-        }, 6000);
+        handler.postDelayed(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e(TAG, "Hi");
+                        handler.postDelayed(this, 1000);
+                    }
+                },
+                6000);
     }
-
 }
 ```
 查看Handler的源码可以看到，postDelayed方法其实就是在发送一条延时的Message
 
 ```java
-	public final boolean postDelayed(Runnable r, long delayMillis){
-		return sendMessageDelayed(getPostMessage(r), delayMillis);
-    }
+public final boolean postDelayed(Runnable r, long delayMillis) {
+    return sendMessageDelayed(getPostMessage(r), delayMillis);
+}
 ```
 首先要意识到，非静态类和匿名内部类都会持有外部类的隐式引用。当HandlerActivity生命周期结束后，延时发送的Message持有Handler的引用，而Handler持有外部类(HandlerActivity)的隐式引用。该引用会继续存在直到Message被处理完成，而此处并没有可以令Handler终止的条件语句，所以阻止了HandlerActivity的回收，最终导致内存泄漏。
 
@@ -118,11 +119,11 @@ public class HandlerActivity extends AppCompatActivity {
 解决办法就是在HandlerActivity退出后，移除Handler的所有回调和消息
 
 ```java
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-       handler.removeCallbacksAndMessages(null);
-    }
+@Override
+protected void onDestroy() {
+    super.onDestroy();
+    handler.removeCallbacksAndMessages(null);
+}
 ```
 ### **2.3、Thread**
 
@@ -147,22 +148,23 @@ public class ThreadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread);
         threadIndex++;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                int j = threadIndex;
-                while (true) {
-                    Log.e(TAG, "Hi--" + j);
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
+        new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                int j = threadIndex;
+                                while (true) {
+                                    Log.e(TAG, "Hi--" + j);
+                                    try {
+                                        Thread.sleep(2000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        })
+                .start();
     }
-
 }
 ```
 旋转几次屏幕，可以看到输出结果为：
@@ -202,20 +204,22 @@ public class ThreadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread);
         threadIndex++;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                int j = threadIndex;
-                while (threadSwitch) {
-                    Log.e(TAG, "Hi--" + j);
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
+        new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                int j = threadIndex;
+                                while (threadSwitch) {
+                                    Log.e(TAG, "Hi--" + j);
+                                    try {
+                                        Thread.sleep(2000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        })
+                .start();
     }
 
     @Override
@@ -223,7 +227,6 @@ public class ThreadActivity extends AppCompatActivity {
         super.onDestroy();
         threadSwitch = false;
     }
-
 }
 ```
 如果想保持Thread继续运行，可以按以下步骤来：
@@ -272,7 +275,6 @@ public class ThreadActivity extends AppCompatActivity {
             }
         }
     }
-
 }
 ```
 ### **2.4、Context**
@@ -292,7 +294,6 @@ public class ToastUtils {
         toast.setText(info);
         toast.show();
     }
-
 }
 ```
 然后，在Activity中使用
@@ -311,7 +312,6 @@ public class ToastActivity extends AppCompatActivity {
     public void showToast(View view) {
         ToastUtils.showToast(this, "显示Toast:" + (i++));
     }
-
 }
 ```
 先点击一次 Button 使 Toast 弹出后，退出 ToastActivity，此时 LeakCanary 又会提示说造成内存泄漏了
@@ -321,13 +321,15 @@ public class ToastActivity extends AppCompatActivity {
 
 ```java
 public Toast(Context context) {
-        mContext = context;
-        mTN = new TN();
-        mTN.mY = context.getResources().getDimensionPixelSize(
-                com.android.internal.R.dimen.toast_y_offset);
-        mTN.mGravity = context.getResources().getInteger(
-                com.android.internal.R.integer.config_toastDefaultGravity);
-    }
+    mContext = context;
+    mTN = new TN();
+    mTN.mY =
+            context.getResources()
+                    .getDimensionPixelSize(com.android.internal.R.dimen.toast_y_offset);
+    mTN.mGravity =
+            context.getResources()
+                    .getInteger(com.android.internal.R.integer.config_toastDefaultGravity);
+}
 ```
 解决办法是改为使用 ApplicationContext 即可，因为ApplicationContext会随着应用的存在而存在，而不依赖于Activity的生命周期
 
@@ -343,7 +345,6 @@ public class ToastUtils {
         toast.setText(info);
         toast.show();
     }
-
 }
 ```
 ### **2.5、集合**
@@ -375,7 +376,6 @@ public class MyApplication extends Application {
         super.onCreate();
         LeakCanary.install(this);
     }
-
 }
 ```
 如果还想监测Fragmnet的内存泄漏情况，则在自定义的Application中进行如下初始化
@@ -395,22 +395,19 @@ public class MyApplication extends Application {
         MyApplication application = (MyApplication) context.getApplicationContext();
         return application.refWatcher;
     }
-
 }
-
 ```
 然后在要监测的Fragment中的onDestroy()建立监听
 
 ```java
 public class BaseFragment extends Fragment {
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         RefWatcher refWatcher = MyApplication.getRefWatcher();
         refWatcher.watch(this);
     }
-	
 }
 ```
 当在测试debug版本的过程中出现内存泄露时，LeakCanary将会自动展示一个通知栏显示检测结果

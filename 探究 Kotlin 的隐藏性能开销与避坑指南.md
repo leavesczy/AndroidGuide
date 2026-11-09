@@ -1,10 +1,10 @@
-在 2019 年 Google I/O 大会上，Google 宣布了今后 Android 开发将优先使用 Kotlin ，即 Kotlin-first，随之在 Android 开发界兴起了一阵全民学习 Kotlin 的热潮。之后 Google 也推出了一系列用 Kotlin 实现的 ktx 扩展库，例如 `activity-ktx`、`fragment-ktx`、`core-ktx`等，提供了各种方便的扩展方法用于简化开发者的工作，Kotlin 协程目前也是官方在 Android 上进行异步编程的推荐解决方案
+在 2019 年 Google I/O 大会上，Google 宣布了今后 Android 开发将优先使用 Kotlin ，即 Kotlin-first，随之在 Android 开发界兴起了一阵全民学习 Kotlin 的热潮。之后 Google 也推出了一系列用 Kotlin 实现的 ktx 扩展库，例如 `activity-ktx`、`fragment-ktx`、`core-ktx` 等，提供了各种方便的扩展方法用于简化开发者的工作，Kotlin 协程目前也是官方在 Android 上进行异步编程的推荐解决方案
 
 Google 推荐优先使用 Kotlin，也宣称不会放弃 Java，但目前各种 ktx 扩展库还是需要由 Kotlin 代码进行使用才能最大化地享受到其便利性，Java 代码来调用显得有点不伦不类。作为 Jetpack 主要组件之一的 Paging 3.x 版本目前也已经完全用 Kotlin 实现，为 Kotlin 协程提供了一流的支持。刚出正式版本不久的 Jetpack Compose 也只支持 Kotlin，Java 无缘声明式 UI
 
 开发者可以感受到 Kotlin 在 Android 开发中的重要性在不断提高，虽然 Google 说不会放弃 Java，但以后的事谁说得准呢？开发者还是需要尽早迁移到 Kotlin，这也是必不可挡的技术趋势
 
-Kotlin 在设计理念上有很多和 Java 不同的地方，开发者能够直观感受到的是语法层面上的差异性，背后也包含有**一系列隐藏的性能开销以及一些隐藏得很深的“坑”**，本篇文章就来介绍在使用 Kotlin 过程中存在的隐藏性能开销，帮助读者避坑，希望对你有所帮助 🤣🤣
+Kotlin 在设计理念上有很多和 Java 不同的地方，开发者能够直观感受到的是语法层面上的差异性，背后也包含有**一系列隐藏的性能开销以及一些隐藏得很深的“坑”**，本篇文章就来介绍在使用 Kotlin 过程中存在的隐藏性能开销，帮助读者避坑，希望对你有所帮助
 
 # 慎用 @JvmOverloads
 
@@ -21,13 +21,11 @@ fun println(log: String = "") {
 ```
 
 ```java
-//Java
-public void println(String log) {
-
-}
+// Java
+public void println(String log) {}
 
 public void println() {
-	println("");
+    println("");
 }
 ```
 
@@ -44,7 +42,7 @@ open class BaseView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr, defStyleRes)
 ```
 
-如果我们是像 BaseView 一样直接继承于 View 的话，此时使用`@JvmOverloads`就不会产生任何问题，可如果我们继承的是 TextView 的话，那么问题就来了
+如果我们是像 BaseView 一样直接继承于 View 的话，此时使用 `@JvmOverloads` 就不会产生任何问题，可如果我们继承的是 TextView 的话，那么问题就来了
 
 直接继承于 TextView 不做任何修改，在布局文件中分别使用 MyTextView 和 TextView，给它们完全一样的参数，看看运行效果
 
@@ -83,7 +81,7 @@ public TextView(Context context, @Nullable AttributeSet attrs) {
 }
 ```
 
-因此，如果我们要直接继承的是 View 类的话可以直接使用`@JvmOverloads`，此时不会有任何问题，而如果我们要继承的是现有控件的话，就需要考虑应该如何设置默认值了
+因此，如果我们要直接继承的是 View 类的话可以直接使用 `@JvmOverloads`，此时不会有任何问题，而如果我们要继承的是现有控件的话，就需要考虑应该如何设置默认值了
 
 # 慎用 解构声明
 
@@ -113,21 +111,18 @@ String nickname = people.component2();
 
 ```java
 public final class People {
-   @NotNull
-   private final String name;
-   @NotNull
-   private final String nickname;
+    @NotNull private final String name;
+    @NotNull private final String nickname;
 
-   @NotNull
-   public final String component1() {
-      return this.name;
-   }
+    @NotNull
+    public final String component1() {
+        return this.name;
+    }
 
-   @NotNull
-   public final String component2() {
-      return this.nickname;
-   }
-    
+    @NotNull
+    public final String component2() {
+        return this.nickname;
+    }
 }
 ```
 
@@ -151,7 +146,7 @@ private fun printInfo(people: People) {
 
 当我们要以忽略大小写的方式比较两个字符串是否相等时，通常想到的是通过 `toUpperCase` 或 `toLowerCase` 方法将两个字符串转换为全大写或者全小写，然后再进行比较，这种方式完全可以满足需求，但当中也包含着一个隐藏开销
 
-例如，以下的 Kotlin 代码反编译为 Java 代码后，可以看到每次调用`toUpperCase`方法都会创建一个新的临时变量，然后再去调用临时变量的 `equals` 方法进行比较
+例如，以下的 Kotlin 代码反编译为 Java 代码后，可以看到每次调用 `toUpperCase` 方法都会创建一个新的临时变量，然后再去调用临时变量的 `equals` 方法进行比较
 
 ```kotlin
 fun main() {
@@ -172,7 +167,7 @@ public static final void main() {
 
 以上代码就多创建了两个临时变量，这样的代码无疑会比较低效
 
-有一个更好的解决方案，就是通过 Kotlin 提供的支持忽略大小写的 `equals` 扩展方法来进行比较，此方法内部会调用 String 类原生的 `equalsIgnoreCase`来进行比较，从而避免了创建临时变量，相对来说会比较高效一些
+有一个更好的解决方案，就是通过 Kotlin 提供的支持忽略大小写的 `equals` 扩展方法来进行比较，此方法内部会调用 String 类原生的 `equalsIgnoreCase` 来进行比较，从而避免了创建临时变量，相对来说会比较高效一些
 
 ```kotlin
 fun main() {
@@ -208,9 +203,9 @@ val integerArray: Array<Int> = arrayOf(1, 2, 3)
 将以上代码反编译为 Java 代码后，就可以明确地看出一种是基本数据类型 int，一种是包装类型 Integer，`arrayOf` 方法会自动对入参值进行**装箱**
 
 ```java
-private final int[] intArray = new int[]{1, 2, 3};
+private final int[] intArray = new int[] {1, 2, 3};
 
-private final Integer[] integerArray = new Integer[]{1, 2, 3};
+private final Integer[] integerArray = new Integer[] {1, 2, 3};
 ```
 
 为了表示基本数据类型的数组，Kotlin 为每一种基本数据类型都提供了若干相应的类并做了特殊的优化。例如，`IntArray、ByteArray、BooleanArray` 等类型都会被编译成普通的 Java 基本数据类型数组：`int[]、byte[]、boolean[]`，这些数组中的值在存储时不会进行装箱操作，而是使用了可能的最高效的方式
@@ -243,31 +238,31 @@ fun main() {
 
 ```java
 public static final void printValue(@NotNull int... values) {
-  	Intrinsics.checkNotNullParameter(values, "values");
-  	int $i$f$forEach = false;
-  	int[] var3 = values;
-  	int var4 = values.length;
+    Intrinsics.checkNotNullParameter(values, "values");
+    int $i$f$forEach = false;
+    int[] var3 = values;
+    int var4 = values.length;
 
-  	for(int var5 = 0; var5 < var4; ++var5) {
-     	int element$iv = var3[var5];
-     	int var8 = false;
-     	boolean var9 = false;
-     	System.out.println(element$iv);
-  	}
+    for (int var5 = 0; var5 < var4; ++var5) {
+        int element$iv = var3[var5];
+        int var8 = false;
+        boolean var9 = false;
+        System.out.println(element$iv);
+    }
 }
 
 public static final void main() {
-  	printValue();
-  	printValue(1);
-  	printValue(2, 3);
-  	int[] values = new int[]{4, 5, 6};
-  	//复制后再进行调用
-  	printValue(Arrays.copyOf(values, values.length));
+    printValue();
+    printValue(1);
+    printValue(2, 3);
+    int[] values = new int[] {4, 5, 6};
+    // 复制后再进行调用
+    printValue(Arrays.copyOf(values, values.length));
 }
 
 // $FF: synthetic method
 public static void main(String[] var0) {
-  	main();
+    main();
 }
 ```
 
@@ -275,7 +270,7 @@ public static void main(String[] var0) {
 
 # 慎用 lazy
 
-我们经常会使用`lazy()`函数来惰性加载只读属性，将加载操作延迟到需要使用的时候，适用于某些不适合立刻加载或者加载成本较高的情况
+我们经常会使用 `lazy()` 函数来惰性加载只读属性，将加载操作延迟到需要使用的时候，适用于某些不适合立刻加载或者加载成本较高的情况
 
 例如，以下的 `lazyValue` 只会等到我们调用到的时候才会被赋值
 
@@ -285,13 +280,13 @@ val lazyValue by lazy {
 }
 ```
 
-而在使用`lazy()`函数时很容易被忽略的地方就是其包含有一个可选的 model 参数：
+而在使用 `lazy()` 函数时很容易被忽略的地方就是其包含有一个可选的 model 参数：
 
 - LazyThreadSafetyMode.SYNCHRONIZED。只允许由单个线程来完成初始化，且初始化操作包含有双重锁检查，从而使得所有线程都得到相同的值
 - LazyThreadSafetyMode.PUBLICATION。允许多个线程同时执行初始化操作，但只有第一个初始化成功的值会被当做最终值，最终所有线程也都会得到相同的值
 - LazyThreadSafetyMode.NONE。允许多个线程同时执行初始化操作，不进行任何线程同步，导致不同线程可能会得到不同的初始化值，因此不应该用于多线程环境
 
-`lazy()`函数默认情况下使用的就是`LazyThreadSafetyMode.SYNCHRONIZED`，从 SynchronizedLazyImpl 可以看到，其内部就使用到了`synchronized`来实现多线程同步，以此避免多线程竞争
+`lazy()` 函数默认情况下使用的就是 `LazyThreadSafetyMode.SYNCHRONIZED`，从 SynchronizedLazyImpl 可以看到，其内部就使用到了 `synchronized` 来实现多线程同步，以此避免多线程竞争
 
 ```kotlin
 public actual fun <T> lazy(initializer: () -> T): Lazy<T> = SynchronizedLazyImpl(initializer)
@@ -331,7 +326,7 @@ private class SynchronizedLazyImpl<out T>(initializer: () -> T, lock: Any? = nul
 }
 ```
 
-对于 Android 开发者来说，大多数情况下我们都是在主线程中调用 `lazy()` 函数，此时使用 `LazyThreadSafetyMode.SYNCHRONIZED` 就会带来不必要的线程同步开销，因此可以根据实际情况考虑替换为`LazyThreadSafetyMode.NONE`
+对于 Android 开发者来说，大多数情况下我们都是在主线程中调用 `lazy()` 函数，此时使用 `LazyThreadSafetyMode.SYNCHRONIZED` 就会带来不必要的线程同步开销，因此可以根据实际情况考虑替换为 `LazyThreadSafetyMode.NONE`
 
 # 慎用 lateinit var
 
@@ -398,12 +393,12 @@ lambda 表达式语法虽然方便，但也隐藏着两个性能问题：
 - 每次调用 lambda 表达式都相当于在创建一个对象
 - lambda 表达式内部隐藏了自动装箱和自动拆箱的操作
 
-将以上代码反编译为 Java 代码后，可以看到 callback 最终的实际类型就是 Function2，每次调用`requestHttp` 方法就相当于是在创建一个 Function2 变量
+将以上代码反编译为 Java 代码后，可以看到 callback 最终的实际类型就是 Function2，每次调用 `requestHttp` 方法就相当于是在创建一个 Function2 变量
 
 ```java
 public static final void requestHttp(@NotNull Function2 callback) {
-	Intrinsics.checkNotNullParameter(callback, "callback");
-	callback.invoke(200, "success");
+    Intrinsics.checkNotNullParameter(callback, "callback");
+    callback.invoke(200, "success");
 }
 ```
 
@@ -439,12 +434,12 @@ fun main() {
 
 ```java
 public static final void main() {
-	String data = "success";
-	int code = 200;
-	String var4 = "code: " + code;
-	System.out.println(var4);
-	var4 = "data: " + data;
-	System.out.println(var4);
+    String data = "success";
+    int code = 200;
+    String var4 = "code: " + code;
+    System.out.println(var4);
+    var4 = "data: " + data;
+    System.out.println(var4);
 }
 ```
 
@@ -456,7 +451,7 @@ public static final void main() {
 
 # init 的声明顺序很重要
 
-看以下代码，我们可以在 init 块中调用 parameter1，却无法调用 parameter2，从 IDE 的提示信息 ` Variable 'parameter2' must be initialized`也可以看出来，对于 init 块来说 parameter2 此时还未赋值，自然就无法使用了
+看以下代码，我们可以在 init 块中调用 parameter1，却无法调用 parameter2，从 IDE 的提示信息 ` Variable 'parameter2' must be initialized` 也可以看出来，对于 init 块来说 parameter2 此时还未赋值，自然就无法使用了
 
 ```kotlin
 class KotlinMode {
@@ -478,14 +473,14 @@ class KotlinMode {
 
 ```java
 public final class KotlinMode {
-   private final String parameter1 = "leavesC";
-   private final String parameter2;
+    private final String parameter1 = "leavesC";
+    private final String parameter2;
 
-   public KotlinMode() {
-      String var1 = this.parameter1;
-      System.out.println(var1);
-      this.parameter2 = "业志陈";
-   }
+    public KotlinMode() {
+        String var1 = this.parameter1;
+        System.out.println(var1);
+        this.parameter2 = "业志陈";
+    }
 }
 ```
 
@@ -512,24 +507,24 @@ class KotlinMode {
 }
 ```
 
-从反编译出的 Java 代码可以看出来，`print()`方法依旧是会在 parameter2 初始化之前被调用，此时`print()`方法访问到的 parameter2 也只会为 null，从而引发意料之外的 NPE
+从反编译出的 Java 代码可以看出来，`print()` 方法依旧是会在 parameter2 初始化之前被调用，此时 `print()` 方法访问到的 parameter2 也只会为 null，从而引发意料之外的 NPE
 
 ```java
 public final class KotlinMode {
-   private final String parameter1 = "leavesC";
-   private final String parameter2;
+    private final String parameter1 = "leavesC";
+    private final String parameter2;
 
-   private final void print() {
-      String var1 = this.parameter2;
-      System.out.println(var1);
-   }
+    private final void print() {
+        String var1 = this.parameter2;
+        System.out.println(var1);
+    }
 
-   public KotlinMode() {
-      String var1 = this.parameter1;
-      System.out.println(var1);
-      this.print();
-      this.parameter2 = "业志陈";
-   }
+    public KotlinMode() {
+        String var1 = this.parameter1;
+        System.out.println(var1);
+        this.print();
+        this.parameter2 = "业志陈";
+    }
 }
 ```
 
@@ -561,18 +556,18 @@ fun printMsg(msg: String) {
 ```kotlin
 UserBean(userName=null, userAge=26)
 Exception in thread "main" java.lang.NullPointerException: Parameter specified as non-null is null: method temp.TestKt.printMsg, parameter msg
-	at temp.TestKt.printMsg(Test.kt)
-	at temp.TestKt.main(Test.kt:16)
-	at temp.TestKt.main(Test.kt)
+    at temp.TestKt.printMsg(Test.kt)
+    at temp.TestKt.main(Test.kt:16)
+    at temp.TestKt.main(Test.kt)
 ```
 
 `printMsg` 方法接收了参数后实际上什么也没做，为啥会抛出 NPE ？
 
-将`printMsg`反编译为 Java 方法，可以发现方法内部会对入参进行空校验，当发现为 null 时就会直接抛出 NPE。这个比较好理解，毕竟 Kotlin 的类型系统会严格区分 **可 null** 和 **不可为 null** 两种类型，其区分手段之一就是会自动在我们的代码里插入一些类型校验逻辑，即自动加上了非空断言，当发现不可为 null 的参数传入了 null 的话就会马上抛出 NPE，即使我们并没有使用到该参数
+将 `printMsg` 反编译为 Java 方法，可以发现方法内部会对入参进行空校验，当发现为 null 时就会直接抛出 NPE。这个比较好理解，毕竟 Kotlin 的类型系统会严格区分 **可 null** 和 **不可为 null** 两种类型，其区分手段之一就是会自动在我们的代码里插入一些类型校验逻辑，即自动加上了非空断言，当发现不可为 null 的参数传入了 null 的话就会马上抛出 NPE，即使我们并没有使用到该参数
 
 ```java
 public static final void printMsg(@NotNull String msg) {
-	Intrinsics.checkNotNullParameter(msg, "msg");
+    Intrinsics.checkNotNullParameter(msg, "msg");
 }
 ```
 
@@ -582,29 +577,28 @@ public static final void printMsg(@NotNull String msg) {
 
 ```java
 public final class UserBean {
-   @NotNull
-   private final String userName;
-   private final int userAge;
+    @NotNull private final String userName;
+    private final int userAge;
 
-   @NotNull
-   public final String getUserName() {
-      return this.userName;
-   }
+    @NotNull
+    public final String getUserName() {
+        return this.userName;
+    }
 
-   public final int getUserAge() {
-      return this.userAge;
-   }
+    public final int getUserAge() {
+        return this.userAge;
+    }
 
-   public UserBean(@NotNull String userName, int userAge) {
-      //进行 null 检查
-      Intrinsics.checkNotNullParameter(userName, "userName");
-      super();
-      this.userName = userName;
-      this.userAge = userAge;
-   }
+    public UserBean(@NotNull String userName, int userAge) {
+        // 进行 null 检查
+        Intrinsics.checkNotNullParameter(userName, "userName");
+        super();
+        this.userName = userName;
+        this.userAge = userAge;
+    }
 
-   ···
-    
+    ···
+
 }
 ```
 
@@ -623,7 +617,7 @@ public final class UserBean {
 
 在 Java 中，字段和其访问器的组合被称作属性。在 Kotlin 中，属性是头等的语言特性，完全替代了字段和访问器方法。在类中声明一个属性和声明一个变量一样是使用 val 和 var 关键字，两者在使用上的差异就在于赋值后是否还允许修改，在字节码上的差异性之一就在于是否会自动生成相应的 `setValue` 方法
 
-例如，以下的 Kotlin 代码在反编译为 Java 代码后，可以看到两个属性的可见性都变为了 private， name 变量会同时包含有`getValue`和`setValue` 方法，而 nickname 变量只有 `getValue` 方法，这也是我们在 Java 代码中只能以 `kotlinMode.getName()` 的方式来访问 name 变量的原因
+例如，以下的 Kotlin 代码在反编译为 Java 代码后，可以看到两个属性的可见性都变为了 private， name 变量会同时包含有 `getValue` 和 `setValue` 方法，而 nickname 变量只有 `getValue` 方法，这也是我们在 Java 代码中只能以 `kotlinMode.getName()` 的方式来访问 name 变量的原因
 
 ```kotlin
 class KotlinMode {
@@ -637,25 +631,23 @@ class KotlinMode {
 
 ```java
 public final class KotlinMode {
-   @NotNull
-   private String name = "业志陈";
-   @NotNull
-   private final String nickname = "leavesC";
+    @NotNull private String name = "业志陈";
+    @NotNull private final String nickname = "leavesC";
 
-   @NotNull
-   public final String getName() {
-      return this.name;
-   }
+    @NotNull
+    public final String getName() {
+        return this.name;
+    }
 
-   public final void setName(@NotNull String var1) {
-      Intrinsics.checkNotNullParameter(var1, "<set-?>");
-      this.name = var1;
-   }
+    public final void setName(@NotNull String var1) {
+        Intrinsics.checkNotNullParameter(var1, "<set-?>");
+        this.name = var1;
+    }
 
-   @NotNull
-   public final String getNickname() {
-      return this.nickname;
-   }
+    @NotNull
+    public final String getNickname() {
+        return this.nickname;
+    }
 }
 ```
 
@@ -684,7 +676,7 @@ public final class KotlinMode {
 
 ---
 
-`@JvmField` 的一个使用场景就是在配套使用 ARouter 的时候。我们在使用 ARouter 进行参数自动注入时，就需要为待注入的参数添加 `@JvmField`注解，就像以下代码一样，不添加的话就会导致编译失败
+`@JvmField` 的一个使用场景就是在配套使用 ARouter 的时候。我们在使用 ARouter 进行参数自动注入时，就需要为待注入的参数添加 `@JvmField` 注解，就像以下代码一样，不添加的话就会导致编译失败
 
 ```kotlin
 @Route(path = RoutePath.USER_HOME)
@@ -705,23 +697,23 @@ class UserHomeActivity : AppCompatActivity() {
 
 那为什么不添加该注解就会导致编译失败呢？
 
-其实，ARouter 实现参数自动注入是需要依靠注解处理器生成的辅助文件来实现的，即会生成以下的辅助代码，当中会以 `substitute.userId` 、`substitute.userName`的形式来调用 Activity 中的两个参数值，如果不添加 `@JvmField`注解，辅助文件就没法以直接调用变量名的方式来完成注入，自然就会导致编译失败了
+其实，ARouter 实现参数自动注入是需要依靠注解处理器生成的辅助文件来实现的，即会生成以下的辅助代码，当中会以 `substitute.userId` 、`substitute.userName` 的形式来调用 Activity 中的两个参数值，如果不添加 `@JvmField` 注解，辅助文件就没法以直接调用变量名的方式来完成注入，自然就会导致编译失败了
 
 ```kotlin
 public class UserHomeActivity$$ARouter$$Autowired implements ISyringe {
-    
-  private SerializationService serializationService;
 
-  @Override
-  public void inject(Object target) {
-    serializationService = ARouter.getInstance().navigation(SerializationService.class);
-    UserHomeActivity substitute = (UserHomeActivity)target;
-    substitute.userId = substitute.getIntent().getLongExtra("userHomeId", substitute.userId);
-  }
+    private SerializationService serializationService;
+
+    @Override
+    public void inject(Object target) {
+        serializationService = ARouter.getInstance().navigation(SerializationService.class);
+        UserHomeActivity substitute = (UserHomeActivity)target;
+        substitute.userId = substitute.getIntent().getLongExtra("userHomeId", substitute.userId);
+    }
 }
 ```
 
-Kotlin 这套为属性自动生成 `getValue`和`setValue` 方法的机制有一个缺点，就是可能会导致方法数极速膨胀，使得 Android App 的 dex 文件很快就达到最大方法数限制，不得不进行分包处理
+Kotlin 这套为属性自动生成 `getValue` 和 `setValue` 方法的机制有一个缺点，就是可能会导致方法数极速膨胀，使得 Android App 的 dex 文件很快就达到最大方法数限制，不得不进行分包处理
 
 # 推荐阅读
 

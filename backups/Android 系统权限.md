@@ -26,7 +26,7 @@ Android 应用默认情况下未关联权限，这意味着它无法执行对用
 
 例如，需要监控传入的短信的应用要指定：
 
-```
+```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.app.myapp" >
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
@@ -82,7 +82,7 @@ Android 将根据 **targetSdkVersion** 属性值决定应用是否需要权限�
 
 例如，想要控制谁可以启动一个 Activity ，应用可如下所示声明此操作的权限：
 
-```
+```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.myapp" >
     <permission android:name="com.example.myapp.permission.DEADLY_ACTIVITY"
@@ -101,7 +101,7 @@ Android 将根据 **targetSdkVersion** 属性值决定应用是否需要权限�
 
 下面是 **CALL_PHONE** 权限的标签和描述示例：
 
-```
+```xml
 <string name="permlab_callPhone">directly call phone numbers</string>
 <string name="permdesc_callPhone">Allows the application to call
     phone numbers without your intervention. Malicious applications may

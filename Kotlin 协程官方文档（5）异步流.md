@@ -1,5 +1,5 @@
 > 最近一直在了解关于 **Kotlin协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
-> 
+>
 > 协程官方文档：[coroutines-guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/coroutines-guide.md)
 
 挂起函数可以异步返回单个值，但如何返回多个异步计算值呢？这就是 kotlin Flows（流） 的用处了
@@ -478,12 +478,12 @@ fun main() = runBlocking<Unit> {
 
 代码会生成以下异常：
 
-```
+```text
 Exception in thread "main" java.lang.IllegalStateException: Flow invariant is violated:
-		Flow was collected in [CoroutineId(1), "coroutine#1":BlockingCoroutine{Active}@5511c7f8, BlockingEventLoop@2eac3323],
-		but emission happened in [CoroutineId(1), "coroutine#1":DispatchedCoroutine{Active}@2dae0000, DefaultDispatcher].
-		Please refer to 'flow' documentation or use 'flowOn' instead
-	at ...
+        Flow was collected in [CoroutineId(1), "coroutine#1":BlockingCoroutine{Active}@5511c7f8, BlockingEventLoop@2eac3323],
+        but emission happened in [CoroutineId(1), "coroutine#1":DispatchedCoroutine{Active}@2dae0000, DefaultDispatcher].
+        Please refer to 'flow' documentation or use 'flowOn' instead
+    at ...
 ```
 
 ## 8.2、flowOn 运算符
@@ -816,7 +816,7 @@ flatMapConcat 的顺序特性在输出结果中清晰可见：
 
 ## 11.2、flatMapMerge
 
-另一种 flattening 模式是同时收集所有传入流并将其值合并到单个流中，以便尽快发出值。它由 flatMapMerge  和 flattenMerge 运算符实现。它们都接受一个可选的并发参数，该参数用于限制同时收集的并发流的数量（默认情况下等于 DEFAULT_CONCURRENCY）
+另一种 flattening 模式是同时收集所有传入流并将其值合并到单个流中，以便尽快发出值。它由 flatMapMerge 和 flattenMerge 运算符实现。它们都接受一个可选的并发参数，该参数用于限制同时收集的并发流的数量（默认情况下等于 DEFAULT_CONCURRENCY）
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -1071,7 +1071,7 @@ fun main() = runBlocking<Unit> {
 }            
 ```
 
-现在我们可以看到打印了一条 “Caught ...” 消息，至此我们捕获了所有异常，而无需显式使用 try/catch 
+现在我们可以看到打印了一条 “Caught ...” 消息，至此我们捕获了所有异常，而无需显式使用 try/catch
 
 # 十四、流完成
 
@@ -1181,7 +1181,7 @@ fun main() = runBlocking<Unit> {
 //sampleEnd
 ```
 
-我们可以看到  completion cause 为空，但流收集失败并抛出异常:
+我们可以看到 completion cause 为空，但流收集失败并抛出异常:
 
 ```kotlin
 1

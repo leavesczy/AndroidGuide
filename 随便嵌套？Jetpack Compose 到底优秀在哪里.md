@@ -49,7 +49,7 @@
 
 此时就出现了一个矛盾点：FrameLayout 的宽度由三个子项的最大宽度来决定，因此需要先测量出所有子项的最大宽度后才能确定自身的宽度。而 textView2 和 textView3 又希望宽度和 FrameLayout 保持一致，因此只有先测量出 FrameLayout 的宽度后才能决定自身的宽度。这就相当于陷入了一个死循环中
 
-当然，FrameLayout 在进行 `measure` 时也已经考虑到这种情况了，应对策略就是进行两次 `measure` 操作，其 `onMeasure`方法在逻辑上可以分为两步
+当然，FrameLayout 在进行 `measure` 时也已经考虑到这种情况了，应对策略就是进行两次 `measure` 操作，其 `onMeasure` 方法在逻辑上可以分为两步
 
 第一步，FrameLayout 会按照正常流程来测量每一个子项。在这个过程中，如果 FrameLayout 的宽或高使用的是 `wrap_content` 的话，那么就将使用了 `match_parent` 的子项都保存到 `mMatchParentChildren` 中
 
@@ -57,10 +57,10 @@
 @Override
 protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     int count = getChildCount();
-    //layout_width 或 layout_height 是否设置了 wrap_content
+    // layout_width 或 layout_height 是否设置了 wrap_content
     final boolean measureMatchParentChildren =
-            MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.EXACTLY ||
-            MeasureSpec.getMode(heightMeasureSpec) != MeasureSpec.EXACTLY;
+            MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.EXACTLY
+                    || MeasureSpec.getMode(heightMeasureSpec) != MeasureSpec.EXACTLY;
     mMatchParentChildren.clear();
 
     int maxHeight = 0;
@@ -70,18 +70,22 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     for (int i = 0; i < count; i++) {
         final View child = getChildAt(i);
         if (mMeasureAllChildren || child.getVisibility() != GONE) {
-            //第一次测量子项的宽高
+            // 第一次测量子项的宽高
             measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
             final LayoutParams lp = (LayoutParams) child.getLayoutParams();
-            maxWidth = Math.max(maxWidth,
-                    child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin);
-            maxHeight = Math.max(maxHeight,
-                    child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin);
+            maxWidth =
+                    Math.max(
+                            maxWidth,
+                            child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin);
+            maxHeight =
+                    Math.max(
+                            maxHeight,
+                            child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin);
             childState = combineMeasuredStates(childState, child.getMeasuredState());
             if (measureMatchParentChildren) {
-                if (lp.width == LayoutParams.MATCH_PARENT ||
-                        lp.height == LayoutParams.MATCH_PARENT) {
-                    //将使用了 match_parent 的子项保存起来
+                if (lp.width == LayoutParams.MATCH_PARENT
+                        || lp.height == LayoutParams.MATCH_PARENT) {
+                    // 将使用了 match_parent 的子项保存起来
                     mMatchParentChildren.add(child);
                 }
             }
@@ -108,20 +112,28 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
             final int childWidthMeasureSpec;
             if (lp.width == LayoutParams.MATCH_PARENT) {
-                final int width = Math.max(0, getMeasuredWidth()
-                        - getPaddingLeftWithForeground() - getPaddingRightWithForeground()
-                        - lp.leftMargin - lp.rightMargin);
-                childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
-                        width, MeasureSpec.EXACTLY);
+                final int width =
+                        Math.max(
+                                0,
+                                getMeasuredWidth()
+                                        - getPaddingLeftWithForeground()
+                                        - getPaddingRightWithForeground()
+                                        - lp.leftMargin
+                                        - lp.rightMargin);
+                childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
             } else {
-                childWidthMeasureSpec = getChildMeasureSpec(widthMeasureSpec,
-                        getPaddingLeftWithForeground() + getPaddingRightWithForeground() +
-                        lp.leftMargin + lp.rightMargin,
-                        lp.width);
+                childWidthMeasureSpec =
+                        getChildMeasureSpec(
+                                widthMeasureSpec,
+                                getPaddingLeftWithForeground()
+                                        + getPaddingRightWithForeground()
+                                        + lp.leftMargin
+                                        + lp.rightMargin,
+                                lp.width);
             }
 
             ···
-            //第二次测量子项的宽高
+            // 第二次测量子项的宽高
             child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
         }
     }
@@ -132,7 +144,7 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
 而在实际开发中面对的情况其实会更加复杂：
 
-- 即使使用的不是 FrameLayout，改为 LinearLayout 一样会有这个问题。此外，虽然我们一般也不会用 `wrap_content` 来嵌套 `match_parent`，但如果搭配使用 LinearLayout 和 `layout_weight`的话，测量次数也不止一次
+- 即使使用的不是 FrameLayout，改为 LinearLayout 一样会有这个问题。此外，虽然我们一般也不会用 `wrap_content` 来嵌套 `match_parent`，但如果搭配使用 LinearLayout 和 `layout_weight` 的话，测量次数也不止一次
 - 如果将 textView2 和 textView3 替换为其它 ViewGroup 的话，将连锁导致 ViewGroup 内嵌的其它子项也要跟着一起重新测量
 - 如果该布局是用于 Activity 的话，由于 ViewRootImpl 的 `performTraversals()` 会在 Activity 启动时被调用两次（API Leave 31），因此 FrameLayout 需要测量两次，连锁导致 textView1 测量两次，textView2 和 textView3 各测量四次，总计十二次
 
@@ -151,21 +163,21 @@ Jetpack Compose 的布局模型通过单次传递即可完成界面树的布局�
 ```kotlin
 @Composable
 fun SearchResult(...) {
-  Row(...) {
-    Image(...)
-    Column(...) {
-      Text(...)
-      Text(..)
+    Row(...) {
+        Image(...)
+        Column(...) {
+            Text(...)
+            Text(..)
+        }
     }
-  }
 }
 
 SearchResult
-  Row
-    Image
-    Column
-      Text
-      Text
+    Row
+        Image
+        Column
+            Text
+            Text
 ```
 
 在 `SearchResult` 示例中，界面树布局遵循以下顺序：
@@ -344,7 +356,7 @@ fun CustomLayout(
 Divider(
     color = Color.Black,
     modifier = Modifier
-		.width(10.dp)
+        .width(10.dp)
         .fillMaxHeight()
 )
 ```
@@ -404,7 +416,7 @@ private fun CustomLayout() {
 
 固有特性测量就用于满足 **父布局和子项的宽高需要两者来共同确定** 这种需求，其提供了一种机制用于在正式测量前能够让布局组件预先获取到子项对尺寸的 **期望值**，这些期望值包括：在特定的宽度下，子项能够正常显示的最小高度和最大高度分别是多少？以及在特定的高度下，子项能够正常显示的最小宽度和最大宽度又分别是多少？在拿到这些期望值后，也就知道了父布局在特定宽度或高度下能够正常显示的尺寸大小范围
 
-MeasurePolicy 中的四个 Intrinsic 方法就代表这些期望值的获取途径。例如，当我们使用了 `height(intrinsicSize = IntrinsicSize.Min)`后，布局阶段就会来调用 `minIntrinsicHeight` 方法；使用了 `height(intrinsicSize = IntrinsicSize.Max)` 后，就会来调用 `maxIntrinsicHeight` 方法
+MeasurePolicy 中的四个 Intrinsic 方法就代表这些期望值的获取途径。例如，当我们使用了 `height(intrinsicSize = IntrinsicSize.Min)` 后，布局阶段就会来调用 `minIntrinsicHeight` 方法；使用了 `height(intrinsicSize = IntrinsicSize.Max)` 后，就会来调用 `maxIntrinsicHeight` 方法
 
 ```kotlin
 fun interface MeasurePolicy {
@@ -422,7 +434,7 @@ fun interface MeasurePolicy {
 }
 ```
 
-这四个方法都有默认实现，但默认实现未必能满足我们的需求，我们需要根据实际需求来重写特定方法。例如，我们可以通过重写 `minIntrinsicHeight`方法来计算出 CustomLayout 在特定 width 下能够正常显示的最小高度是多少。此时，除了调用了 `matchParentHeight()`方法的子项之外，其它子项的 `minIntrinsicHeight` 累加之后的值即是 CustomLayout 能够接受的最小高度
+这四个方法都有默认实现，但默认实现未必能满足我们的需求，我们需要根据实际需求来重写特定方法。例如，我们可以通过重写 `minIntrinsicHeight` 方法来计算出 CustomLayout 在特定 width 下能够正常显示的最小高度是多少。此时，除了调用了 `matchParentHeight()` 方法的子项之外，其它子项的 `minIntrinsicHeight` 累加之后的值即是 CustomLayout 能够接受的最小高度
 
 ```kotlin
 override fun IntrinsicMeasureScope.minIntrinsicHeight(
@@ -443,7 +455,7 @@ override fun IntrinsicMeasureScope.minIntrinsicHeight(
 
 在适配固有特性测量之前，由于 CustomLayout 是根布局，所以 Constraints 对应的最大尺寸即屏幕宽高，类似于 `Constraints(minWidth = 0, maxWidth = 1080, minHeight = 0, maxHeight = 1776)`，因此 Divider 采用了 `fillMaxHeight()` 修饰后就会直接撑满整个屏幕高度
 
-在适配固有特性测量之后，由于 CustomLayout  使用了`IntrinsicSize.Min` 来进行修饰，在语义上就是希望 CustomLayout 能够按照最小高度来进行显示，因此 Constraints 对应的最小和最大高度就变成了 `minIntrinsicHeight` 方法的返回值，类似于 `Constraints(minWidth = 0, maxWidth = 1080, minHeight = 480, maxHeight = 480)`，此时 Divider 的高度就会直接固定为 480 px 了，而不会越界
+在适配固有特性测量之后，由于 CustomLayout 使用了 `IntrinsicSize.Min` 来进行修饰，在语义上就是希望 CustomLayout 能够按照最小高度来进行显示，因此 Constraints 对应的最小和最大高度就变成了 `minIntrinsicHeight` 方法的返回值，类似于 `Constraints(minWidth = 0, maxWidth = 1080, minHeight = 480, maxHeight = 480)`，此时 Divider 的高度就会直接固定为 480 px 了，而不会越界
 
 所以说，在适配了固有特性测量机制后，四个 Intrinsic 方法相当于是在正式开始 measure 之前进行的一次粗略测量，一次性计算出能接受的尺寸范围，CustomLayout 就无需在 measure 阶段来多次测量子项了，而是改为依靠 Intrinsic 方法来影响子项的测量结果，从而避免了多次测量
 
@@ -453,7 +465,7 @@ override fun IntrinsicMeasureScope.minIntrinsicHeight(
 
 为了能够识别出哪一个子项希望占满布局高度，就需要将这种 “期望” 传递给 CustomLayout，也即子项需要能够传参给到父布局。Jetpack Compose 通过 ParentDataModifier 来实现参数传递，我们在使用 Column 时声明的 `weight` 参数也是通过 ParentDataModifier 来传递的，IntrinsicMeasurable 接口内部就包含一个 Any? 类型的 `parentData` 参数
 
-CustomLayout 通过声明自己专属的 CustomLayoutParentData 类来作为参数载体，并通过扩展函数 `matchParentHeight()`来传递参数值
+CustomLayout 通过声明自己专属的 CustomLayoutParentData 类来作为参数载体，并通过扩展函数 `matchParentHeight()` 来传递参数值
 
 ```kotlin
 @LayoutScopeMarker
@@ -525,7 +537,7 @@ private fun IntrinsicMeasurable.matchParentHeight(): Boolean {
 
 最终 CustomLayout 相对之前主要有以下改动：
 
-1. 为子项提供一个专属的特定布局作用域 CustomLayoutScope，确保 `matchParentHeight()`方法只有 CustomLayout 的子项才能使用
+1. 为子项提供一个专属的特定布局作用域 CustomLayoutScope，确保 `matchParentHeight()` 方法只有 CustomLayout 的子项才能使用
 2. Divider 会影响 CustomLayout 占据的整体宽度，但不会影响 CustomLayout 的整体高度，因此在进行 measure 时就要分情况来判断是否需要累加 layoutHeight
 3. 在计算子项的坐标值时，除了 Divider 的 Y 坐标需要固定为 0 外，其它子项照旧
 

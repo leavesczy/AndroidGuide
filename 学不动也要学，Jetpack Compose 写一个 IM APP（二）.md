@@ -1,4 +1,4 @@
-历经两年的打磨，在 2021 年七月底的时候，Google 终于发布了 Jetpack Compose 的正式版本。我对 Jetpack Compose 的很多特性都很感兴趣，也觉得其很可能会成为以后 Android 原生应用开发时的首选技术方案，所以在正式版发布之前就开始了一次实战演练，花了两个月时间断断续续写了一个完全用 Jetpack Compose 实现的 IM APP，实现了基本的聊天功能，同时也写了一篇文章对其进行介绍：[学不动也要学，Jetpack Compose 写一个 IM APP](https://juejin.cn/post/6991429231821684773) 
+历经两年的打磨，在 2021 年七月底的时候，Google 终于发布了 Jetpack Compose 的正式版本。我对 Jetpack Compose 的很多特性都很感兴趣，也觉得其很可能会成为以后 Android 原生应用开发时的首选技术方案，所以在正式版发布之前就开始了一次实战演练，花了两个月时间断断续续写了一个完全用 Jetpack Compose 实现的 IM APP，实现了基本的聊天功能，同时也写了一篇文章对其进行介绍：[学不动也要学，Jetpack Compose 写一个 IM APP](https://juejin.cn/post/6991429231821684773)
 
 在文章中，我以 [compose_chat](https://github.com/leavesczy/compose_chat) 为例，详细地介绍了 Jetpack Compose 的很多重要概念和基础特性，包括：
 
@@ -18,7 +18,7 @@
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/adbeccad79d94d0dbff85bc02d7ccf04~tplv-k3u1fbpfcp-zoom-1.image)
 
-上一篇文章中我主要讲解的是概念，对于具体的代码介绍得比较少，此篇文章就再来补充具体的代码细节，以及一些可以和 Jetpack Compose 无缝结合使用的 Jetpack 库和三方开源库。由于现在关于 Jetpack Compose 的学习资料还比较少，有些地方也许我也理解错了，如有错误希望读者能指出来，也希望对你有所帮助 🤣🤣
+上一篇文章中我主要讲解的是概念，对于具体的代码介绍得比较少，此篇文章就再来补充具体的代码细节，以及一些可以和 Jetpack Compose 无缝结合使用的 Jetpack 库和三方开源库。由于现在关于 Jetpack Compose 的学习资料还比较少，有些地方也许我也理解错了，如有错误希望读者能指出来，也希望对你有所帮助
 
 # 一、MutableState
 
@@ -35,7 +35,7 @@ interface MutableState<T> : State<T> {
 }
 ```
 
-我们可以通过 `mutableStateOf`方法来创建一个 MutableState
+我们可以通过 `mutableStateOf` 方法来创建一个 MutableState
 
 ```kotlin
 var nickname = mutableStateOf("")
@@ -307,7 +307,7 @@ fun ChatScreen() {
 
 在 Jetpack Compose 中，我们的业务处理逻辑应该都是放在 ViewModel 中的，可组合函数不应该包含任何业务处理逻辑，而应该只根据入参参数的变化来进行视图更新
 
-为了能够在可组合函数中**创建**或者是**拿到已有的** ViewModel 实例，一个必要的前提就是当前可组合函数要拥有 ViewModelStoreOwner 实例，两者的关系可以看我的另一篇文章：[从源码看 Jetpack（6）-ViewModel 源码详解](https://juejin.cn/post/6873356946896846856) 
+为了能够在可组合函数中**创建**或者是**拿到已有的** ViewModel 实例，一个必要的前提就是当前可组合函数要拥有 ViewModelStoreOwner 实例，两者的关系可以看我的另一篇文章：[从源码看 Jetpack（6）-ViewModel 源码详解](https://juejin.cn/post/6873356946896846856)
 
 简单来说就是 ViewModel 需要依靠 ViewModelStoreOwner 来创建和存储，所有 ViewModel 实例都需要保存在 ViewModelStoreOwner 中，详情可以去看我的源码解读文章，这里不再赘述
 
@@ -322,7 +322,7 @@ fun LoginScreen(navController: NavHostController) {
 }
 ```
 
-从源码可以看出 `viewModel`方法也是依靠 CompositionLocal 来获取 ViewModelStoreOwner 实例的。Compose 在 Activity 创建时就自动为 LocalViewModelStoreOwner 赋值了，默认值就是和 Activity 相关联的 ViewModelStoreOwner
+从源码可以看出 `viewModel` 方法也是依靠 CompositionLocal 来获取 ViewModelStoreOwner 实例的。Compose 在 Activity 创建时就自动为 LocalViewModelStoreOwner 赋值了，默认值就是和 Activity 相关联的 ViewModelStoreOwner
 
 ```kotlin
 @Composable
@@ -627,7 +627,7 @@ fun HomeScreenDrawer(homeScreenDrawerState: HomeScreenDrawerState) {
 Compose 提供的 BackHandler 方法就同时使用到了以上三者，其意义分别是：
 
 - 外部传入的 onBack 方法仅需要在拦截了返回事件时进行调用即可，效应仅需要拿到最新值即可，即使该值发生了变化，也不影响当前的效应执行过程，因此 就通过 rememberUpdatedState 来捕获 onBack 回调，从而避免去重启效应。而如果不使用 rememberUpdatedState 的话，就需要将 onBack 当做附带效应的 key，这就会导致 onBack 一发生变化就需要重启效应
-- 外部在调用 BackHandler 方法时传入的  enabled 参数可能是基于某个逻辑表达式来传入的，随时可能发生变化，而 SideEffect 在每次重组时都会被执行，因此 BackHandler 就通过 SideEffect 来保证 OnBackPressedCallback 能实时指向当前最新的启用状态
+- 外部在调用 BackHandler 方法时传入的 enabled 参数可能是基于某个逻辑表达式来传入的，随时可能发生变化，而 SideEffect 在每次重组时都会被执行，因此 BackHandler 就通过 SideEffect 来保证 OnBackPressedCallback 能实时指向当前最新的启用状态
 - DisposableEffect 提供了 onDispose 回调，当 key 发生变化或者是可组合项退出组合时就会被调用，因此就通过 DisposableEffect 来自动移除对 OnBackPressed 事件的监听。需要注意的是，DisposableEffect 必须添加 onDispose 语句，且必须放在最后面，否则编译器将报错
 
 ```kotlin
@@ -824,11 +824,11 @@ fun CoilImage(
 
 # 九、结尾
 
-关于 Jetpack Compose 和 compose_chat 的介绍就到这里了，先后看完我两篇文章的话，读者应该都能快速上手开发了 🤣🤣
+关于 Jetpack Compose 和 compose_chat 的介绍就到这里了，先后看完我两篇文章的话，读者应该都能快速上手开发了
 
-最后再放一下 compose_chat 的 GitHub 地址：[🎁🎁🎁 用 Jetpack Compose 实现一个 IM APP](https://github.com/leavesczy/compose_chat)
+最后再放一下 compose_chat 的 GitHub 地址：[用 Jetpack Compose 实现一个 IM APP](https://github.com/leavesczy/compose_chat)
 
- Apk 下载尝鲜：[🎁🎁🎁 用 Jetpack Compose 实现一个 IM APP](https://github.com/leavesczy/compose_chat/releases)
+Apk 下载尝鲜：[ 用 Jetpack Compose 实现一个 IM APP](https://github.com/leavesczy/compose_chat/releases)
 
 腾讯云 IM SDK 免费版最多只能注册一百个账号，1.0 版本的 compose_chat 用户数已经满了，因此 2.0 版本我更换了新的 AppId。如果发现无法注册，读者可以使用以下几个我预先注册好的账号，但多设备同时登陆的话会互相挤掉线 ~~
 

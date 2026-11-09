@@ -17,9 +17,7 @@ public static void setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler h
 当 crash 发生时，系统会回调 UncaughtExceptionHandler 的如下方法，我们就需要来重写该方法
 
 ```java
-public void uncaughtException(Thread thread, Throwable throwable){
-
-}
+public void uncaughtException(Thread thread, Throwable throwable) {}
 ```
 
 因此，现在需要进行的步骤是：
@@ -121,7 +119,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     }
 
 }
-
 ```
 
 采用了单例模式，每个方法的作用也都注释了其作用

@@ -1,12 +1,12 @@
 Fragment 是 Android 中历史十分悠久的一个组件，在 Android 3.0 （API 级别 11）的时候推出，时至今日已成为 Android 开发中最常用的组件之一
 
-在一开始的时候，引入 Fragment 的目的是为了在大屏幕（如平板电脑）上能够更加动态和灵活地设计界面，被定义为一个 **轻量级 Activity** 而进行设计。通过 Fragment 可以将整个界面划分为多个分散的区域块，且同个 Fragment 可以被应用于多个 Activity 中，从而实现界面的**模块化**并提高**可重用性**。随着 Android 系统的逐渐升级，系统功能越来越丰富，Fragment 因此也自然而然的就被添加了很多和 Activity 完全一样的 API。例如，想要跳转到某个 Activity 并获取返回值，Activity 和 Fragment 就都加上了`startActivityForResult`方法；在 6.0 的时候有了运行时权限，就都加上了`requestPermissions`方法；在 8.0 的时候有了画中画模式，就又都加上了`onPictureInPictureModeChanged`方法
+在一开始的时候，引入 Fragment 的目的是为了在大屏幕（如平板电脑）上能够更加动态和灵活地设计界面，被定义为一个 **轻量级 Activity** 而进行设计。通过 Fragment 可以将整个界面划分为多个分散的区域块，且同个 Fragment 可以被应用于多个 Activity 中，从而实现界面的**模块化**并提高**可重用性**。随着 Android 系统的逐渐升级，系统功能越来越丰富，Fragment 因此也自然而然的就被添加了很多和 Activity 完全一样的 API。例如，想要跳转到某个 Activity 并获取返回值，Activity 和 Fragment 就都加上了 `startActivityForResult` 方法；在 6.0 的时候有了运行时权限，就都加上了 `requestPermissions` 方法；在 8.0 的时候有了画中画模式，就又都加上了 `onPictureInPictureModeChanged` 方法
 
-随着系统更迭，Fragment 逐渐变得不再**轻量**，繁杂的功能让其越来越复杂，也导致以前的版本中暗坑无数，framework 层中的`android.app.Fragment`和 support 包中的 `android.support.v4.app.Fragment` 如今都被废弃不再维护了，也遗留了很多个没有解决的 bug，因此 Fragment 在长久以来并不能说是一个多么让开发者喜欢的组件
+随着系统更迭，Fragment 逐渐变得不再**轻量**，繁杂的功能让其越来越复杂，也导致以前的版本中暗坑无数，framework 层中的 `android.app.Fragment` 和 support 包中的 `android.support.v4.app.Fragment` 如今都被废弃不再维护了，也遗留了很多个没有解决的 bug，因此 Fragment 在长久以来并不能说是一个多么让开发者喜欢的组件
 
 而到了如今 AndroidX & Jetpack 的年代，Google 官方也终于开始重新构思 Fragment 的定位，并对 Fragment 进行了大量重构。引用官方的说法：**我们希望 Fragment 成为一个真正的核心组件，它应该拥有可预测的、合理的行为，不应该出现随机错误，也不应该破坏现有的功能。我们希望挑个时间发布 Fragment 的 2.0 版，它将只包含那些新的、好用的 API。但在时机成熟之前，我们会在现有的 Fragment 中逐步加入新的并弃用旧的 API，并为旧功能提供更好的替代方案。当没人再使用已弃用的 API 时，迁移到 Fragment 2.0 就会变得很容易**
 
-本篇文章就来介绍新时代 AndroidX Fragment 的方方方面，陆陆续续写了一万多字，有基础知识也有新知识，也许就包含了一些你还没了解过的知识点，看完之后你会发现 Fragment 如今好像真的在变得越来越好用了，希望对你有所帮助 🤣🤣
+本篇文章就来介绍新时代 AndroidX Fragment 的方方方面，陆陆续续写了一万多字，有基础知识也有新知识，也许就包含了一些你还没了解过的知识点，看完之后你会发现 Fragment 如今好像真的在变得越来越好用了，希望对你有所帮助
 
 本文所有示例代码基于以下版本进行讲解
 
@@ -26,12 +26,16 @@ dependencies {
 目前 Fragment 已支持直接在构造函数中传入 layoutId，并在 `onCreateView` 方法中自动完成 View 的 `inflate` 操作，这样子类就无需重写 `onCreateView` 方法了
 
 ```java
-public class Fragment implements ComponentCallbacks, View.OnCreateContextMenuListener, LifecycleOwner,
-        ViewModelStoreOwner, HasDefaultViewModelProviderFactory, SavedStateRegistryOwner,
-        ActivityResultCaller {
+public class Fragment
+        implements ComponentCallbacks,
+                View.OnCreateContextMenuListener,
+                LifecycleOwner,
+                ViewModelStoreOwner,
+                HasDefaultViewModelProviderFactory,
+                SavedStateRegistryOwner,
+                ActivityResultCaller {
 
-    @LayoutRes
-    private int mContentLayoutId;
+    @LayoutRes private int mContentLayoutId;
 
     @ContentView
     public Fragment(@LayoutRes int contentLayoutId) {
@@ -41,14 +45,15 @@ public class Fragment implements ComponentCallbacks, View.OnCreateContextMenuLis
 
     @MainThread
     @Nullable
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         if (mContentLayoutId != 0) {
             return inflater.inflate(mContentLayoutId, container, false);
         }
         return null;
     }
-
 }
 ```
 因此，最简单的情况下我们仅需要一行代码就可以声明一个 Fragment 子类
@@ -77,7 +82,7 @@ Fragment 一般情况下都需要和 FragmentActivity 组合使用，而我们�
 
 </LinearLayout>
 ```
-如果想要通过代码在合适的时机再来主动注入 Fragment，那么也可以不声明 name 属性，改为通过 `supportFragmentManager` 来主动执行 `add` 操作。此外，由于当发生 Configuration Change 时，系统会自动恢复重建每个 Activity 和 Fragment，因此我们需要主动判断当前 Activity 是否属于正常启动，对应`savedInstanceState == null`，此时才去主动添加 Fragment，否则就会造成两个 Fragment 重叠在一起
+如果想要通过代码在合适的时机再来主动注入 Fragment，那么也可以不声明 name 属性，改为通过 `supportFragmentManager` 来主动执行 `add` 操作。此外，由于当发生 Configuration Change 时，系统会自动恢复重建每个 Activity 和 Fragment，因此我们需要主动判断当前 Activity 是否属于正常启动，对应 `savedInstanceState == null`，此时才去主动添加 Fragment，否则就会造成两个 Fragment 重叠在一起
 
 ```kotlin
 class MyFragmentActivity : AppCompatActivity() {
@@ -96,7 +101,7 @@ class MyFragmentActivity : AppCompatActivity() {
 
 }
 ```
-`supportFragmentManager.commit`方法是`fragment-ktx`库中提供的扩展方法，实际上也只是对 FragmentManager 和 FragmentTransaction 做了一层封装
+`supportFragmentManager.commit` 方法是 `fragment-ktx` 库中提供的扩展方法，实际上也只是对 FragmentManager 和 FragmentTransaction 做了一层封装
 
 ```kotlin
 public inline fun FragmentManager.commit(
@@ -137,17 +142,17 @@ Fragment 的大部分生命周期方法都和 Activity 相映射，但两者的�
 
 ---
 
-此外，如果 Activity 启动了另外一个 Activity，此时其 `onSaveInstanceState` 方法就会被调用，此方法一样会嵌套调用 Fragment 的相应方法，但该方法和 `onStop` 方法的先后顺序在不同系统版本上有着差异性。在 API 28 之前的所有版本，`onSaveInstanceState()`会在 `onStop()`方法之前被调用，API 28+ 则相反
+此外，如果 Activity 启动了另外一个 Activity，此时其 `onSaveInstanceState` 方法就会被调用，此方法一样会嵌套调用 Fragment 的相应方法，但该方法和 `onStop` 方法的先后顺序在不同系统版本上有着差异性。在 API 28 之前的所有版本，`onSaveInstanceState()` 会在 `onStop()` 方法之前被调用，API 28+ 则相反
 
 ![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a639b442db6c46f4bd57ec0ead3cf157~tplv-k3u1fbpfcp-watermark.image)
 
-当 Activity 从后台返回前台时，如果该 Activity 属于销毁重建的情况的话，Fragment 会重新走一遍生命周期方法，此时其 `onCreate、onCreateView、onActivityCreated、onViewStateRestored` 方法的参数值 Bundle 就不为 null，当中就保留了我们在 `onSaveInstanceState`方法中插入的值，我们可以依靠该 Bundle 来帮助页面重建
+当 Activity 从后台返回前台时，如果该 Activity 属于销毁重建的情况的话，Fragment 会重新走一遍生命周期方法，此时其 `onCreate、onCreateView、onActivityCreated、onViewStateRestored` 方法的参数值 Bundle 就不为 null，当中就保留了我们在 `onSaveInstanceState` 方法中插入的值，我们可以依靠该 Bundle 来帮助页面重建
 
 ---
 
 此外，目前 `onAttach(Activity)` 和 `onActivityCreated(Bundle)` 这两个方法已经被标记为废弃了，这两个方法的初衷是为了让 Fragment 的逻辑能够和载体 Activity 之间建立联系，并得到来自于 Activity 的 `onCreate` 事件通知，这就导致了开发者有可能会写出和 Activity 强关联的逻辑，官方现在不鼓励这种耦合。View 相关的逻辑应该放在 `onViewCreated` 方法中处理，其它初始化代码应该在 `onCreate` 方法中处理，Fragment 的初始化逻辑不应该去依赖于这两个废弃的方法，Fragment 应该更加独立才对
 
-如果实在需要得到 Activity 的 `onCreate` 事件通知，可以通过在 `onAttach(Context)`方法中添加 LifecycleObserver 来实现
+如果实在需要得到 Activity 的 `onCreate` 事件通知，可以通过在 `onAttach(Context)` 方法中添加 LifecycleObserver 来实现
 
 ```kotlin
 override fun onAttach(context: Context) {
@@ -236,7 +241,7 @@ Fragment-2: onDetach-start
 - 当执行 replace 操作时。Fragment 1 会先执行到 `onStop`，意味着 Fragment 1 已经被切换到后台了。然后就开始执行 Fragment 2 的生命周期直到 `onResume` ，意味着 Fragment 2 已经被切换到前台了。之后就会接着执行 Fragment 1 的 `onDestroyView` ，此时就意味着 Fragment 1 不仅被切换到了后台，其 View 也被销毁了
 - 当点击返回键时。Fragment 2 会先执行到 `onStop`，意味着 Fragment 2 已经被切换到后台了。Fragment 1 则会再次执行从 `onCreateView` 到 `onResume` 之间的所有方法，意味着重新回到了前台。之后就会接着执行 Fragment 2 的生命周期直到 `onDetach` ，此时 Fragment 2 就被完全销毁了，无法再次回到该实例页面
 
-点击返回键时，由于 replace 操作调用了`addToBackStack(null)` 方法，意味着该事务加入到了回退栈中，因此此时响应了返回键事件的其实就是该事务，所以 replace 操作就会被撤销，FragmentManager 负责将视图恢复到 replace 之前的状态，因此 Fragment 2 整个实例被完全销毁了，Fragment 1 得以重新回到前台
+点击返回键时，由于 replace 操作调用了 `addToBackStack(null)` 方法，意味着该事务加入到了回退栈中，因此此时响应了返回键事件的其实就是该事务，所以 replace 操作就会被撤销，FragmentManager 负责将视图恢复到 replace 之前的状态，因此 Fragment 2 整个实例被完全销毁了，Fragment 1 得以重新回到前台
 
 所以说，**FragmentTransaction 的回退栈中保留的是事务而非具体的 Fragment 实例，能响应返回事件的是我们向其中提交的事务，具体的响应结果就是将该事务撤销，恢复到之前的状态**
 
@@ -292,7 +297,7 @@ Fragment-2: onDetach-start
 - 当第一次点击返回键时。由于 replace 事务并没有被添加到回退栈中，而 add 操作有，所以此时响应了返回事件的是 add 操作，点击返回键就相当于把 add 操作给撤销掉了，因此 Fragment 1 就会执行到 `onDetach` 方法，Fragment 2 不受影响
 - 当第二次点击返回键时，由于此时 FragmentTransaction 的回退栈为空，所以此时响应了返回事件的其实是 Activity，所以 Activity 会退出，连带着 Fragment 2 也一起被销毁了
 
-看完这两个例子，读者应该明白了吧？在回退栈中，调用了`addToBackStack(String)` 方法的事务才是重点，Fragment 并不是
+看完这两个例子，读者应该明白了吧？在回退栈中，调用了 `addToBackStack(String)` 方法的事务才是重点，Fragment 并不是
 
 ## 3、FragmentLifecycle
 
@@ -331,21 +336,21 @@ Fragment 相对于 Activity 来说比较特殊，因为其关联的 View 对象�
 Fragment 内部也声明了九种状态值用于标记其自身的生命周期状态，当中就包含一个 VIEW_CREATED，即表示 FragmentView 已经被创建了，从这也可以看出 Fragment 内部维护的生命周期密度要比 FragmentLifecycle 小得多
 
 ```java
-static final int INITIALIZING = -1;          // Not yet attached.
-static final int ATTACHED = 0;               // Attached to the host.
-static final int CREATED = 1;                // Created.
-static final int VIEW_CREATED = 2;           // View Created.
-static final int AWAITING_EXIT_EFFECTS = 3;  // Downward state, awaiting exit effects
-static final int ACTIVITY_CREATED = 4;       // Fully created, not started.
-static final int STARTED = 5;                // Created and started, not resumed.
+static final int INITIALIZING = -1; // Not yet attached.
+static final int ATTACHED = 0; // Attached to the host.
+static final int CREATED = 1; // Created.
+static final int VIEW_CREATED = 2; // View Created.
+static final int AWAITING_EXIT_EFFECTS = 3; // Downward state, awaiting exit effects
+static final int ACTIVITY_CREATED = 4; // Fully created, not started.
+static final int STARTED = 5; // Created and started, not resumed.
 static final int AWAITING_ENTER_EFFECTS = 6; // Upward state, awaiting enter effects
-static final int RESUMED = 7;                // Created started and resumed.
+static final int RESUMED = 7; // Created started and resumed.
 ```
-状态值切换到 DESTROYED，对于 FragmentLifecycle 来说意味着 `onDestroy、onDetach` 等方法被调用，对于 FragmentViewLifecycle 来说则意味着`onDestroyView`方法被调用，因此 FragmentViewLifecycle 的跨度范围要比 FragmentLifecycle 小一些。而且 FragmentLifecycle 切换到 DESTROYED 后状态值是不可逆的，无法再次更改，而 FragmentViewLifecycle 切换到 DESTROYED 后是有机会再次更改的，因为 View 对象可以先后多次加载和销毁，每次加载就意味着生命周期的重新开始
+状态值切换到 DESTROYED，对于 FragmentLifecycle 来说意味着 `onDestroy、onDetach` 等方法被调用，对于 FragmentViewLifecycle 来说则意味着 `onDestroyView` 方法被调用，因此 FragmentViewLifecycle 的跨度范围要比 FragmentLifecycle 小一些。而且 FragmentLifecycle 切换到 DESTROYED 后状态值是不可逆的，无法再次更改，而 FragmentViewLifecycle 切换到 DESTROYED 后是有机会再次更改的，因为 View 对象可以先后多次加载和销毁，每次加载就意味着生命周期的重新开始
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ac4e51b89052484ea83c8f6b14d05f82~tplv-k3u1fbpfcp-watermark.image)
 
-Fragment 提供了一个`getViewLifecycleOwner()`方法由于提供 FragmentViewLifecycle，从中可以看出该方法只能在 `onCreateView()` 到 `onDestroyView()` 之间被调用，即只能在 FragmentView 创建了且销毁之前使用，否则将直接抛出异常
+Fragment 提供了一个 `getViewLifecycleOwner()` 方法由于提供 FragmentViewLifecycle，从中可以看出该方法只能在 `onCreateView()` 到 `onDestroyView()` 之间被调用，即只能在 FragmentView 创建了且销毁之前使用，否则将直接抛出异常
 
 ```java
 @Nullable
@@ -360,13 +365,12 @@ public LifecycleOwner getViewLifecycleOwner() {
     }
     return mViewLifecycleOwner;
 }
-
 ```
 ---
 
 FragmentViewLifecycle 非常有用，我们在日常开发中可以根据实际情况使用 FragmentViewLifecycle 来替代 FragmentLifecycle，因为 FragmentLifecycle 存在着一些并不明显的使用误区，很容易就造成 bug
 
-举个例子。假设我们的 Fragment 需要监听 ViewModel 中某个 LiveData 值的变化，并根据监听到的值来设置界面，此时就要考虑在 Fragment 中的哪里来订阅 LiveData 了。看了以上内容后，我们已经知道 `onCreateView` 方法到 `onDestoryView`之间是可能会先后执行多次的，那么监听操作就不应该放在这里面了，否则就会造成重复订阅。此时我们想到的可能就是这两种方式了：**声明全局变量 ViewModel 时顺便监听** 或者是 **在 onCreate 方法中进行监听**
+举个例子。假设我们的 Fragment 需要监听 ViewModel 中某个 LiveData 值的变化，并根据监听到的值来设置界面，此时就要考虑在 Fragment 中的哪里来订阅 LiveData 了。看了以上内容后，我们已经知道 `onCreateView` 方法到 `onDestoryView` 之间是可能会先后执行多次的，那么监听操作就不应该放在这里面了，否则就会造成重复订阅。此时我们想到的可能就是这两种方式了：**声明全局变量 ViewModel 时顺便监听** 或者是 **在 onCreate 方法中进行监听**
 
 ```kotlin
 private val pageViewModel by lazy {
@@ -393,7 +397,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 
 会出现该问题的本质原因还是因为 FragmentView 的生命周期和 Fragment 并不同步。如果 Fragment 已经接收过 textLiveData 的回调了，那么当 FragmentView 销毁重建后，由于 textLiveData 的值没有发生变化，和 textLiveData 绑定的 LifecycleOwner 也还一直存在着，那么重建后的 FragmentView 自然就不会收到 textLiveData 的回调了，从而导致无法根据回调来重建页面
 
-为了解决该问题，就需要使用到 FragmentViewLifecycle 了。由于 FragmentViewLifecycle 的生命周期在 `onDestoryView`的时候就结束了，此时也会自动移除 Observer，因此我们可以直接在 `onViewCreated` 方法中使用 `viewLifecycleOwner` 来监听 textLiveData，从而保证每次重建后的 FragmentView 都能收到回调
+为了解决该问题，就需要使用到 FragmentViewLifecycle 了。由于 FragmentViewLifecycle 的生命周期在 `onDestoryView` 的时候就结束了，此时也会自动移除 Observer，因此我们可以直接在 `onViewCreated` 方法中使用 `viewLifecycleOwner` 来监听 textLiveData，从而保证每次重建后的 FragmentView 都能收到回调
 
 ```kotlin
 private val pageViewModel by lazy {
@@ -428,11 +432,11 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
 # 3、setMaxLifecycle
 
-在以前，Fragment 往往会和 ViewPager 配套使用，由于 ViewPager 存在页面**预加载**的机制，相邻 Fragment 会在对用户不可见的时候就执行`onResume`方法，从而触发一些不必要的业务逻辑，导致多余的流量消耗和性能消耗
+在以前，Fragment 往往会和 ViewPager 配套使用，由于 ViewPager 存在页面**预加载**的机制，相邻 Fragment 会在对用户不可见的时候就执行 `onResume` 方法，从而触发一些不必要的业务逻辑，导致多余的流量消耗和性能消耗
 
-为了解决以上问题，实现 Fragment **懒加载**的效果，我们需要在`onViewCreated`、`onResume`、`onHiddenChanged`、`setUserVisibleHint`等多个方法中添加标记位，通过组合标记位来准确得知 Fragment 当前是否真的对用户可见，且只在可见的情况下才去触发关联的业务逻辑。这种实现方式长久以来一直很流行，也完全可用，但也真的不够优雅，我们需要组合多个条件才能实现目的，且 Fragment 在不可见的时候就去回调`onResume`方法本身也是一种很违反常识的行为
+为了解决以上问题，实现 Fragment **懒加载**的效果，我们需要在 `onViewCreated`、`onResume`、`onHiddenChanged`、`setUserVisibleHint` 等多个方法中添加标记位，通过组合标记位来准确得知 Fragment 当前是否真的对用户可见，且只在可见的情况下才去触发关联的业务逻辑。这种实现方式长久以来一直很流行，也完全可用，但也真的不够优雅，我们需要组合多个条件才能实现目的，且 Fragment 在不可见的时候就去回调 `onResume` 方法本身也是一种很违反常识的行为
 
-现如今我们也有了更好的选择，`setUserVisibleHint`方法已经被废弃了，从注释可以看到官方现在推荐使用`setMaxLifecycle` 方法来更为精准地控制 Fragment 的生命周期
+现如今我们也有了更好的选择，`setUserVisibleHint` 方法已经被废弃了，从注释可以看到官方现在推荐使用 `setMaxLifecycle` 方法来更为精准地控制 Fragment 的生命周期
 
 ```kotlin
 /**
@@ -458,7 +462,7 @@ public void setUserVisibleHint(boolean isVisibleToUser) {
     }
 }
 ```
-`setMaxLifecycle`方法从名字就可以看出来是用于为 Fragment 设置一个最大的生命周期状态，实际上也的确是，state 参数值我们只能选择 CREATED、STARTED、RESUMED 三者之一
+`setMaxLifecycle` 方法从名字就可以看出来是用于为 Fragment 设置一个最大的生命周期状态，实际上也的确是，state 参数值我们只能选择 CREATED、STARTED、RESUMED 三者之一
 
 ```kotlin
 @NonNull
@@ -493,7 +497,7 @@ Fragment-1: onViewStateRestored
 Fragment-1: onStart
 Fragment-1: onResume
 ```
-而如果设置了`setMaxLifecycle(fragment, Lifecycle.State.CREATED)`的话，就会发现 Fragment 只会执行到 `onCreate` 方法，且 Fragment 也不会显示，毕竟 FragmentView 没有被创建，自然也不会被挂载到 Activity 中
+而如果设置了 `setMaxLifecycle(fragment, Lifecycle.State.CREATED)` 的话，就会发现 Fragment 只会执行到 `onCreate` 方法，且 Fragment 也不会显示，毕竟 FragmentView 没有被创建，自然也不会被挂载到 Activity 中
 
 ```kotlin
 supportFragmentManager.commit {
@@ -529,7 +533,7 @@ Fragment-1: onPause
 ```
 怎么理解以上三种情况的差异呢？
 
-其实，`setMaxLifecycle` 控制的是 FragmentLifecycle，同个 FragmentLifecycle 状态值对应的可能是不同的生命周期方法，就像以下图片所示。`onResume`方法对应的是 RESUMED，此时我们要求 FragmentLifecycle 的最大值是 STARTED，那么 Fragment 只能执行`onPause` 方法将状态值切换到 STARTED。而如果我们一开始就设置了最大值是 STARTED 的话，Fragment 就只会从 `onAttach` 执行到 `onStart` 方法，此时 FragmentLifecycle 一样是 STARTED
+其实，`setMaxLifecycle` 控制的是 FragmentLifecycle，同个 FragmentLifecycle 状态值对应的可能是不同的生命周期方法，就像以下图片所示。`onResume` 方法对应的是 RESUMED，此时我们要求 FragmentLifecycle 的最大值是 STARTED，那么 Fragment 只能执行 `onPause` 方法将状态值切换到 STARTED。而如果我们一开始就设置了最大值是 STARTED 的话，Fragment 就只会从 `onAttach` 执行到 `onStart` 方法，此时 FragmentLifecycle 一样是 STARTED
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ac4e51b89052484ea83c8f6b14d05f82~tplv-k3u1fbpfcp-watermark.image)
 
@@ -550,7 +554,7 @@ void updateFragmentMaxLifecycle(boolean dataSetChanged) {
         }
 
         if (itemId != mPrimaryItemId) {
-            //重点
+            // 重点
             transaction.setMaxLifecycle(fragment, STARTED);
         } else {
             toResume = fragment; // itemId map key, so only one can match the predicate
@@ -558,7 +562,7 @@ void updateFragmentMaxLifecycle(boolean dataSetChanged) {
         fragment.setMenuVisibility(itemId == mPrimaryItemId);
     }
     if (toResume != null) { // in case the Fragment wasn't added yet
-        //重点
+        // 重点
         transaction.setMaxLifecycle(toResume, RESUMED);
     }
 
@@ -601,33 +605,45 @@ class FragmentFactoryFragment : BaseFragment(R.layout.fragment_fragment_factory)
 通过反射无参构造函数来实例化 Fragment 并注入 `arguments` 的过程，就对应 Fragment 中的 `instantiate` 方法
 
 ```java
-public static Fragment instantiate(@NonNull Context context, @NonNull String fname,
-        @Nullable Bundle args) {
+public static Fragment instantiate(
+        @NonNull Context context, @NonNull String fname, @Nullable Bundle args) {
     try {
-        Class<? extends Fragment> clazz = FragmentFactory.loadFragmentClass(
-                context.getClassLoader(), fname);
-        //反射无参构造函数
+        Class<? extends Fragment> clazz =
+                FragmentFactory.loadFragmentClass(context.getClassLoader(), fname);
+        // 反射无参构造函数
         Fragment f = clazz.getConstructor().newInstance();
         if (args != null) {
             args.setClassLoader(f.getClass().getClassLoader());
-            //注入 Bundle
+            // 注入 Bundle
             f.setArguments(args);
         }
         return f;
     } catch (java.lang.InstantiationException e) {
-        throw new InstantiationException("Unable to instantiate fragment " + fname
-                + ": make sure class name exists, is public, and has an"
-                + " empty constructor that is public", e);
+        throw new InstantiationException(
+                "Unable to instantiate fragment "
+                        + fname
+                        + ": make sure class name exists, is public, and has an"
+                        + " empty constructor that is public",
+                e);
     } catch (IllegalAccessException e) {
-        throw new InstantiationException("Unable to instantiate fragment " + fname
-                + ": make sure class name exists, is public, and has an"
-                + " empty constructor that is public", e);
+        throw new InstantiationException(
+                "Unable to instantiate fragment "
+                        + fname
+                        + ": make sure class name exists, is public, and has an"
+                        + " empty constructor that is public",
+                e);
     } catch (NoSuchMethodException e) {
-        throw new InstantiationException("Unable to instantiate fragment " + fname
-                + ": could not find Fragment constructor", e);
+        throw new InstantiationException(
+                "Unable to instantiate fragment "
+                        + fname
+                        + ": could not find Fragment constructor",
+                e);
     } catch (InvocationTargetException e) {
-        throw new InstantiationException("Unable to instantiate fragment " + fname
-                + ": calling Fragment constructor caused an exception", e);
+        throw new InstantiationException(
+                "Unable to instantiate fragment "
+                        + fname
+                        + ": calling Fragment constructor caused an exception",
+                e);
     }
 }
 ```
@@ -646,7 +662,7 @@ class FragmentFactoryFragment(private val bgColor: Int) :
 
 }
 ```
-继承 FragmentFactory，在 `instantiate`方法中判断当前要实例化的是哪一个 Fragment，在此根据 bgColor 实例化 Fragment 并返回
+继承 FragmentFactory，在 `instantiate` 方法中判断当前要实例化的是哪一个 Fragment，在此根据 bgColor 实例化 Fragment 并返回
 
 ```kotlin
 class MyFragmentFactory(private val bgColor: Int) : FragmentFactory() {
@@ -694,8 +710,8 @@ FragmentFactory 也存在着局限性：
 
 Activity 和 Fragment 中有两组历史悠久的 API 如今都已经被废弃了：
 
-- `startActivityForResult()`、`onActivityResult()` 
-- `requestPermissions()`、`onRequestPermissionsResult()` 
+- `startActivityForResult()`、`onActivityResult()`
+- `requestPermissions()`、`onRequestPermissionsResult()`
 
 虽然这两组 API 所执行的操作并不一样，但都属于**发起请求并等待回调结果**的操作类型，官方建议使用新增的 `registerForActivityResult` 方法来实现这类需求，因为通过 Activity Result API 实现的代码更有复用性，减少了模板代码且易于测试
 
@@ -704,7 +720,7 @@ Activity 和 Fragment 中有两组历史悠久的 API 如今都已经被废弃�
 按照需求，userName 和 location 都需要保存在 Intent 中，以便在两者之间实现数据交换，保存 userName 和取出 location 的过程都由 ActivityResultContract 来实现，对应 GetLocation
 
 - GetLocation 的两个泛型声明就分别对应着**请求参数的数据类型**以及**返回参数的数据类型**
-- `createIntent`方法用于保存请求参数 userName，并指定要启动的是 ActivityResultApiTestActivity
+- `createIntent` 方法用于保存请求参数 userName，并指定要启动的是 ActivityResultApiTestActivity
 - `parseResult` 方法会拿到 ActivityResultApiTestActivity 返回的 Intent 对象，如果判断为成功状态的话则直接取出 location 并返回
 
 ```kotlin
@@ -762,7 +778,7 @@ class ActivityResultApiTestActivity : BaseActivity() {
 
 }
 ```
-ActivityResultApiFragment 通过 `registerForActivityResult` 方法来注册 GetLocation，需要的时候再通过`getLocation.launch("业志陈")`来传入用户名并启动 GetLocation，最终在 `onActivityResult` 方法中获取到请求结果
+ActivityResultApiFragment 通过 `registerForActivityResult` 方法来注册 GetLocation，需要的时候再通过 `getLocation.launch("业志陈")` 来传入用户名并启动 GetLocation，最终在 `onActivityResult` 方法中获取到请求结果
 
 ```kotlin
 class ActivityResultApiFragment :
@@ -824,7 +840,7 @@ class ActivityResultApiFragment :
 
 - 完全隔绝了请求的发起者和处理者之间的引用关系，发起者直接面向于 ActivityResultContract，无需知道请求最终是交由谁处理，这样开发者就可以随时替换 ActivityResultContract 的具体实现逻辑了，避免耦合且易于测试
 - 请求的发起逻辑和处理逻辑都能够得到复用，减少了重复代码
-- 统一了 `startActivityForResult` 和 `requestPermissions`的请求方式，并提供了更加简洁方便的回调方法，避免了以前申请逻辑和回调逻辑是完全割裂开的情况
+- 统一了 `startActivityForResult` 和 `requestPermissions` 的请求方式，并提供了更加简洁方便的回调方法，避免了以前申请逻辑和回调逻辑是完全割裂开的情况
 
 # 6、Fragment Result API
 
@@ -932,21 +948,21 @@ class FragmentResultApiActivity : BaseActivity() {
 使用 Fragment Result API 的好处有：
 
 - Fragment Result API 并不局限于 Fragment 之间，只要 Activity 也持有和 Fragment 相同的 FragmentManager 实例，也可以用以上方式在 Activity 和 Fragment 之间实现数据通信。但需要注意，一个 requestKey 所属的数据只能被一个消费者得到，后注册的 FragmentResultListener 会把先注册的给覆盖掉
-- Fragment Result API 也可以用于在父 Fragment 和子 Fragment 之间传递数据，但前提是两者持有的是相同的 FragmentManager 实例。例如，如果要将数据从子 Fragment 传递给父 Fragment，父 Fragment 应通过`getChildFragmentManager()` 来调用`setFragmentResultListener()`，而不是`getParentFragmentManager()`
+- Fragment Result API 也可以用于在父 Fragment 和子 Fragment 之间传递数据，但前提是两者持有的是相同的 FragmentManager 实例。例如，如果要将数据从子 Fragment 传递给父 Fragment，父 Fragment 应通过 `getChildFragmentManager()` 来调用 `setFragmentResultListener()`，而不是 `getParentFragmentManager()`
 - 数据的发送者只负责下发数据，不关心也不知道有多少个接收者，也不知道数据是否有被消费。数据的接收者只负责接收数据，不关心也不知道有多少个数据源。避免了 Activity 和 Fragment 之间存在引用关系，使得每个个体之间更加独立
 - 只有当 Activity 和 Fragment 至少处于 STARTED 状态，即只有处于活跃状态时才会接收到数据回调，非活跃状态下连续传值也只会保留最新值，当切换到 DESTROYED 状态时也会自动移除监听，从而保证了生命周期的安全性
 
-每一个载体（Activity 或者 Fragment）都包含一个和自身同等级的 FragmentManager 用于管理子 Fragment，对应 Activity 的 `supportFragmentManager` 和 Fragment 的 `childFragmentManager`；每一个 子 Fragment 也都包含一个来自于载体的 FragmentManager，对应 Fragment 的 `parentFragmentManager` 
+每一个载体（Activity 或者 Fragment）都包含一个和自身同等级的 FragmentManager 用于管理子 Fragment，对应 Activity 的 `supportFragmentManager` 和 Fragment 的 `childFragmentManager`；每一个 子 Fragment 也都包含一个来自于载体的 FragmentManager，对应 Fragment 的 `parentFragmentManager`
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9cbcff81baeb4442adcf6ed448ac9ed5~tplv-k3u1fbpfcp-watermark.image)
 
 # 7、OnBackPressed
 
-Activity 包含有一个 `onBackPressed`方法用于响应用户点击返回键的操作，可用来控制是否允许用户退出当前页面，但 Fragment 并不包含类似方法。如果想要让 Fragment 也可以拦截用户的返回操作的话，按照以往的方法就需要通过在 Activity 和 Fragment 之间建立回调来进行拦截，这无疑也造成了两者之间存在耦合
+Activity 包含有一个 `onBackPressed` 方法用于响应用户点击返回键的操作，可用来控制是否允许用户退出当前页面，但 Fragment 并不包含类似方法。如果想要让 Fragment 也可以拦截用户的返回操作的话，按照以往的方法就需要通过在 Activity 和 Fragment 之间建立回调来进行拦截，这无疑也造成了两者之间存在耦合
 
-如今开发者有了更好的实现方式：通过 OnBackPressedDispatcher 使得任意可以访问 Activity 的代码逻辑都可以拦截 `onBackPressed`方法
+如今开发者有了更好的实现方式：通过 OnBackPressedDispatcher 使得任意可以访问 Activity 的代码逻辑都可以拦截 `onBackPressed` 方法
 
-我们可以在 Fragment 中向 Activity 添加一个 OnBackPressedCallback 回调，传递的值 true 即代表该 Fragment 会拦截用户的每一次返回操作并进行回调，我们需要根据业务逻辑在合适的时候将其置为 false，从而放开对`onBackPressed`的控制权。此外，`addCallback` 方法的第一个参数是 LifecycleOwner 类型，也即当前的 Fragment 对象，该参数确保了仅在 Fragment 的生命周期至少处于 `ON_START` 状态时才进行回调，并在 `ON_DESTROY` 时自动移除监听，从而保证了生命周期的安全性
+我们可以在 Fragment 中向 Activity 添加一个 OnBackPressedCallback 回调，传递的值 true 即代表该 Fragment 会拦截用户的每一次返回操作并进行回调，我们需要根据业务逻辑在合适的时候将其置为 false，从而放开对 `onBackPressed` 的控制权。此外，`addCallback` 方法的第一个参数是 LifecycleOwner 类型，也即当前的 Fragment 对象，该参数确保了仅在 Fragment 的生命周期至少处于 `ON_START` 状态时才进行回调，并在 `ON_DESTROY` 时自动移除监听，从而保证了生命周期的安全性
 
 ```kotlin
 class PlaceholderFragment(private val sectionNumber: Int) :
@@ -1041,59 +1057,60 @@ public void onDestroy() {
 
 ```java
 public interface LifecycleListener {
-  void onStart();
-  void onStop();
-  void onDestroy();
+    void onStart();
+
+    void onStop();
+
+    void onDestroy();
 }
 ```
 ActivityFragmentLifecycle 用于 SupportRequestManagerFragment 这个 Fragment 中来使用（省略了部分代码）。可以看到，在 Fragment 的三个生命周期回调事件中，都会相应通知 ActivityFragmentLifecycle。那么，不管 ImageView 的载体是 Activity 还是 Fragment，我们都可以向其注入一个无 UI 界面的 SupportRequestManagerFragment，以此来监听载体在整个生命周期内活跃状态的变化
 
 ```java
 public class SupportRequestManagerFragment extends Fragment {
-    
-  private static final String TAG = "SupportRMFragment";
-    
-  private final ActivityFragmentLifecycle lifecycle;
 
-  public SupportRequestManagerFragment() {
-    this(new ActivityFragmentLifecycle());
-  }
+    private static final String TAG = "SupportRMFragment";
 
-  @VisibleForTesting
-  @SuppressLint("ValidFragment")
-  public SupportRequestManagerFragment(@NonNull ActivityFragmentLifecycle lifecycle) {
-    this.lifecycle = lifecycle;
-  }
+    private final ActivityFragmentLifecycle lifecycle;
 
-  @NonNull
-  ActivityFragmentLifecycle getGlideLifecycle() {
-    return lifecycle;
-  }
+    public SupportRequestManagerFragment() {
+        this(new ActivityFragmentLifecycle());
+    }
 
-  @Override
-  public void onStart() {
-    super.onStart();
-    lifecycle.onStart();
-  }
+    @VisibleForTesting
+    @SuppressLint("ValidFragment")
+    public SupportRequestManagerFragment(@NonNull ActivityFragmentLifecycle lifecycle) {
+        this.lifecycle = lifecycle;
+    }
 
-  @Override
-  public void onStop() {
-    super.onStop();
-    lifecycle.onStop();
-  }
+    @NonNull
+    ActivityFragmentLifecycle getGlideLifecycle() {
+        return lifecycle;
+    }
 
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-    lifecycle.onDestroy();
-    unregisterFragmentWithRoot();
-  }
+    @Override
+    public void onStart() {
+        super.onStart();
+        lifecycle.onStart();
+    }
 
-  @Override
-  public String toString() {
-    return super.toString() + "{parent=" + getParentFragmentUsingHint() + "}";
-  }
-    
+    @Override
+    public void onStop() {
+        super.onStop();
+        lifecycle.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        lifecycle.onDestroy();
+        unregisterFragmentWithRoot();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "{parent=" + getParentFragmentUsingHint() + "}";
+    }
 }
 ```
 > 更多细节看这篇文章：[三方库源码笔记（9）-Glide 源码详解](https://juejin.cn/post/6891307560557608967)
@@ -1180,6 +1197,6 @@ RequestPermissionsFragment.request(
 
 # 9、结尾
 
-自我感觉本篇文章已经讲清楚了 Fragment 大部分的知识点了，陆陆续续写了一万多字，有基础知识也有新知识，也许也包含了一些你还没了解过的知识点，看完之后你有觉得 Fragment 如今真的在变得越来越好用了吗 🤣🤣 有遗漏的知识点欢迎补充
+自我感觉本篇文章已经讲清楚了 Fragment 大部分的知识点了，陆陆续续写了一万多字，有基础知识也有新知识，也许也包含了一些你还没了解过的知识点，看完之后你有觉得 Fragment 如今真的在变得越来越好用了吗？有遗漏的知识点欢迎补充
 
 最后当然也少不了本文的全部示例代码了：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)

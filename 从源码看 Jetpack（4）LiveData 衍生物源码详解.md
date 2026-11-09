@@ -1,4 +1,4 @@
-> Google Jetpack 自从推出以后，极大地改变了 Android 开发者们的开发模式，并降低了开发难度。这也要求我们对当中一些子组件的实现原理具有一定的了解，所以我就打算来写一系列 Jetpack 源码解析的文章，希望对你有所帮助 🤣🤣🤣
+> Google Jetpack 自从推出以后，极大地改变了 Android 开发者们的开发模式，并降低了开发难度。这也要求我们对当中一些子组件的实现原理具有一定的了解，所以我就打算来写一系列 Jetpack 源码解析的文章，希望对你有所帮助
 
 上篇文章介绍了 LiveData 的源码实现，本篇文章再来介绍下 LiveData 的一系列衍生类及衍生方法，基于以下版本来进行讲解
 
@@ -76,25 +76,25 @@ public <S> void addSource(@NonNull LiveData<S> source, @NonNull Observer<? super
     Source<S> e = new Source<>(source, onChanged);
     Source<?> existing = mSources.putIfAbsent(source, e);
     if (existing != null && existing.mObserver != onChanged) {
-        //走到这一步，说明之前已经传进来过同个 source 对象
-        //但当时传的 Observer 对象与本地传递的 Observer 对象不是同一个
-        //直接抛出异常
+        // 走到这一步，说明之前已经传进来过同个 source 对象
+        // 但当时传的 Observer 对象与本地传递的 Observer 对象不是同一个
+        // 直接抛出异常
         throw new IllegalArgumentException(
                 "This source was already added with the different observer");
     }
     if (existing != null) {
-        //走到此步，说明之间已经用相同的 source 和 onChanged 对象调用过 addSource 方法
-        //所以直接返回
+        // 走到此步，说明之间已经用相同的 source 和 onChanged 对象调用过 addSource 方法
+        // 所以直接返回
         return;
     }
-    //如果 MediatorLiveData 当前有处于活跃状态的 Observer 对其进行监听
-    //则调用 Source 对象的 plug() 方法
+    // 如果 MediatorLiveData 当前有处于活跃状态的 Observer 对其进行监听
+    // 则调用 Source 对象的 plug() 方法
     if (hasActiveObservers()) {
         e.plug();
     }
 }
 
-//移除对数据源的监听行为
+// 移除对数据源的监听行为
 @MainThread
 public <S> void removeSource(@NonNull LiveData<S> toRemote) {
     Source<?> source = mSources.remove(toRemote);
@@ -118,12 +118,12 @@ private static class Source<V> implements Observer<V> {
         mObserver = observer;
     }
 
-    //对外部数据源 mLiveData 进行监听
+    // 对外部数据源 mLiveData 进行监听
     void plug() {
         mLiveData.observeForever(this);
     }
 
-    //移除对外部数据源 mLiveData 的监听
+    // 移除对外部数据源 mLiveData 的监听
     void unplug() {
         mLiveData.removeObserver(this);
     }
@@ -164,31 +164,32 @@ Transformations 类是 `lifecycle-livedata` 这个依赖库提供的一个工具
 
 ## map
 
-`map(LiveData<X> , Function<X, Y>)` 方法用于简化向 MediatorLiveData 添加数据源的过程。大多数情况下，我们在使用 MediatorLiveData 时就是先将**数据源类型 X** 转换我们的**目标数据类型 Y**，然后再通过 `setValue` 方法进行数据回调。`map` 方法将这个数据类型转换过程抽象为了接口 `Function<I, O>`，将  `setValue` 过程隐藏在了 `map` 方法内部
+`map(LiveData<X> , Function<X, Y>)` 方法用于简化向 MediatorLiveData 添加数据源的过程。大多数情况下，我们在使用 MediatorLiveData 时就是先将**数据源类型 X** 转换我们的**目标数据类型 Y**，然后再通过 `setValue` 方法进行数据回调。`map` 方法将这个数据类型转换过程抽象为了接口 `Function<I, O>`，将 `setValue` 过程隐藏在了 `map` 方法内部
 
 ```java
 @MainThread
 @NonNull
 public static <X, Y> LiveData<Y> map(
-        @NonNull LiveData<X> source,
-        @NonNull final Function<X, Y> mapFunction) {
+        @NonNull LiveData<X> source, @NonNull final Function<X, Y> mapFunction) {
     final MediatorLiveData<Y> result = new MediatorLiveData<>();
-    result.addSource(source, new Observer<X>() {
-        @Override
-        public void onChanged(@Nullable X x) {
-            result.setValue(mapFunction.apply(x));
-        }
-    });
+    result.addSource(
+            source,
+            new Observer<X>() {
+                @Override
+                public void onChanged(@Nullable X x) {
+                    result.setValue(mapFunction.apply(x));
+                }
+            });
     return result;
 }
 
 public interface Function<I, O> {
     /**
-    * Applies this function to the given input.
-    *
-    * @param input the input
-    * @return the function result.
-    */
+     * Applies this function to the given input.
+     *
+     * @param input the input
+     * @return the function result.
+     */
     O apply(I input);
 }
 ```
@@ -213,7 +214,7 @@ nameLengthLiveData.observe(this, {
 
 假设当前需要你来实现一个通过用户名来查询所有匹配的用户列表的功能，通过向数据库或者网络请求等耗时的方式来获得匹配结果，为了避免阻塞主线程，需要将这个匹配过程放在子线程来完成，主线程通过回调的方式来取得结果
 
-首先，假设有一个 UserDataSource 提供了 `getUsersWithNameLiveData(String)`方法用于请求匹配结果，并通过 LiveData 作为返回值来传递请求结果。`switchMap` 方法内部也使用到了 MediatorLiveData，将 `nameQueryLiveData` 作为数据源，每当 `setNameQuery(String)`方法修改了用户名时，`switchMap` 就能收到更新通知，然后自动触发 `getUsersWithNameLiveData(String)` 方法来进行请求。最终外部只要监听 `getUsersWithNameLiveData()`方法的返回值即可得到最终的请求结果，而不必理会 ViewModel 内部究竟是通过什么方法来取得结果值
+首先，假设有一个 UserDataSource 提供了 `getUsersWithNameLiveData(String)` 方法用于请求匹配结果，并通过 LiveData 作为返回值来传递请求结果。`switchMap` 方法内部也使用到了 MediatorLiveData，将 `nameQueryLiveData` 作为数据源，每当 `setNameQuery(String)` 方法修改了用户名时，`switchMap` 就能收到更新通知，然后自动触发 `getUsersWithNameLiveData(String)` 方法来进行请求。最终外部只要监听 `getUsersWithNameLiveData()` 方法的返回值即可得到最终的请求结果，而不必理会 ViewModel 内部究竟是通过什么方法来取得结果值
 
 ```kotlin
 class UserViewModel : ViewModel() {
@@ -249,40 +250,44 @@ public static <X, Y> LiveData<Y> switchMap(
         @NonNull LiveData<X> source,
         @NonNull final Function<X, LiveData<Y>> switchMapFunction) {
     final MediatorLiveData<Y> result = new MediatorLiveData<>();
-    //先内部构建一个 MediatorLiveData，然后将 source 作为其数据源
-    result.addSource(source, new Observer<X>() {
+    // 先内部构建一个 MediatorLiveData，然后将 source 作为其数据源
+    result.addSource(
+            source,
+            new Observer<X>() {
 
-        //缓存每次的请求结果
-        LiveData<Y> mSource;
+                // 缓存每次的请求结果
+                LiveData<Y> mSource;
 
-        @Override
-        public void onChanged(@Nullable X x) {
-            //触发外界根据请求值 x 获得 LiveData 结果值的逻辑
-            //对应上面例子的 getUsersWithNameLiveData 方法
-            //这个过程是惰性的，即只有数据源 source 发生了变化才会触发请求
-            LiveData<Y> newLiveData = switchMapFunction.apply(x);
-            if (mSource == newLiveData) {
-                //如果 newLiveData 之前已经拿到了，则不必重复监听其回调结果
-                //直接返回即可
-                return;
-            }
-            if (mSource != null) {
-                //新值到来，移除对旧值的监听
-                result.removeSource(mSource);
-            }
-            mSource = newLiveData;
-            if (mSource != null) {
-                result.addSource(mSource, new Observer<Y>() {
-                    @Override
-                    public void onChanged(@Nullable Y y) {
-                        //等到拿到了getUsersWithNameLiveData 的请求结果后
-                        //就将结果值回调出去
-                        result.setValue(y);
+                @Override
+                public void onChanged(@Nullable X x) {
+                    // 触发外界根据请求值 x 获得 LiveData 结果值的逻辑
+                    // 对应上面例子的 getUsersWithNameLiveData 方法
+                    // 这个过程是惰性的，即只有数据源 source 发生了变化才会触发请求
+                    LiveData<Y> newLiveData = switchMapFunction.apply(x);
+                    if (mSource == newLiveData) {
+                        // 如果 newLiveData 之前已经拿到了，则不必重复监听其回调结果
+                        // 直接返回即可
+                        return;
                     }
-                });
-            }
-        }
-    });
+                    if (mSource != null) {
+                        // 新值到来，移除对旧值的监听
+                        result.removeSource(mSource);
+                    }
+                    mSource = newLiveData;
+                    if (mSource != null) {
+                        result.addSource(
+                                mSource,
+                                new Observer<Y>() {
+                                    @Override
+                                    public void onChanged(@Nullable Y y) {
+                                        // 等到拿到了getUsersWithNameLiveData 的请求结果后
+                                        // 就将结果值回调出去
+                                        result.setValue(y);
+                                    }
+                                });
+                    }
+                }
+            });
     return result;
 }
 ```
@@ -295,26 +300,28 @@ public static <X, Y> LiveData<Y> switchMap(
 @NonNull
 public static <X> LiveData<X> distinctUntilChanged(@NonNull LiveData<X> source) {
     final MediatorLiveData<X> outputLiveData = new MediatorLiveData<>();
-    outputLiveData.addSource(source, new Observer<X>() {
+    outputLiveData.addSource(
+            source,
+            new Observer<X>() {
 
-        //用于是否是第一次收到回调值
-        boolean mFirstTime = true;
+                // 用于是否是第一次收到回调值
+                boolean mFirstTime = true;
 
-        @Override
-        public void onChanged(X currentValue) {
-            final X previousValue = outputLiveData.getValue();
-            //等式成立的条件一共有三种，满足其一即可
-            //1. 是第一次收到回调值，即 mFirstTime 为 true
-            //2. 上次的回调值为 null，本次的回调值不为 null
-            //3. 上次的回调值不为 null，且与本次的回调值不相等
-            if (mFirstTime
-                    || (previousValue == null && currentValue != null)
-                    || (previousValue != null && !previousValue.equals(currentValue))) {
-                mFirstTime = false;
-                outputLiveData.setValue(currentValue);
-            }
-        }
-    });
+                @Override
+                public void onChanged(X currentValue) {
+                    final X previousValue = outputLiveData.getValue();
+                    // 等式成立的条件一共有三种，满足其一即可
+                    // 1. 是第一次收到回调值，即 mFirstTime 为 true
+                    // 2. 上次的回调值为 null，本次的回调值不为 null
+                    // 3. 上次的回调值不为 null，且与本次的回调值不相等
+                    if (mFirstTime
+                            || (previousValue == null && currentValue != null)
+                            || (previousValue != null && !previousValue.equals(currentValue))) {
+                        mFirstTime = false;
+                        outputLiveData.setValue(currentValue);
+                    }
+                }
+            });
     return outputLiveData;
 }
 ```
@@ -352,30 +359,30 @@ class CompressImgLiveData(private val filePath: String) : ComputableLiveData<Bit
      //获取到执行结果 bitmap
  })
 ```
-可以看到，ComputableLiveData 封装了大部分的处理逻辑，仅开放出了一个 `compute()`方法由外部来实现耗时任务的执行体，对使用者来说十分方便
+可以看到，ComputableLiveData 封装了大部分的处理逻辑，仅开放出了一个 `compute()` 方法由外部来实现耗时任务的执行体，对使用者来说十分方便
 
-ComputableLiveData 一共有四个全局变量。为了保证耗时任务只能同时由一个线程来执行，所以使用到了两个 AtomicBoolean 变量来标记耗时任务的执行状态，避免在多线程情况下出现读写竞争的情况，保证 `compute()`方法的原子性
+ComputableLiveData 一共有四个全局变量。为了保证耗时任务只能同时由一个线程来执行，所以使用到了两个 AtomicBoolean 变量来标记耗时任务的执行状态，避免在多线程情况下出现读写竞争的情况，保证 `compute()` 方法的原子性
 
 ```java
-//用于执行耗时任务的线程池
+// 用于执行耗时任务的线程池
 @SuppressWarnings("WeakerAccess") /* synthetic access */
 final Executor mExecutor;
 
-//用于触发耗时任务并接收耗时任务的执行结果
+// 用于触发耗时任务并接收耗时任务的执行结果
 @SuppressWarnings("WeakerAccess") /* synthetic access */
 final LiveData<T> mLiveData;
 
-//用于标记当前的耗时任务结果值是否已经过时，已过时则值为 true
-//外部通过调用 invalidate() 方法将耗时任务置为过时状态
+// 用于标记当前的耗时任务结果值是否已经过时，已过时则值为 true
+// 外部通过调用 invalidate() 方法将耗时任务置为过时状态
 @SuppressWarnings("WeakerAccess") /* synthetic access */
 final AtomicBoolean mInvalid = new AtomicBoolean(true);
 
-//用于标记当前是否正在执行耗时任务
-//正在执行状态则值为 true
+// 用于标记当前是否正在执行耗时任务
+// 正在执行状态则值为 true
 @SuppressWarnings("WeakerAccess") /* synthetic access */
 final AtomicBoolean mComputing = new AtomicBoolean(false);
 ```
-ComputableLiveData 有两个构造方法，主要是开放了由外部传入线程池对象的入口。当外部对 `mLiveData` 进行监听的 Observer 数量从无到有时，将自动触发执行 `mRefreshRunnable` 
+ComputableLiveData 有两个构造方法，主要是开放了由外部传入线程池对象的入口。当外部对 `mLiveData` 进行监听的 Observer 数量从无到有时，将自动触发执行 `mRefreshRunnable`
 
 ```java
 /**
@@ -406,7 +413,7 @@ public ComputableLiveData(@NonNull Executor executor) {
     };
 }
 ```
-耗时任务的执行是放在 `mRefreshRunnable` 内部，通过两个 AtomicBoolean 变量来标记 `compute()`的执行状态，并将任务体放在 while 循环内部，在任务过时的时候自动重新执行
+耗时任务的执行是放在 `mRefreshRunnable` 内部，通过两个 AtomicBoolean 变量来标记 `compute()` 的执行状态，并将任务体放在 while 循环内部，在任务过时的时候自动重新执行
 
 ```java
 @VisibleForTesting
@@ -459,13 +466,13 @@ final Runnable mRefreshRunnable = new Runnable() {
     }
 };
 ```
-当外部认定 `compute()`方法的结果值已失效时，可以通过 `invalidate()` 方法来触发任务体重新执行。当 `mInvalidationRunnable` 被执行时，`mInvalid` 的值一共有两种情况：
+当外部认定 `compute()` 方法的结果值已失效时，可以通过 `invalidate()` 方法来触发任务体重新执行。当 `mInvalidationRunnable` 被执行时，`mInvalid` 的值一共有两种情况：
 
 1. mInvalid 值为 true。if 等式不成立，说明此时 `compute()` 还未开始执行，或者之前已经被置为过时状态了（compute() 将自动重新执行），此时直接 return 即可
 2. mInvalid 值为 false。mInvalid 将被置为 true，if 等式成立，此时 mRefreshRunnable 的执行状态分为几种
    - mRefreshRunnable 已执行完毕。此时只要 isActive 为 true，则将重新触发执行 mRefreshRunnable
-   - mRefreshRunnable 还处于执行中，且`while (mInvalid.compareAndSet(true, false))`正在执行中。由于将 mInvalid 修改为了 true，则将导致 while 循环重新执行一次，从而达到重新触发 `compute()` 的目的
-   - mRefreshRunnable 还处于执行中，`while (mInvalid.compareAndSet(true, false))`已执行完毕，但还未执行到 `while (computed && mInvalid.get())` 语句。此时将 mInvalid 修改为了 true，则将导致 `while (computed && mInvalid.get())`  等式成立， while 循环重新执行一次，从而达到重新触发 `compute()` 的目的
+   - mRefreshRunnable 还处于执行中，且 `while (mInvalid.compareAndSet(true, false))` 正在执行中。由于将 mInvalid 修改为了 true，则将导致 while 循环重新执行一次，从而达到重新触发 `compute()` 的目的
+   - mRefreshRunnable 还处于执行中，`while (mInvalid.compareAndSet(true, false))` 已执行完毕，但还未执行到 `while (computed && mInvalid.get())` 语句。此时将 mInvalid 修改为了 true，则将导致 `while (computed && mInvalid.get())` 等式成立， while 循环重新执行一次，从而达到重新触发 `compute()` 的目的
 
 ```java
 // invalidation check always happens on the main thread
@@ -500,7 +507,7 @@ public void invalidate() {
 `compute()` 即需要由子类实现的抽象方法，即任务的执行体
 
 ```java
-//由外部实现耗时任务的具体逻辑
+// 由外部实现耗时任务的具体逻辑
 // TODO https://issuetracker.google.com/issues/112197238
 @SuppressWarnings({"WeakerAccess", "UnknownNullness"})
 @WorkerThread

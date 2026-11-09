@@ -1,4 +1,4 @@
-> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助 🤣🤣🤣
+> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助
 
 # 一、ARouter
 
@@ -34,7 +34,7 @@
 
 以上介绍来自于 ARouter 的 Github 官网：[README_CN](https://github.com/alibaba/ARouter/blob/master/README_CN.md)
 
-本文就基于以下版本，对 ARouter 进行一次全面的源码解析和原理介绍，做到知其然也知其所以然，希望对你有所帮助 😂😂
+本文就基于以下版本，对 ARouter 进行一次全面的源码解析和原理介绍，做到知其然也知其所以然，希望对你有所帮助
 
 ```groovy
 dependencies {
@@ -78,7 +78,7 @@ public class ARouter$$Group$$account implements IRouteGroup {
   }
 }
 ```
-还有一个重点需要注意，就是这类自动生成的文件的包名路径都是 `com.alibaba.android.arouter.routes`，且类名前缀也是有特定规则的。虽然 `ARouter$$Group$$account` 类实现了将对应关系保存到 Map 的逻辑，但是 `loadInto` 方法还是需要由 ARouter 在运行时来调用，那么 ARouter 就需要拿到 `ARouter$$Group$$account` 这个类才行，而 ARouter 就是通过扫描 `com.alibaba.android.arouter.routes`这个包名路径来获取所有辅助文件的
+还有一个重点需要注意，就是这类自动生成的文件的包名路径都是 `com.alibaba.android.arouter.routes`，且类名前缀也是有特定规则的。虽然 `ARouter$$Group$$account` 类实现了将对应关系保存到 Map 的逻辑，但是 `loadInto` 方法还是需要由 ARouter 在运行时来调用，那么 ARouter 就需要拿到 `ARouter$$Group$$account` 这个类才行，而 ARouter 就是通过扫描 `com.alibaba.android.arouter.routes` 这个包名路径来获取所有辅助文件的
 
 ARouter 的基本实现思路就是：
 
@@ -361,14 +361,13 @@ protected Postcard build(String path, String group) {
 public final class Postcard extends RouteMeta {
     // Base
     private Uri uri;
-    private Object tag;             // A tag prepare for some thing wrong.
-    private Bundle mBundle;         // Data to transform
-    private int flags = -1;         // Flags of route
-    private int timeout = 300;      // Navigation timeout, TimeUnit.Second
-    private IProvider provider;     // It will be set value, if this postcard was provider.
+    private Object tag; // A tag prepare for some thing wrong.
+    private Bundle mBundle; // Data to transform
+    private int flags = -1; // Flags of route
+    private int timeout = 300; // Navigation timeout, TimeUnit.Second
+    private IProvider provider; // It will be set value, if this postcard was provider.
     private boolean greenChannel;
     private SerializationService serializationService;
-    
 }
 ```
 Postcard 的 `navigation()` 方法又会调用到 `_ARouter` 的以下方法来完成 Activity 的跳转。该方法逻辑上并不复杂，注释也写得很清楚了
@@ -635,22 +634,22 @@ public class UserHomeActivity$$ARouter$$Autowired implements ISyringe {
     substitute.userName = substitute.getIntent().getStringExtra("userName");
   }
 }
-
 ```
-因为在跳转到 Activity 时携带的参数也是需要放到 Intent 里的，所以 `inject` 方法也只是帮我们实现了从 Intent 取值然后向变量赋值的逻辑而已，这就要求相应的变量必须是 `public` 的，这就是在 Kotlin 代码中需要同时向变量加上 `@JvmField`注解的原因
+因为在跳转到 Activity 时携带的参数也是需要放到 Intent 里的，所以 `inject` 方法也只是帮我们实现了从 Intent 取值然后向变量赋值的逻辑而已，这就要求相应的变量必须是 `public` 的，这就是在 Kotlin 代码中需要同时向变量加上 `@JvmField` 注解的原因
 
 现在来看下 ARouter 是如何实现**参数自动注入**的，其起始方法就是：`ARouter.getInstance().inject(this)`，其最终会调用到以下方法
 
 ```java
 final class _ARouter {
-   
+
     static void inject(Object thiz) {
-        AutowiredService autowiredService = ((AutowiredService) ARouter.getInstance().build("/arouter/service/autowired").navigation());
+        AutowiredService autowiredService =
+                ((AutowiredService)
+                        ARouter.getInstance().build("/arouter/service/autowired").navigation());
         if (null != autowiredService) {
             autowiredService.autowire(thiz);
         }
     }
-    
 }
 ```
 ARouter 通过控制反转的方式拿到 AutowiredService 对应的实现类 AutowiredServiceImpl 的实例对象，然后调用其 `autowire` 方法完成参数注入
@@ -673,20 +672,26 @@ public class AutowiredServiceImpl implements AutowiredService {
     public void autowire(Object instance) {
         String className = instance.getClass().getName();
         try {
-            //如果在白名单中了的话，那么就不再执行参数注入
+            // 如果在白名单中了的话，那么就不再执行参数注入
             if (!blackList.contains(className)) {
                 ISyringe autowiredHelper = classCache.get(className);
-                if (null == autowiredHelper) {  // No cache.
-                    autowiredHelper = (ISyringe) Class.forName(instance.getClass().getName() + SUFFIX_AUTOWIRED).getConstructor().newInstance();
+                if (null == autowiredHelper) { // No cache.
+                    autowiredHelper =
+                            (ISyringe)
+                                    Class.forName(
+                                                    instance.getClass().getName()
+                                                            + SUFFIX_AUTOWIRED)
+                                            .getConstructor()
+                                            .newInstance();
                 }
-                //完成参数注入
+                // 完成参数注入
                 autowiredHelper.inject(instance);
-                //缓存起来，避免重复反射
+                // 缓存起来，避免重复反射
                 classCache.put(className, autowiredHelper);
             }
         } catch (Exception ex) {
-            //如果参数注入过程抛出异常，那么就将其加入白名单中
-            blackList.add(className);    // This instance need not autowired.
+            // 如果参数注入过程抛出异常，那么就将其加入白名单中
+            blackList.add(className); // This instance need not autowired.
         }
     }
 }
@@ -771,7 +776,7 @@ Warehouse.providersIndex：
 ```java
 protected <T> T navigation(Class<? extends T> service) {
     try {
-        //从 Warehouse.providersIndex 取值拿到 RouteMeta 中存储的 path 和 group
+        // 从 Warehouse.providersIndex 取值拿到 RouteMeta 中存储的 path 和 group
         Postcard postcard = LogisticsCenter.buildProvider(service.getName());
 
         // Compatible 1.0.5 compiler sdk.
@@ -784,7 +789,7 @@ protected <T> T navigation(Class<? extends T> service) {
         if (null == postcard) {
             return null;
         }
-       //重点
+        // 重点
         LogisticsCenter.completion(postcard);
         return (T) postcard.getProvider();
     } catch (NoRouteFoundException ex) {
@@ -802,7 +807,7 @@ protected <T> T navigation(Class<? extends T> service) {
  * @param postcard Incomplete postcard, should complete by this method.
  */
 public synchronized static void completion(Postcard postcard) {
-   ... //省略之前已经讲解过的代码	
+   ... //省略之前已经讲解过的代码   
 
    RouteMeta routeMeta = Warehouse.routes.get(postcard.getPath());
 
@@ -899,7 +904,7 @@ public class ARouter$$Interceptors$$user implements IInterceptorGroup {
   }
 }
 ```
-而这些拦截器一样是会在初始化的时候，通过`LogisticsCenter.init`方法存到 `Warehouse.interceptorsIndex`中
+而这些拦截器一样是会在初始化的时候，通过 `LogisticsCenter.init` 方法存到 `Warehouse.interceptorsIndex` 中
 
 ```java
 /**
@@ -986,8 +991,8 @@ final class _ARouter {
 `InterceptorServiceImpl` 的主要逻辑是：
 
 1. 在第一次获取 `InterceptorServiceImpl` 实例的时候，其 `init` 方法会马上被调用，该方法内部会交由线程池来执行，通过反射生成每个拦截器对象，并调用每个拦截器的 `init` 方法来完成拦截器的初始化，并将每个拦截器对象都存到 `Warehouse.interceptors` 中。如果初始化完成了，则唤醒等待在 `interceptorInitLock` 上的线程
-2. 当拦截器逻辑被触发，即 `doInterceptions` 方法被调用时，如果此时第一个步骤还未执行完的话，则会通过 `checkInterceptorsInitStatus()`方法等待第一个步骤执行完成。如果十秒内都未完成的话，则走失败流程直接返回
-3. 在线程池中遍历拦截器列表，如果有某个拦截器拦截了请求的话则调用 `callback.onInterrupt`方法通知外部，否则的话则调用 `callback.onContinue()` 方法继续跳转逻辑
+2. 当拦截器逻辑被触发，即 `doInterceptions` 方法被调用时，如果此时第一个步骤还未执行完的话，则会通过 `checkInterceptorsInitStatus()` 方法等待第一个步骤执行完成。如果十秒内都未完成的话，则走失败流程直接返回
+3. 在线程池中遍历拦截器列表，如果有某个拦截器拦截了请求的话则调用 `callback.onInterrupt` 方法通知外部，否则的话则调用 `callback.onContinue()` 方法继续跳转逻辑
 
 ```java
 @Route(path = "/arouter/service/interceptor")
@@ -1334,4 +1339,4 @@ public class InterceptorProcessor extends BaseProcessor {
 ```
 # 九、结尾
 
-ARouter 的实现原理和源码解析都讲得差不多了，自认还是讲得挺全面的，那么下一篇就再来进入实战篇吧，自己来动手实现一个简易版本的 ARouter 😂😂
+ARouter 的实现原理和源码解析都讲得差不多了，自认还是讲得挺全面的，那么下一篇就再来进入实战篇吧，自己来动手实现一个简易版本的 ARouter

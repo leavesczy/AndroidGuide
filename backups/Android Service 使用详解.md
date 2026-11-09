@@ -34,16 +34,16 @@ Service可以分为以下三种形式：
 例如
 
 ```java
-  <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        
-        <service android:name=".MyService" />
-        
-    </application>
+    <application
+                android:allowBackup="true"
+                android:icon="@mipmap/ic_launcher"
+                android:label="@string/app_name"
+                android:supportsRtl="true"
+                android:theme="@style/AppTheme">
+
+                <service android:name=".MyService" />
+
+        </application>
 ```
 **android:name** 属性是唯一必需的属性，用于指定服务的类名，还可将其他属性包括在 **< service >** 元素中以定义一些特性
 
@@ -106,11 +106,12 @@ public class MyService extends Service {
     private int startId;
 
     public enum Control {
-        PLAY, PAUSE, STOP
+        PLAY,
+        PAUSE,
+        STOP
     }
 
-    public MyService() {
-    }
+    public MyService() {}
 
     @Override
     public void onCreate() {
@@ -180,7 +181,6 @@ public class MyService extends Service {
         Log.e(TAG, "onBind");
         throw new UnsupportedOperationException("Not yet implemented");
     }
-
 }
 ```
 
@@ -217,19 +217,18 @@ public class MainActivity extends AppCompatActivity {
         bundle.putSerializable("Key", MyService.Control.STOP);
         intent.putExtras(bundle);
         startService(intent);
-        //或者是直接如下调用
-        //Intent intent = new Intent(this, MyService.class);
-        //stopService(intent);
+        // 或者是直接如下调用
+        // Intent intent = new Intent(this, MyService.class);
+        // stopService(intent);
     }
-    
 }
 ```
 在清单文件中声明Service，为其添加**label**标签，便于在系统中识别Service
 
 ```java
-      <service
-          android:name=".MyService"
-          android:label="@string/app_name" />
+            <service
+                    android:name=".MyService"
+                    android:label="@string/app_name" />
 ```
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-c3690e2316b8f9a4?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -264,7 +263,7 @@ IntentService 执行以下操作：
  - 创建工作队列，用于将 Intent 逐一传递给 onHandleIntent() 实现，这样就不必担心多线程问题
  - 在处理完所有启动请求后停止服务，因此不必自己调用 stopSelf()方法
  - 提供 onBind() 的默认实现（返回 null）
- - 提供 onStartCommand() 的默认实现，可将 Intent 依次发送到工作队列和 onHandleIntent() 
+ - 提供 onStartCommand() 的默认实现，可将 Intent 依次发送到工作队列和 onHandleIntent()
 
 因此，只需实现构造函数与 onHandleIntent() 方法即可
 
@@ -293,7 +292,6 @@ public class MyIntentService extends IntentService {
             }
         }
     }
-
 }
 ```
 
@@ -315,7 +313,6 @@ public class StartIntentServiceActivity extends AppCompatActivity {
         intent.putExtras(bundle);
         startService(intent);
     }
-
 }
 ```
 当中，**startService(View view)**方法与一个Button绑定，连续快速地多次点击Button，验证**IntentService**当中的日志是否依次输出，还是交叉着输出
@@ -427,7 +424,6 @@ public class MyBindService extends Service {
     public int getRandomNumber() {
         return mGenerator.nextInt(100);
     }
-
 }
 ```
 
@@ -444,20 +440,21 @@ public class BindServiceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_bind_service);
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection mConnection =
+            new ServiceConnection() {
 
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            MyBindService.MyBinder binder = (MyBindService.MyBinder) service;
-            mService = binder.getService();
-            mBound = true;
-        }
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    MyBindService.MyBinder binder = (MyBindService.MyBinder) service;
+                    mService = binder.getService();
+                    mBound = true;
+                }
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mBound = false;
-        }
-    };
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    mBound = false;
+                }
+            };
 
     public void bindService(View view) {
         Intent intent = new Intent(this, MyBindService.class);
@@ -473,7 +470,8 @@ public class BindServiceActivity extends AppCompatActivity {
 
     public void getData(View view) {
         if (mBound) {
-            Toast.makeText(this, "获取到的随机数：" + mService.getRandomNumber(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "获取到的随机数：" + mService.getRandomNumber(), Toast.LENGTH_SHORT)
+                    .show();
         } else {
             Toast.makeText(this, "服务未绑定", Toast.LENGTH_SHORT).show();
         }
@@ -487,13 +485,12 @@ public class BindServiceActivity extends AppCompatActivity {
             mBound = false;
         }
     }
-
 }
 ```
 
 ### **4.2、绑定服务的生命周期**
 
-绑定服务的生命周期在同时启动服务的情况下比较特殊，想要终止服务，除了需要取消绑定服务外，还需要服务通过 stopSelf() 自行停止或其他组件调用 stopService() 
+绑定服务的生命周期在同时启动服务的情况下比较特殊，想要终止服务，除了需要取消绑定服务外，还需要服务通过 stopSelf() 自行停止或其他组件调用 stopService()
 
 其中，如果服务已启动并接受绑定，则当系统调用了onUnbind() 方法，想要在客户端下一次绑定到服务时调用 onRebind() 方法的话，则onUnbind() 方法需返回 true。onRebind() 返回空值，但客户端仍可以在其 onServiceConnected() 回调中接收到 IBinder对象
 
@@ -503,7 +500,7 @@ public class BindServiceActivity extends AppCompatActivity {
 
  - 如果只需要在 Activity 可见时与服务交互，则应在 onStart() 期间绑定，在 onStop() 期间取消绑定
  - 如果希望 Activity 在后台停止运行状态下仍可接收响应，则可在 onCreate() 期间绑定，在 onDestroy() 期间取消绑定。这意味着 Activity 在其整个运行过程中（包括后台运行期间）都需要使用此服务
- - 通常情况下，切勿在 Activity 的 onResume() 和 onPause() 期间绑定和取消绑定，因为每一次生命周期转换都会发生这些回调，应该使发生在这些转换期间的处理保持在最低水平。假设有两个Activity需要绑定到同一服务，从Activity  A跳转到Activity  B，这个过程中会依次执行A-onPause，B-onCreate，B-onStart，B-onResume，A-onStop。这样系统会在A-onPause的时候销毁服务，又在B-onResume的时候重建服务。当Activity  B回退到Activity  A时，会依次执行B-onPause，A-onRestart，A-onStart，A-onResume，B-onStop，B-onDestroy。此时，系统会在B-onPause时销毁服务，又在A-onResume时重建服务。这样就造成了多次的销毁与重建，因此需要选定好绑定服务与取消绑定服务的时机
+ - 通常情况下，切勿在 Activity 的 onResume() 和 onPause() 期间绑定和取消绑定，因为每一次生命周期转换都会发生这些回调，应该使发生在这些转换期间的处理保持在最低水平。假设有两个Activity需要绑定到同一服务，从Activity A跳转到Activity B，这个过程中会依次执行A-onPause，B-onCreate，B-onStart，B-onResume，A-onStop。这样系统会在A-onPause的时候销毁服务，又在B-onResume的时候重建服务。当Activity B回退到Activity A时，会依次执行B-onPause，A-onRestart，A-onStart，A-onResume，B-onStop，B-onDestroy。此时，系统会在B-onPause时销毁服务，又在A-onResume时重建服务。这样就造成了多次的销毁与重建，因此需要选定好绑定服务与取消绑定服务的时机
 
 
 
@@ -516,16 +513,16 @@ public class BindServiceActivity extends AppCompatActivity {
 修改MyService当中的play()方法
 
 ```java
-    private void play() {
-        if (!mediaPlayer.isPlaying()) {
-            mediaPlayer.start();
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-            mBuilder.setSmallIcon(R.drawable.bird);
-            mBuilder.setContentTitle("这是标题吧~leavesc");
-            mBuilder.setContentText("http://blog.csdn.net/new_one_object");
-            startForeground(1, mBuilder.build());
-        }
+private void play() {
+    if (!mediaPlayer.isPlaying()) {
+        mediaPlayer.start();
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.bird);
+        mBuilder.setContentTitle("这是标题吧~leavesc");
+        mBuilder.setContentText("http://blog.csdn.net/new_one_object");
+        startForeground(1, mBuilder.build());
     }
+}
 ```
 点击播放音乐后，状态栏就出现了一个通知
 

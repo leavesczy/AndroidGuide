@@ -1,5 +1,5 @@
 > 最近一直在了解关于 **Kotlin协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
-> 
+>
 > 协程官方文档：[coroutines-guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/coroutines-guide.md)
 
 此章节涵盖了协程的基本概念
@@ -112,14 +112,14 @@ class MyTest {
 import kotlinx.coroutines.*
 
 fun main() = runBlocking {
-	//sampleStart
+    //sampleStart
     val job = GlobalScope.launch { // launch a new coroutine and keep a reference to its Job
         delay(1000L)
         println("World!")
     }
     println("Hello,")
     job.join() // wait until child coroutine completes
-	//sampleEnd    
+    //sampleEnd    
 }
 ```
 
@@ -190,7 +190,7 @@ Coroutine scope is over
 
 # 六、提取函数并重构
 
-抽取 launch 内部的代码块为一个独立的函数，需要将之声明为挂起函数。挂起函数可以像常规函数一样在协程中使用，但它们的额外特性是：可以依次使用其它挂起函数（如 delay 函数）来使协程挂起 
+抽取 launch 内部的代码块为一个独立的函数，需要将之声明为挂起函数。挂起函数可以像常规函数一样在协程中使用，但它们的额外特性是：可以依次使用其它挂起函数（如 delay 函数）来使协程挂起
 
 ```kotlin
 import kotlinx.coroutines.*

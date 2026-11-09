@@ -6,7 +6,7 @@ Android 开发者们对 Jetpack Compose 应该已经很熟悉了吧？我在项�
 
 # 一、基本思路
 
-在 Jetpack Compose 中，我们一般都是通过 Modifier  的 `clickable` 或者 `combinedClickable` 这两个扩展函数来为可组合函数的点击事件设置监听，方法均位于 `compose.foundation` 库的 Clickable 类中，一共有四个方法可供使用
+在 Jetpack Compose 中，我们一般都是通过 Modifier 的 `clickable` 或者 `combinedClickable` 这两个扩展函数来为可组合函数的点击事件设置监听，方法均位于 `compose.foundation` 库的 Clickable 类中，一共有四个方法可供使用
 
 `clickable` 和 `combinedClickable` 方法均包含了重载函数，差别只在于是否包含 `interactionSource` 和 `indication` 这两个入参参数，重载函数之间还是属于直接调用的关系，所以只需关注第二个和第四个方法即可
 
@@ -278,22 +278,24 @@ fun clickableDemo() {
 将以上代码反编译为 Java 代码，格式化后大致如下所示
 
 ```java
-public static final void clickable(@NotNull Modifier modifier,
-                                   boolean enabled,
-                                   @Nullable String onClickLabel,
-                                   @Nullable Role role,
-                                   @NotNull Function0 onClick) {
+public static final void clickable(
+        @NotNull Modifier modifier,
+        boolean enabled,
+        @Nullable String onClickLabel,
+        @Nullable Role role,
+        @NotNull Function0 onClick) {
     Intrinsics.checkNotNullParameter(modifier, "modifier");
     Intrinsics.checkNotNullParameter(onClick, "onClick");
 }
 
-public static void clickable$default(Modifier modifier,
-                                     boolean enabled,
-                                     String onClickLabel,
-                                     Role role,
-                                     Function0 onClick,
-                                     int flag,
-                                     Object object) {
+public static void clickable$default(
+        Modifier modifier,
+        boolean enabled,
+        String onClickLabel,
+        Role role,
+        Function0 onClick,
+        int flag,
+        Object object) {
     if ((flag & 1) != 0) {
         enabled = true;
     }
@@ -309,8 +311,22 @@ public static void clickable$default(Modifier modifier,
 public static final void clickableDemo() {
     Modifier modifier = Modifier.Companion.getINSTANCE();
     clickable(modifier, true, "clickableDemo", (Role) null, (Function0) null.INSTANCE);
-    clickable$default(modifier, true, (String) null, (Role) null, (Function0) null.INSTANCE, 6, (Object) null);
-    clickable$default(modifier, false, "clickableDemo", (Role) null, (Function0) null.INSTANCE, 5, (Object) null);
+    clickable$default(
+            modifier,
+            true,
+            (String) null,
+            (Role) null,
+            (Function0) null.INSTANCE,
+            6,
+            (Object) null);
+    clickable$default(
+            modifier,
+            false,
+            "clickableDemo",
+            (Role) null,
+            (Function0) null.INSTANCE,
+            5,
+            (Object) null);
 }
 ```
 
@@ -497,7 +513,7 @@ if (onClickArgumentIndex > 0) {
 
 ## 白名单机制不完善
 
-如果我们在代码中都是通过直接调用`clickable` 和 `combinedClickable` 这两个方法来监听点击事件的话，那通过判断 `onClickLabel` 的值来实现白名单功能是完全可行的，但对于 Jetpack Compose 提供的一些封装了点击事件的控件就不适用了。例如 Button 和 TextButton 内部都封装了 `clickable` 方法，但没有开放设置  `onClickLabel` 值的入口，所以这类控件就无法加入白名单了
+如果我们在代码中都是通过直接调用 `clickable` 和 `combinedClickable` 这两个方法来监听点击事件的话，那通过判断 `onClickLabel` 的值来实现白名单功能是完全可行的，但对于 Jetpack Compose 提供的一些封装了点击事件的控件就不适用了。例如 Button 和 TextButton 内部都封装了 `clickable` 方法，但没有开放设置 `onClickLabel` 值的入口，所以这类控件就无法加入白名单了
 
 ## 防抖逻辑会互相关联
 
@@ -508,7 +524,7 @@ if (onClickArgumentIndex > 0) {
 
 在上文中隐藏了一个小细节：OnClickWrap 中定义的 `lastClickTime` 是静态变量。这就会导致不同的点击事件源会共享 `lastClickTime` 值且同时受到该值的限制，因此本文实现的效果是第一种。如果声明为非静态变量，那对应的就是第二种逻辑
 
-而我之所以不将`lastClickTime` 声明为非静态变量，是因为被可组合函数的 **重组** 限制了：假如点击事件会造成对应的可组合函数重组，那么将 `onClick` 重置为 OnClickWrap 实例的代码将被再一次执行，此时声明为非静态变量的 `lastClickTime`  就又变成了默认值 0，从而也就无法实现双击防抖的效果了
+而我之所以不将 `lastClickTime` 声明为非静态变量，是因为被可组合函数的 **重组** 限制了：假如点击事件会造成对应的可组合函数重组，那么将 `onClick` 重置为 OnClickWrap 实例的代码将被再一次执行，此时声明为非静态变量的 `lastClickTime` 就又变成了默认值 0，从而也就无法实现双击防抖的效果了
 
 # 六、结尾
 
@@ -516,4 +532,4 @@ if (onClickArgumentIndex > 0) {
 
 相关的代码我都上传到了 Github：[asm-samples](https://github.com/leavesczy/asm-samples)
 
-希望对你有所帮助 🤣🤣🤣
+希望对你有所帮助

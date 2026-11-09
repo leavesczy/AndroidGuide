@@ -1,6 +1,6 @@
-> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助 🤣🤣🤣
+> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助
 
-在上篇文章中我讲解了 Retrofit 是如何实现支持不同的 API 返回值的。例如，对于同一个 API 接口，我们既可以使用 Retrofit 原生的 `Call<ResponseBody>`方式来作为返回值，也可以使用 `Observable<ResponseBody>`这种 RxJava 的方式来发起网络请求
+在上篇文章中我讲解了 Retrofit 是如何实现支持不同的 API 返回值的。例如，对于同一个 API 接口，我们既可以使用 Retrofit 原生的 `Call<ResponseBody>` 方式来作为返回值，也可以使用 `Observable<ResponseBody>` 这种 RxJava 的方式来发起网络请求
 
 ```kotlin
 interface ApiService {
@@ -45,11 +45,11 @@ class MainActivity : AppCompatActivity() {
 
 ```json
 {
-	"status": 200,
-	"msg": "success",
-	"data": {
-		
-	}
+    "status": 200,
+    "msg": "success",
+    "data": {
+        
+    }
 }
 ```
 对应我们项目中的实际代码就是一个泛型类
@@ -268,4 +268,4 @@ class LiveDataCallAdapterActivity : AppCompatActivity() {
 ```
 # 三、GitHub
 
-LiveDataCallAdapter 的实现逻辑挺简单的，在使用上也很简单。本篇文章也算作是在了解了 Retrofit 源码后所做的一个实战 😁😁 这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)
+LiveDataCallAdapter 的实现逻辑挺简单的，在使用上也很简单。本篇文章也算作是在了解了 Retrofit 源码后所做的一个实战。这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)

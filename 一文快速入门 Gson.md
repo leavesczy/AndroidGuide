@@ -9,49 +9,49 @@ Gson 的 GitHub 主页点击这里：[Gson](https://github.com/google/gson)
 在进行序列化与反序列操作前，需要先实例化一个 `com .google.gson.Gson` 对象，获取 Gson 对象的方法有两种
 
 ```java
-        //通过构造函数来获取
-        Gson gson = new Gson();
-        //通过 GsonBuilder 来获取，可以进行多项特殊配置
-        Gson gson = new GsonBuilder().create();
+// 通过构造函数来获取
+Gson gson = new Gson();
+// 通过 GsonBuilder 来获取，可以进行多项特殊配置
+Gson gson = new GsonBuilder().create();
 ```
-## 2、生成  Json
+## 2、生成 Json
 
 利用 Gson 可以很方便地生成 Json 字符串，通过使用 `addProperty` 的四个重载方法
 
 ```java
-    public static void main(String[] args) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("String", "leavesC");
-        jsonObject.addProperty("Number_Integer", 23);
-        jsonObject.addProperty("Number_Double", 22.9);
-        jsonObject.addProperty("Boolean", true);
-        jsonObject.addProperty("Char", 'c');
-        System.out.println();
-        System.out.println(jsonObject);
-    }
+public static void main(String[] args) {
+    JsonObject jsonObject = new JsonObject();
+    jsonObject.addProperty("String", "leavesC");
+    jsonObject.addProperty("Number_Integer", 23);
+    jsonObject.addProperty("Number_Double", 22.9);
+    jsonObject.addProperty("Boolean", true);
+    jsonObject.addProperty("Char", 'c');
+    System.out.println();
+    System.out.println(jsonObject);
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/86dce58efe1b406db415b9ed6cbbe40b~tplv-k3u1fbpfcp-zoom-1.image)
 
-`addProperty` 方法底层调用的是 `add(String property, JsonElement value)` 方法，即将基本数据类型转化为了 **JsonElement** 对象，JsonElement 是一个抽象类，而 **JsonObject** 继承了 JsonElement ，因此我们可以通过 JsonObject 自己来构建一个 JsonElement 
+`addProperty` 方法底层调用的是 `add(String property, JsonElement value)` 方法，即将基本数据类型转化为了 **JsonElement** 对象，JsonElement 是一个抽象类，而 **JsonObject** 继承了 JsonElement ，因此我们可以通过 JsonObject 自己来构建一个 JsonElement
 
 ```java
-    public static void main(String[] args) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("String", "leavesC");
-        jsonObject.addProperty("Number", 23);
-        jsonObject.addProperty("Number", 22.9);
-        jsonObject.addProperty("Boolean", true);
-        jsonObject.addProperty("Char", 'c');
+public static void main(String[] args) {
+    JsonObject jsonObject = new JsonObject();
+    jsonObject.addProperty("String", "leavesC");
+    jsonObject.addProperty("Number", 23);
+    jsonObject.addProperty("Number", 22.9);
+    jsonObject.addProperty("Boolean", true);
+    jsonObject.addProperty("Char", 'c');
 
-        JsonObject jsonElement = new JsonObject();
-        jsonElement.addProperty("Boolean", false);
-        jsonElement.addProperty("Double", 25.9);
-        jsonElement.addProperty("Char", 'c');
-        jsonObject.add("JsonElement", jsonElement);
+    JsonObject jsonElement = new JsonObject();
+    jsonElement.addProperty("Boolean", false);
+    jsonElement.addProperty("Double", 25.9);
+    jsonElement.addProperty("Char", 'c');
+    jsonObject.add("JsonElement", jsonElement);
 
-        System.out.println();
-        System.out.println(jsonObject);
-    }
+    System.out.println();
+    System.out.println(jsonObject);
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/41f93e3921b8496eaaf6860573be42c8~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -123,39 +123,34 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                ", sex=" + sex +
-                '}';
+        return "User{" + "name='" + name + '\'' + ", age=" + age + ", sex=" + sex + '}';
     }
-
 }
 ```
 序列化的方法很简单，调用 gson 对象的 toJson 方法，传入要序列化的对象
 
 ```java
-    public static void main(String[] args) {
-        //序列化
-        User user = new User("leavesC", 24, true);
-        Gson gson = new Gson();
-        System.out.println();
-        System.out.println(gson.toJson(user));
-    }
+public static void main(String[] args) {
+    // 序列化
+    User user = new User("leavesC", 24, true);
+    Gson gson = new Gson();
+    System.out.println();
+    System.out.println(gson.toJson(user));
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e192083ec56b4b38ba7634f4bb9e9ac5~tplv-k3u1fbpfcp-zoom-1.image)
 
 反序化的方式也类似
 
 ```java
-    public static void main(String[] args) {
-        //反序列化
-        String userJson = "{\"name\":\"leavesC\",\"age\":24,\"sex\":true}";
-        Gson gson = new Gson();
-        User user = gson.fromJson(userJson, User.class);
-        System.out.println();
-        System.out.println(user);
-    }
+public static void main(String[] args) {
+    // 反序列化
+    String userJson = "{\"name\":\"leavesC\",\"age\":24,\"sex\":true}";
+    Gson gson = new Gson();
+    User user = gson.fromJson(userJson, User.class);
+    System.out.println();
+    System.out.println(user);
+}
 ```
 # 二、属性重命名
 
@@ -177,14 +172,14 @@ public class User {
 例如
 
 ```java
-    public static void main(String[] args) {
-        //反序列化
-        String userJson = "{\"userName\":\"leavesC\",\"age\":24,\"sex\":true}";
-        Gson gson = new Gson();
-        User user = gson.fromJson(userJson, User.class);
-        System.out.println();
-        System.out.println(user);
-    }
+public static void main(String[] args) {
+    // 反序列化
+    String userJson = "{\"userName\":\"leavesC\",\"age\":24,\"sex\":true}";
+    Gson gson = new Gson();
+    User user = gson.fromJson(userJson, User.class);
+    System.out.println();
+    System.out.println(user);
+}
 ```
 name 属性值解析不到，所以为 null
 
@@ -217,33 +212,32 @@ public class User {
     private int age;
 
     private boolean sex;
-
 }
 ```
 在序列时，Json 格式就会相应改变
 
 ```java
-    public static void main(String[] args) {
-        //序列化
-        User user = new User("leavesC", 24, true);
-        Gson gson = new Gson();
-        System.out.println();
-        System.out.println(gson.toJson(user));
-    }
+public static void main(String[] args) {
+    // 序列化
+    User user = new User("leavesC", 24, true);
+    Gson gson = new Gson();
+    System.out.println();
+    System.out.println(gson.toJson(user));
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3cdb00c69827421a845406668a66d9c6~tplv-k3u1fbpfcp-zoom-1.image)
 
 在反序列化时也一样，能够解析到正确的属性值
 
 ```java
-    public static void main(String[] args) {
-        //反序列化
-        String userJson = "{\"userName\":\"leavesC\",\"age\":24,\"sex\":true}";
-        Gson gson = new Gson();
-        User user = gson.fromJson(userJson, User.class);
-        System.out.println();
-        System.out.println(user);
-    }
+public static void main(String[] args) {
+    // 反序列化
+    String userJson = "{\"userName\":\"leavesC\",\"age\":24,\"sex\":true}";
+    Gson gson = new Gson();
+    User user = gson.fromJson(userJson, User.class);
+    System.out.println();
+    System.out.println(user);
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a22237127f4d424485f7dc05d1fc6b63~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -252,37 +246,37 @@ public class User {
 ```java
 public class User {
 
-    @SerializedName(value = "userName", alternate = {"user_name", "Name"})
+    @SerializedName(
+            value = "userName",
+            alternate = {"user_name", "Name"})
     private String name;
 
     private int age;
 
     private boolean sex;
-
 }
-
 ```
 以下几种情况都能够被正确的反序列化
 
 ```java
-    public static void main(String[] args) {
-        //反序列化
-        Gson gson = new Gson();
-        String userJson = "{\"userName\":\"leavesC\",\"age\":24,\"sex\":true}";
-        User user = gson.fromJson(userJson, User.class);
-        System.out.println();
-        System.out.println(user);
+public static void main(String[] args) {
+    // 反序列化
+    Gson gson = new Gson();
+    String userJson = "{\"userName\":\"leavesC\",\"age\":24,\"sex\":true}";
+    User user = gson.fromJson(userJson, User.class);
+    System.out.println();
+    System.out.println(user);
 
-        userJson = "{\"user_name\":\"leavesC\",\"age\":24,\"sex\":true}";
-        user = gson.fromJson(userJson, User.class);
-        System.out.println();
-        System.out.println(user);
+    userJson = "{\"user_name\":\"leavesC\",\"age\":24,\"sex\":true}";
+    user = gson.fromJson(userJson, User.class);
+    System.out.println();
+    System.out.println(user);
 
-        userJson = "{\"Name\":\"leavesC\",\"age\":24,\"sex\":true}";
-        user = gson.fromJson(userJson, User.class);
-        System.out.println();
-        System.out.println(user);
-    }
+    userJson = "{\"Name\":\"leavesC\",\"age\":24,\"sex\":true}";
+    user = gson.fromJson(userJson, User.class);
+    System.out.println();
+    System.out.println(user);
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7a265bd984754066abad2a908280fa5b~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -303,7 +297,6 @@ public @interface Expose {
 
     boolean deserialize() default true;
 }
-
 ```
 Expose 注解的注解值声明情况有四种
 
@@ -318,16 +311,16 @@ Expose 注解的注解值声明情况有四种
 ```java
 public class User {
 
-    @Expose(serialize = true, deserialize = true)   //序列化和反序列化都生效
+    @Expose(serialize = true, deserialize = true) // 序列化和反序列化都生效
     private String a;
 
-    @Expose(serialize = false, deserialize = true)  //序列化时不生效，反序列化时生效
+    @Expose(serialize = false, deserialize = true) // 序列化时不生效，反序列化时生效
     private String b;
 
-    @Expose(serialize = true, deserialize = false)  //序列化时生效，反序列化时不生效
+    @Expose(serialize = true, deserialize = false) // 序列化时生效，反序列化时不生效
     private String c;
 
-    @Expose(serialize = false, deserialize = false) //序列化和反序列化都不生效，和不写注解一样
+    @Expose(serialize = false, deserialize = false) // 序列化和反序列化都不生效，和不写注解一样
     private String d;
 
     private String e;
@@ -342,31 +335,25 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "a='" + a + '\'' +
-                ", b='" + b + '\'' +
-                ", c='" + c + '\'' +
-                ", d='" + d + '\'' +
-                ", e='" + e + '\'' +
-                '}';
+        return "User{" + "a='" + a + '\'' + ", b='" + b + '\'' + ", c='" + c + '\'' + ", d='" + d
+                + '\'' + ", e='" + e + '\'' + '}';
     }
-
 }
 ```
 按照如上的注解值，只有声明了 Expose 注解且 serialize 值为 true 的字段才能被序列化，只有声明了 Expose 注解且 deserialize 值为 true 的字段才能被反序列化
 
 ```java
-    public static void main(String[] args) {
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        User user = new User("A", "B", "C", "D", "E");
-        System.out.println();
-        System.out.println(gson.toJson(user));
+public static void main(String[] args) {
+    Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+    User user = new User("A", "B", "C", "D", "E");
+    System.out.println();
+    System.out.println(gson.toJson(user));
 
-        String json = "{\"a\":\"A\",\"b\":\"B\",\"c\":\"C\",\"d\":\"D\",\"e\":\"E\"}";
-        user = gson.fromJson(json, User.class);
-        System.out.println();
-        System.out.println(user.toString());
-    }
+    String json = "{\"a\":\"A\",\"b\":\"B\",\"c\":\"C\",\"d\":\"D\",\"e\":\"E\"}";
+    user = gson.fromJson(json, User.class);
+    System.out.println();
+    System.out.println(user.toString());
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1db89d97907f42be91eab1637c1bcb22~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -421,36 +408,29 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "a='" + a + '\'' +
-                ", b='" + b + '\'' +
-                ", c='" + c + '\'' +
-                ", d='" + d + '\'' +
-                ", e='" + e + '\'' +
-                '}';
+        return "User{" + "a='" + a + '\'' + ", b='" + b + '\'' + ", c='" + c + '\'' + ", d='" + d
+                + '\'' + ", e='" + e + '\'' + '}';
     }
-
 }
-
 ```
 ```java
-    public static void main(String[] args) {
-        Gson gson = new GsonBuilder().setVersion(1.6).create();
-        User user = new User("A", "B", "C", "D", "E");
-        System.out.println();
-        System.out.println(gson.toJson(user));
+public static void main(String[] args) {
+    Gson gson = new GsonBuilder().setVersion(1.6).create();
+    User user = new User("A", "B", "C", "D", "E");
+    System.out.println();
+    System.out.println(gson.toJson(user));
 
-        String json = "{\"a\":\"A\",\"b\":\"B\",\"c\":\"C\",\"d\":\"D\",\"e\":\"E\"}";
-        user = gson.fromJson(json, User.class);
-        System.out.println();
-        System.out.println(user.toString());
-    }
+    String json = "{\"a\":\"A\",\"b\":\"B\",\"c\":\"C\",\"d\":\"D\",\"e\":\"E\"}";
+    user = gson.fromJson(json, User.class);
+    System.out.println();
+    System.out.println(user.toString());
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/750f3b022d2d46889bbdeba6be5fcb3d~tplv-k3u1fbpfcp-zoom-1.image)
 
 ## 3、基于访问修饰符
 
-访问修饰符由 **java.lang.reflect.Modifier** 提供 int 类型的定义，而 GsonBuilder 对象的 `excludeFieldsWithModifiers`方法接收一个 int 类型可变参数，指定不进行序列化和反序列化操作的访问修饰符字段
+访问修饰符由 **java.lang.reflect.Modifier** 提供 int 类型的定义，而 GsonBuilder 对象的 `excludeFieldsWithModifiers` 方法接收一个 int 类型可变参数，指定不进行序列化和反序列化操作的访问修饰符字段
 
 看个例子
 
@@ -468,21 +448,23 @@ public class ModifierSample {
     final String finalField = "final";
 
     static String staticField = "static";
-
 }
 ```
 ```java
-    public static void main(String[] args) {
-        Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.PRIVATE, Modifier.STATIC).create();
-        ModifierSample modifierSample = new ModifierSample();
-        System.out.println(gson.toJson(modifierSample));
-    }
+public static void main(String[] args) {
+    Gson gson =
+            new GsonBuilder()
+                    .excludeFieldsWithModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                    .create();
+    ModifierSample modifierSample = new ModifierSample();
+    System.out.println(gson.toJson(modifierSample));
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ba1e07967c374dda91f1e10691fb6ac3~tplv-k3u1fbpfcp-zoom-1.image)
 
 ## 4、基于策略
 
-GsonBuilder 类包含 `setExclusionStrategies(ExclusionStrategy... strategies)`方法用于传入不定长参数的策略方法，用于直接排除指定字段名或者指定字段类型
+GsonBuilder 类包含 `setExclusionStrategies(ExclusionStrategy... strategies)` 方法用于传入不定长参数的策略方法，用于直接排除指定字段名或者指定字段类型
 
 看个例子
 
@@ -503,40 +485,48 @@ public class Strategies {
 
     @Override
     public String toString() {
-        return "Strategies{" +
-                "stringField='" + stringField + '\'' +
-                ", intField=" + intField +
-                ", doubleField=" + doubleField +
-                '}';
+        return "Strategies{"
+                + "stringField='"
+                + stringField
+                + '\''
+                + ", intField="
+                + intField
+                + ", doubleField="
+                + doubleField
+                + '}';
     }
-
 }
 ```
 ```java
 public static void main(String[] args) {
-        Gson gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes fieldAttributes) {
-                //排除指定字段名
-                return fieldAttributes.getName().equals("intField");
-            }
+    Gson gson =
+            new GsonBuilder()
+                    .setExclusionStrategies(
+                            new ExclusionStrategy() {
+                                @Override
+                                public boolean shouldSkipField(
+                                        FieldAttributes fieldAttributes) {
+                                    // 排除指定字段名
+                                    return fieldAttributes.getName().equals("intField");
+                                }
 
-            @Override
-            public boolean shouldSkipClass(Class<?> aClass) {
-                //排除指定字段类型
-                return aClass.getName().equals(double.class.getName());
-            }
-        }).create();
+                                @Override
+                                public boolean shouldSkipClass(Class<?> aClass) {
+                                    // 排除指定字段类型
+                                    return aClass.getName().equals(double.class.getName());
+                                }
+                            })
+                    .create();
 
-        Strategies strategies = new Strategies("stringField", 111, 11.22);
-        System.out.println();
-        System.out.println(gson.toJson(strategies));
+    Strategies strategies = new Strategies("stringField", 111, 11.22);
+    System.out.println();
+    System.out.println(gson.toJson(strategies));
 
-        String json = "{\"stringField\":\"stringField\",\"intField\":111,\"doubleField\":11.22}";
-        strategies = gson.fromJson(json, Strategies.class);
-        System.out.println();
-        System.out.println(strategies);
-    }
+    String json = "{\"stringField\":\"stringField\",\"intField\":111,\"doubleField\":11.22}";
+    strategies = gson.fromJson(json, Strategies.class);
+    System.out.println();
+    System.out.println(strategies);
+}
 ```
 字段名为 "intField" 和字段类型为 double 的字段都会被排除掉
 
@@ -563,18 +553,18 @@ public class Strategies {
     private int intField;
 
     private double doubleField;
-
 }
 ```
 ```java
- public static void main(String[] args) {
-        Gson gson = new GsonBuilder()
-                .serializeNulls() //输出null
-                .create();
-        Strategies strategies = new Strategies(null, 24, 22.333);
-        System.out.println();
-        System.out.println(gson.toJson(strategies));
- }
+public static void main(String[] args) {
+    Gson gson =
+            new GsonBuilder()
+                    .serializeNulls() // 输出null
+                    .create();
+    Strategies strategies = new Strategies(null, 24, 22.333);
+    System.out.println();
+    System.out.println(gson.toJson(strategies));
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b0c33efba86344c6974cacebcee3470f~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -583,15 +573,16 @@ public class Strategies {
 默认的序列化后的 Josn 字符串并不太直观，可以选择格式化输出
 
 ```java
-    public static void main(String[] args) {
-        Gson gson = new GsonBuilder()
-                .serializeNulls() //输出null
-                .setPrettyPrinting()//格式化输出
-                .create();
-        Strategies strategies = new Strategies(null, 24, 22.333);
-        System.out.println();
-        System.out.println(gson.toJson(strategies));
-    }
+public static void main(String[] args) {
+    Gson gson =
+            new GsonBuilder()
+                    .serializeNulls() // 输出null
+                    .setPrettyPrinting() // 格式化输出
+                    .create();
+    Strategies strategies = new Strategies(null, 24, 22.333);
+    System.out.println();
+    System.out.println(gson.toJson(strategies));
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c28fa45112934426a4b7eb1ecf16e70c~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -613,34 +604,37 @@ public class Strategies {
 
     @Override
     public String toString() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.CHINA);
-        return "Strategies{" +
-                "date=" + simpleDateFormat.format(date) +
-                ", date2=" + simpleDateFormat.format(date2) +
-                '}';
+        SimpleDateFormat simpleDateFormat =
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.CHINA);
+        return "Strategies{"
+                + "date="
+                + simpleDateFormat.format(date)
+                + ", date2="
+                + simpleDateFormat.format(date2)
+                + '}';
     }
-
 }
-
 ```
 ```java
 public static void main(String[] args) {
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()//格式化输出
-                .setDateFormat("yyyy-MM-dd HH:mm:ss:SSS")//格式化时间
-                .create();
-        Date date = new Date();
-        Strategies strategies = new Strategies(date, new Date(date.getTime() + 1000000));
-        System.out.println();
-        System.out.println(gson.toJson(strategies));
+    Gson gson =
+            new GsonBuilder()
+                    .setPrettyPrinting() // 格式化输出
+                    .setDateFormat("yyyy-MM-dd HH:mm:ss:SSS") // 格式化时间
+                    .create();
+    Date date = new Date();
+    Strategies strategies = new Strategies(date, new Date(date.getTime() + 1000000));
+    System.out.println();
+    System.out.println(gson.toJson(strategies));
 
-        String json = "{\n" +
-                "  \"date\": \"2018-03-17 19:38:50:033\",\n" +
-                "  \"date2\": \"2018-03-17 19:55:30:033\"\n" +
-                "}";
-        System.out.println();
-        System.out.println(gson.fromJson(json, Strategies.class));
-    }
+    String json =
+            "{\n"
+                    + "  \"date\": \"2018-03-17 19:38:50:033\",\n"
+                    + "  \"date2\": \"2018-03-17 19:55:30:033\"\n"
+                    + "}";
+    System.out.println();
+    System.out.println(gson.fromJson(json, Strategies.class));
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/367f08a42e6244d3b539d8cfd8db7ecc~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -664,24 +658,18 @@ public class User {
 
     private boolean sex;
 
-    public User() {
-    }
+    public User() {}
 
     public User(String name, int age, boolean sex) {
         this.name = name;
         this.age = age;
         this.sex = sex;
     }
-    
+
     @Override
     public String toString() {
-        return "User{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                ", sex=" + sex +
-                '}';
+        return "User{" + "name='" + name + '\'' + ", age=" + age + ", sex=" + sex + '}';
     }
-
 }
 ```
 定义 TypeAdapter 的子类 UserTypeAdapter 来接管 User 类的序列化和反序列化过程
@@ -693,24 +681,24 @@ public class UserTypeAdapter extends TypeAdapter<User> {
 
     @Override
     public void write(JsonWriter jsonWriter, User user) throws IOException {
-        //流式序列化成对象开始
+        // 流式序列化成对象开始
         jsonWriter.beginObject();
-        //将Json的Key值都指定为大写字母开头
+        // 将Json的Key值都指定为大写字母开头
         jsonWriter.name("Name").value(user.getName());
         jsonWriter.name("Age").value(user.getAge());
         jsonWriter.name("Sex").value(user.isSex());
-        //流式序列化结束
+        // 流式序列化结束
         jsonWriter.endObject();
     }
 
     @Override
     public User read(JsonReader jsonReader) throws IOException {
         User user = new User();
-        //流式反序列化开始
+        // 流式反序列化开始
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
             switch (jsonReader.nextName()) {
-                //首字母大小写均合法
+                // 首字母大小写均合法
                 case "name":
                 case "Name":
                     user.setName(jsonReader.nextString());
@@ -722,27 +710,26 @@ public class UserTypeAdapter extends TypeAdapter<User> {
                     user.setSex(jsonReader.nextBoolean());
                     break;
             }
-
         }
-        //流式反序列化结束
+        // 流式反序列化结束
         jsonReader.endObject();
         return user;
     }
-
 }
 ```
 ```java
-    public static void main(String[] args) {
-        Gson gson = new GsonBuilder().registerTypeAdapter(User.class, new UserTypeAdapter()).create();
-        User user = new User("leavesC", 24, true);
-        System.out.println();
-        System.out.println(gson.toJson(user));
+public static void main(String[] args) {
+    Gson gson =
+            new GsonBuilder().registerTypeAdapter(User.class, new UserTypeAdapter()).create();
+    User user = new User("leavesC", 24, true);
+    System.out.println();
+    System.out.println(gson.toJson(user));
 
-        String json = "{\"Name\":\"leavesC\",\"age\":24,\"sex\":true}";
-        user = gson.fromJson(json, User.class);
-        System.out.println();
-        System.out.println(user);
-    }
+    String json = "{\"Name\":\"leavesC\",\"age\":24,\"sex\":true}";
+    user = gson.fromJson(json, User.class);
+    System.out.println();
+    System.out.println(user);
+}
 ```
 可以看到 User 类按照预定义的策略来完成序列化和反序列化了
 
@@ -755,21 +742,29 @@ TypeAdapter 将序列化和反序列操作都接管了过来，其实 Gson 还�
 看个例子
 
 ```java
-    public static void main(String[] args) {
-        Gson gson = new GsonBuilder().registerTypeAdapter(User.class, new JsonSerializer<User>() {
-            @Override
-            public JsonElement serialize(User user, Type type, JsonSerializationContext jsonSerializationContext) {
-                JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("NameHi", user.getName());
-                jsonObject.addProperty("Sex", user.isSex());
-                jsonObject.addProperty("Age", user.getAge());
-                return jsonObject;
-            }
-        }).create();
-        User user = new User("leavesC", 24, true);
-        System.out.println();
-        System.out.println(gson.toJson(user));
-    }
+public static void main(String[] args) {
+    Gson gson =
+            new GsonBuilder()
+                    .registerTypeAdapter(
+                            User.class,
+                            new JsonSerializer<User>() {
+                                @Override
+                                public JsonElement serialize(
+                                        User user,
+                                        Type type,
+                                        JsonSerializationContext jsonSerializationContext) {
+                                    JsonObject jsonObject = new JsonObject();
+                                    jsonObject.addProperty("NameHi", user.getName());
+                                    jsonObject.addProperty("Sex", user.isSex());
+                                    jsonObject.addProperty("Age", user.getAge());
+                                    return jsonObject;
+                                }
+                            })
+                    .create();
+    User user = new User("leavesC", 24, true);
+    System.out.println();
+    System.out.println(gson.toJson(user));
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a1ec92160824423da39f6c0409e27a26~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -777,32 +772,41 @@ TypeAdapter 将序列化和反序列操作都接管了过来，其实 Gson 还�
 
 ```java
 public static void main(String[] args) {
-        Gson gson = new GsonBuilder().registerTypeAdapter(User.class, new JsonDeserializer<User>() {
-            @Override
-            public User deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-                JsonObject jsonObject = jsonElement.getAsJsonObject();
-                String name = null;
-                //同时支持 userName 和 name 两种情况
-                if (jsonObject.has("userName")) {
-                    name = jsonObject.get("userName").getAsString();
-                } else if (jsonObject.has("name")) {
-                    name = jsonObject.get("name").getAsString();
-                }
-                int age = jsonObject.get("age").getAsInt();
-                boolean sex = jsonObject.get("sex").getAsBoolean();
-                return new User(name, age, sex);
-            }
-        }).create();
-        String json = "{\"userName\":\"leavesC\",\"sex\":true,\"age\":24}";
-        User user = gson.fromJson(json, User.class);
-        System.out.println();
-        System.out.println(user);
+    Gson gson =
+            new GsonBuilder()
+                    .registerTypeAdapter(
+                            User.class,
+                            new JsonDeserializer<User>() {
+                                @Override
+                                public User deserialize(
+                                        JsonElement jsonElement,
+                                        Type type,
+                                        JsonDeserializationContext jsonDeserializationContext)
+                                        throws JsonParseException {
+                                    JsonObject jsonObject = jsonElement.getAsJsonObject();
+                                    String name = null;
+                                    // 同时支持 userName 和 name 两种情况
+                                    if (jsonObject.has("userName")) {
+                                        name = jsonObject.get("userName").getAsString();
+                                    } else if (jsonObject.has("name")) {
+                                        name = jsonObject.get("name").getAsString();
+                                    }
+                                    int age = jsonObject.get("age").getAsInt();
+                                    boolean sex = jsonObject.get("sex").getAsBoolean();
+                                    return new User(name, age, sex);
+                                }
+                            })
+                    .create();
+    String json = "{\"userName\":\"leavesC\",\"sex\":true,\"age\":24}";
+    User user = gson.fromJson(json, User.class);
+    System.out.println();
+    System.out.println(user);
 
-        json = "{\"name\":\"leavesC\",\"sex\":true,\"age\":24}";
-        user = gson.fromJson(json, User.class);
-        System.out.println();
-        System.out.println(user);
-    }
+    json = "{\"name\":\"leavesC\",\"sex\":true,\"age\":24}";
+    user = gson.fromJson(json, User.class);
+    System.out.println();
+    System.out.println(user);
+}
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b9adbf6fa0b94ee4b0f2a32e26925174~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -813,26 +817,32 @@ public static void main(String[] args) {
 
 ```java
 @JsonAdapter(UserTypeAdapter.class)
-public class User {
-
-}
+public class User {}
 ```
 # 七、TypeAdapterFactory
 
 TypeAdapterFactory 是用于创建 TypeAdapter 的工厂类，通过参数 TypeToken 来查找确定对应的 TypeAdapter，如果没有就返回 null 并由 Gson 默认的处理方法来进行序列化和反序列化操作，否则就由用户预定义的 TypeAdapter 来进行处理
 
 ```java
-        Gson gson = new GsonBuilder().registerTypeAdapterFactory(new TypeAdapterFactory() {
-            @Override
-            public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-                //如果 Gson 需要与 User 类相关的 TypeAdapter ，则返回我们自己定义的 TypeAdapter 对象
-                if (typeToken.getType().getTypeName().equals(User.class.getTypeName())) {
-                    return (TypeAdapter<T>) new UserTypeAdapter();
-                }
-                //找不到则返回null
-                return null;
-            }
-        }).create();
+Gson gson =
+        new GsonBuilder()
+                .registerTypeAdapterFactory(
+                        new TypeAdapterFactory() {
+                            @Override
+                            public <T> TypeAdapter<T> create(
+                                    Gson gson, TypeToken<T> typeToken) {
+                                // 如果 Gson 需要与 User 类相关的 TypeAdapter ，则返回我们自己定义的 TypeAdapter 对象
+                                if (typeToken
+                                        .getType()
+                                        .getTypeName()
+                                        .equals(User.class.getTypeName())) {
+                                    return (TypeAdapter<T>) new UserTypeAdapter();
+                                }
+                                // 找不到则返回null
+                                return null;
+                            }
+                        })
+                .create();
 ```
 # 八、结语
 

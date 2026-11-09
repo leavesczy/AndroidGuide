@@ -105,7 +105,6 @@ public interface DirectActionListener extends WifiP2pManager.ChannelListener {
     void onSelfDeviceAvailable(WifiP2pDevice wifiP2pDevice);
 
     void onPeersAvailable(Collection<WifiP2pDevice> wifiP2pDeviceList);
-
 }
 ```
 所以，整个广播接收器使用到的所有代码是：
@@ -121,7 +120,10 @@ public class DirectBroadcastReceiver extends BroadcastReceiver {
 
     private DirectActionListener mDirectActionListener;
 
-    public DirectBroadcastReceiver(WifiP2pManager wifiP2pManager, WifiP2pManager.Channel channel, DirectActionListener directActionListener) {
+    public DirectBroadcastReceiver(
+            WifiP2pManager wifiP2pManager,
+            WifiP2pManager.Channel channel,
+            DirectActionListener directActionListener) {
         mWifiP2pManager = wifiP2pManager;
         mChannel = channel;
         mDirectActionListener = directActionListener;
@@ -142,53 +144,65 @@ public class DirectBroadcastReceiver extends BroadcastReceiver {
         if (!TextUtils.isEmpty(intent.getAction())) {
             switch (intent.getAction()) {
                 // 用于指示 Wifi P2P 是否可用
-                case WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION: {
-                    int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
-                    if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
-                        mDirectActionListener.wifiP2pEnabled(true);
-                    } else {
-                        mDirectActionListener.wifiP2pEnabled(false);
-                        List<WifiP2pDevice> wifiP2pDeviceList = new ArrayList<>();
-                        mDirectActionListener.onPeersAvailable(wifiP2pDeviceList);
-                    }
-                    break;
-                }
-                // 对等节点列表发生了变化
-                case WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION: {
-                    mWifiP2pManager.requestPeers(mChannel, new WifiP2pManager.PeerListListener() {
-                        @Override
-                        public void onPeersAvailable(WifiP2pDeviceList peers) {
-                            mDirectActionListener.onPeersAvailable(peers.getDeviceList());
+                case WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION:
+                    {
+                        int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
+                        if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
+                            mDirectActionListener.wifiP2pEnabled(true);
+                        } else {
+                            mDirectActionListener.wifiP2pEnabled(false);
+                            List<WifiP2pDevice> wifiP2pDeviceList = new ArrayList<>();
+                            mDirectActionListener.onPeersAvailable(wifiP2pDeviceList);
                         }
-                    });
-                    break;
-                }
-                // Wifi P2P 的连接状态发生了改变
-                case WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION: {
-                    NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
-                    if (networkInfo.isConnected()) {
-                        mWifiP2pManager.requestConnectionInfo(mChannel, new WifiP2pManager.ConnectionInfoListener() {
-                            @Override
-                            public void onConnectionInfoAvailable(WifiP2pInfo info) {
-                                mDirectActionListener.onConnectionInfoAvailable(info);
-                            }
-                        });
-                        Log.e(TAG, "已连接p2p设备");
-                    } else {
-                        mDirectActionListener.onDisconnection();
-                        Log.e(TAG, "与p2p设备已断开连接");
+                        break;
                     }
-                    break;
-                }
-                //本设备的设备信息发生了变化
-                case WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION: {
-                    mDirectActionListener.onSelfDeviceAvailable((WifiP2pDevice) intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE));
-                    break;
-                }
+                // 对等节点列表发生了变化
+                case WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION:
+                    {
+                        mWifiP2pManager.requestPeers(
+                                mChannel,
+                                new WifiP2pManager.PeerListListener() {
+                                    @Override
+                                    public void onPeersAvailable(WifiP2pDeviceList peers) {
+                                        mDirectActionListener.onPeersAvailable(
+                                                peers.getDeviceList());
+                                    }
+                                });
+                        break;
+                    }
+                // Wifi P2P 的连接状态发生了改变
+                case WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION:
+                    {
+                        NetworkInfo networkInfo =
+                                intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+                        if (networkInfo.isConnected()) {
+                            mWifiP2pManager.requestConnectionInfo(
+                                    mChannel,
+                                    new WifiP2pManager.ConnectionInfoListener() {
+                                        @Override
+                                        public void onConnectionInfoAvailable(WifiP2pInfo info) {
+                                            mDirectActionListener.onConnectionInfoAvailable(info);
+                                        }
+                                    });
+                            Log.e(TAG, "已连接p2p设备");
+                        } else {
+                            mDirectActionListener.onDisconnection();
+                            Log.e(TAG, "与p2p设备已断开连接");
+                        }
+                        break;
+                    }
+                // 本设备的设备信息发生了变化
+                case WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION:
+                    {
+                        mDirectActionListener.onSelfDeviceAvailable(
+                                (WifiP2pDevice)
+                                        intent.getParcelableExtra(
+                                                WifiP2pManager.EXTRA_WIFI_P2P_DEVICE));
+                        break;
+                    }
             }
         }
     }
-
 }
 ```
 # 三、服务端
@@ -219,57 +233,57 @@ wifiP2pManager.createGroup(channel, new WifiP2pManager.ActionListener() {
 此处，使用 IntentService 在后台监听客户端的 Socket 连接请求，并通过输入输出流来传输文件。此处的代码比较简单，就只是在指定端口一直堵塞监听客户端的连接请求，获取待传输的文件信息模型 FileTransfer ，之后就进行实际的数据传输
 
 ```java
-   @Override
-    protected void onHandleIntent(Intent intent) {
-        clean();
-        File file = null;
-        try {
-            serverSocket = new ServerSocket();
-            serverSocket.setReuseAddress(true);
-            serverSocket.bind(new InetSocketAddress(PORT));
-            Socket client = serverSocket.accept();
-            Log.e(TAG, "客户端IP地址 : " + client.getInetAddress().getHostAddress());
-            inputStream = client.getInputStream();
-            objectInputStream = new ObjectInputStream(inputStream);
-            FileTransfer fileTransfer = (FileTransfer) objectInputStream.readObject();
-            Log.e(TAG, "待接收的文件: " + fileTransfer);
-            String name = new File(fileTransfer.getFilePath()).getName();
-            //将文件存储至指定位置
-            file = new File(Environment.getExternalStorageDirectory() + "/" + name);
-            fileOutputStream = new FileOutputStream(file);
-            byte buf[] = new byte[512];
-            int len;
-            long total = 0;
-            int progress;
-            while ((len = inputStream.read(buf)) != -1) {
-                fileOutputStream.write(buf, 0, len);
-                total += len;
-                progress = (int) ((total * 100) / fileTransfer.getFileLength());
-                Log.e(TAG, "文件接收进度: " + progress);
-                if (progressChangListener != null) {
-                    progressChangListener.onProgressChanged(fileTransfer, progress);
-                }
-            }
-            serverSocket.close();
-            inputStream.close();
-            objectInputStream.close();
-            fileOutputStream.close();
-            serverSocket = null;
-            inputStream = null;
-            objectInputStream = null;
-            fileOutputStream = null;
-            Log.e(TAG, "文件接收成功，文件的MD5码是：" + Md5Util.getMd5(file));
-        } catch (Exception e) {
-            Log.e(TAG, "文件接收 Exception: " + e.getMessage());
-        } finally {
-            clean();
+@Override
+protected void onHandleIntent(Intent intent) {
+    clean();
+    File file = null;
+    try {
+        serverSocket = new ServerSocket();
+        serverSocket.setReuseAddress(true);
+        serverSocket.bind(new InetSocketAddress(PORT));
+        Socket client = serverSocket.accept();
+        Log.e(TAG, "客户端IP地址 : " + client.getInetAddress().getHostAddress());
+        inputStream = client.getInputStream();
+        objectInputStream = new ObjectInputStream(inputStream);
+        FileTransfer fileTransfer = (FileTransfer) objectInputStream.readObject();
+        Log.e(TAG, "待接收的文件: " + fileTransfer);
+        String name = new File(fileTransfer.getFilePath()).getName();
+        // 将文件存储至指定位置
+        file = new File(Environment.getExternalStorageDirectory() + "/" + name);
+        fileOutputStream = new FileOutputStream(file);
+        byte buf[] = new byte[512];
+        int len;
+        long total = 0;
+        int progress;
+        while ((len = inputStream.read(buf)) != -1) {
+            fileOutputStream.write(buf, 0, len);
+            total += len;
+            progress = (int) ((total * 100) / fileTransfer.getFileLength());
+            Log.e(TAG, "文件接收进度: " + progress);
             if (progressChangListener != null) {
-                progressChangListener.onTransferFinished(file);
+                progressChangListener.onProgressChanged(fileTransfer, progress);
             }
-            //再次启动服务，等待客户端下次连接
-            startService(new Intent(this, WifiServerService.class));
         }
+        serverSocket.close();
+        inputStream.close();
+        objectInputStream.close();
+        fileOutputStream.close();
+        serverSocket = null;
+        inputStream = null;
+        objectInputStream = null;
+        fileOutputStream = null;
+        Log.e(TAG, "文件接收成功，文件的MD5码是：" + Md5Util.getMd5(file));
+    } catch (Exception e) {
+        Log.e(TAG, "文件接收 Exception: " + e.getMessage());
+    } finally {
+        clean();
+        if (progressChangListener != null) {
+            progressChangListener.onTransferFinished(file);
+        }
+        // 再次启动服务，等待客户端下次连接
+        startService(new Intent(this, WifiServerService.class));
     }
+}
 ```
 因为客户端可能会多次发起连接请求，所以当此处文件传输完成后（不管成功或失败），都需要重新 startService ，让服务再次堵塞等待客户端的连接请求
 
@@ -278,61 +292,66 @@ FileTransfer 包含三个字段，MD5码值用于校验文件的完整性，file
 ```java
 public class FileTransfer implements Serializable {
 
-    //文件路径
+    // 文件路径
     private String filePath;
 
-    //文件大小
+    // 文件大小
     private long fileLength;
 
-    //MD5码
+    // MD5码
     private String md5;
 
     ···
-    
+
 }
 ```
 为了将文件传输进度发布到外部界面，所以除了需要启动Service外，界面还需要绑定Service，此处就需要用到一个更新文件传输状态的接口
 
 ```java
-    public interface OnProgressChangListener {
+public interface OnProgressChangListener {
 
-        //当传输进度发生变化时
-        void onProgressChanged(FileTransfer fileTransfer, int progress);
+    // 当传输进度发生变化时
+    void onProgressChanged(FileTransfer fileTransfer, int progress);
 
-        //当传输结束时
-        void onTransferFinished(File file);
-
-    }
+    // 当传输结束时
+    void onTransferFinished(File file);
+}
 ```
-因此，需要将 progressChangListener 作为参数传给  WifiServerService ，并在进度变化时更新进度对话框
+因此，需要将 progressChangListener 作为参数传给 WifiServerService ，并在进度变化时更新进度对话框
 
 ```java
- private WifiServerService.OnProgressChangListener progressChangListener = new WifiServerService.OnProgressChangListener() {
-        @Override
-        public void onProgressChanged(final FileTransfer fileTransfer, final int progress) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    progressDialog.setMessage("文件名： " + new File(fileTransfer.getFilePath()).getName());
-                    progressDialog.setProgress(progress);
-                    progressDialog.show();
-                }
-            });
-        }
+private WifiServerService.OnProgressChangListener progressChangListener =
+        new WifiServerService.OnProgressChangListener() {
+            @Override
+            public void onProgressChanged(final FileTransfer fileTransfer, final int progress) {
+                runOnUiThread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.setMessage(
+                                        "文件名： "
+                                                + new File(fileTransfer.getFilePath())
+                                                        .getName());
+                                progressDialog.setProgress(progress);
+                                progressDialog.show();
+                            }
+                        });
+            }
 
-        @Override
-        public void onTransferFinished(final File file) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    progressDialog.cancel();
-                    if (file != null && file.exists()) {
-                        openFile(file.getPath());
-                    }
-                }
-            });
-        }
-    };
+            @Override
+            public void onTransferFinished(final File file) {
+                runOnUiThread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.cancel();
+                                if (file != null && file.exists()) {
+                                    openFile(file.getPath());
+                                }
+                            }
+                        });
+            }
+        };
 ```
 # 四、客户端
 
@@ -341,16 +360,16 @@ public class FileTransfer implements Serializable {
 首先，需要先注册P2P广播，以便获取周边设备信息以及连接状态
 
 ```java
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_send_file);
-        initView();
-        mWifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mWifiP2pManager.initialize(this, getMainLooper(), this);
-        broadcastReceiver = new DirectBroadcastReceiver(mWifiP2pManager, mChannel, this);
-        registerReceiver(broadcastReceiver, DirectBroadcastReceiver.getIntentFilter());
-    }
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_send_file);
+    initView();
+    mWifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+    mChannel = mWifiP2pManager.initialize(this, getMainLooper(), this);
+    broadcastReceiver = new DirectBroadcastReceiver(mWifiP2pManager, mChannel, this);
+    registerReceiver(broadcastReceiver, DirectBroadcastReceiver.getIntentFilter());
+}
 ```
 通过 discoverPeers 方法搜索周边设备，回调函数用于通知方法是否调用成功
 
@@ -368,7 +387,7 @@ mWifiP2pManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
      }
 });
 ```
-当搜索结束后，系统就会触发 WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION 广播，此时就可以调用 requestPeers 方法获取设备列表信息，此处用 RecyclerView 展示列表，在  onPeersAvailable 方法刷新列表
+当搜索结束后，系统就会触发 WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION 广播，此时就可以调用 requestPeers 方法获取设备列表信息，此处用 RecyclerView 展示列表，在 onPeersAvailable 方法刷新列表
 
 ```java
 mWifiP2pManager.requestPeers(mChannel, new WifiP2pManager.PeerListListener() {
@@ -379,14 +398,14 @@ mWifiP2pManager.requestPeers(mChannel, new WifiP2pManager.PeerListListener() {
 });
 ```
 ```java
-    @Override
-    public void onPeersAvailable(Collection<WifiP2pDevice> wifiP2pDeviceList) {
-        Log.e(TAG, "onPeersAvailable :" + wifiP2pDeviceList.size());
-        this.wifiP2pDeviceList.clear();
-        this.wifiP2pDeviceList.addAll(wifiP2pDeviceList);
-        deviceAdapter.notifyDataSetChanged();
-        loadingDialog.cancel();
-    }
+@Override
+public void onPeersAvailable(Collection<WifiP2pDevice> wifiP2pDeviceList) {
+    Log.e(TAG, "onPeersAvailable :" + wifiP2pDeviceList.size());
+    this.wifiP2pDeviceList.clear();
+    this.wifiP2pDeviceList.addAll(wifiP2pDeviceList);
+    deviceAdapter.notifyDataSetChanged();
+    loadingDialog.cancel();
+}
 ```
 之后，通过点击事件选中群主（服务器端）设备，通过 connect 方法请求与之进行连接
 
@@ -397,22 +416,25 @@ private void connect() {
         config.deviceAddress = mWifiP2pDevice.deviceAddress;
         config.wps.setup = WpsInfo.PBC;
         showLoadingDialog("正在连接 " + mWifiP2pDevice.deviceName);
-        mWifiP2pManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                Log.e(TAG, "connect onSuccess");
-            }
+        mWifiP2pManager.connect(
+                mChannel,
+                config,
+                new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        Log.e(TAG, "connect onSuccess");
+                    }
 
-            @Override
-            public void onFailure(int reason) {
-                showToast("连接失败 " + reason);
-                dismissLoadingDialog();
-            }
-        });
+                    @Override
+                    public void onFailure(int reason) {
+                        showToast("连接失败 " + reason);
+                        dismissLoadingDialog();
+                    }
+                });
     }
 }
 ```
-此处依然无法通过函数函数来判断连接结果，需要依靠系统发出的 WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION  方法来获取到连接结果，在此处可以通过 requestConnectionInfo 获取到组连接信息，信息最后通过 onConnectionInfoAvailable 方法传递出来，在此可以判断当前设备是否为群主，获取群组IP地址
+此处依然无法通过函数函数来判断连接结果，需要依靠系统发出的 WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION 方法来获取到连接结果，在此处可以通过 requestConnectionInfo 获取到组连接信息，信息最后通过 onConnectionInfoAvailable 方法传递出来，在此可以判断当前设备是否为群主，获取群组IP地址
 
 ```java
 @Override
@@ -425,7 +447,10 @@ public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
     Log.e(TAG, "onConnectionInfoAvailable");
     Log.e(TAG, "onConnectionInfoAvailable groupFormed: " + wifiP2pInfo.groupFormed);
     Log.e(TAG, "onConnectionInfoAvailable isGroupOwner: " + wifiP2pInfo.isGroupOwner);
-    Log.e(TAG, "onConnectionInfoAvailable getHostAddress: " + wifiP2pInfo.groupOwnerAddress.getHostAddress());
+    Log.e(
+            TAG,
+            "onConnectionInfoAvailable getHostAddress: "
+                    + wifiP2pInfo.groupOwnerAddress.getHostAddress());
     StringBuilder stringBuilder = new StringBuilder();
     if (mWifiP2pDevice != null) {
         stringBuilder.append("连接的设备名：");
@@ -470,9 +495,11 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
                 if (path != null) {
                     File file = new File(path);
                     if (file.exists() && wifiP2pInfo != null) {
-                        FileTransfer fileTransfer = new FileTransfer(file.getPath(), file.length());
+                        FileTransfer fileTransfer =
+                                new FileTransfer(file.getPath(), file.length());
                         Log.e(TAG, "待发送的文件：" + fileTransfer);
-                        new WifiClientTask(this, fileTransfer).execute(wifiP2pInfo.groupOwnerAddress.getHostAddress());
+                        new WifiClientTask(this, fileTransfer)
+                                .execute(wifiP2pInfo.groupOwnerAddress.getHostAddress());
                     }
                 }
             }
@@ -482,9 +509,11 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 private String getPath(Context context, Uri uri) {
     if ("content".equalsIgnoreCase(uri.getScheme())) {
-        Cursor cursor = context.getContentResolver().query(uri, new String[]{"_data"}, null, null, null);
+        Cursor cursor =
+                context.getContentResolver()
+                        .query(uri, new String[] {"_data"}, null, null, null);
         if (cursor != null) {
-           if (cursor.moveToFirst()) {
+            if (cursor.moveToFirst()) {
                 String data = cursor.getString(cursor.getColumnIndex("_data"));
                 cursor.close();
                 return data;
@@ -606,7 +635,6 @@ public class WifiClientTask extends AsyncTask<String, Integer, Boolean> {
         progressDialog.cancel();
         Log.e(TAG, "onPostExecute: " + aBoolean);
     }
-
 }
 ```
 # 五、校验文件完整性
@@ -654,7 +682,6 @@ public class Md5Util {
         }
         return hexValue.toString();
     }
-
 }
 ```
 因为客户端会将 FileTransfer 传给服务器端，所以服务器端在文件传输结束后，可以重新计算文件的 MD5码值，进行对比以判断文件是否完整

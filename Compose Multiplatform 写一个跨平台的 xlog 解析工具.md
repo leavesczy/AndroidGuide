@@ -265,7 +265,7 @@ compose.desktop {
 
 为了更优雅点，compose-multiplatform-xlog-decode 通过 Github Action 来实现自动化打包并发布 release。Github Action 功能十分强大，可以指定使用特定的操作系统，并依次执行指定的指令
 
-```kotlin
+```yaml
 create-release-distribution:
 strategy:
   matrix:
@@ -342,6 +342,6 @@ steps:
       token: ${{secrets.ACTION_TOKEN}}
 ```
 
-相应的代码我都已经开源到了 Github，有兴趣的同学可以去下载试试：[compose-multiplatform-xlog-decode](https://github.com/leavesczy/compose-multiplatform-xlog-decode) 
+相应的代码我都已经开源到了 Github，有兴趣的同学可以去下载试试：[compose-multiplatform-xlog-decode](https://github.com/leavesczy/compose-multiplatform-xlog-decode)
 
 另外，如果只想要解析逻辑不需要 GUI 的话，也可以只引用项目中的 core 模块，当中就只包含解析逻辑

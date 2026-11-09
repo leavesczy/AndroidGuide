@@ -24,15 +24,13 @@ public class NormalReceiver extends BroadcastReceiver {
 
     private static final String TAG = "NormalReceiver";
 
-    public NormalReceiver() {
-    }
+    public NormalReceiver() {}
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String msg = intent.getStringExtra("Msg");
         Log.e(TAG, msg);
     }
-
 }
 ```
 在清单文件中声明的 BroadcastReceiver ，必须包含值为 **NORMAL_ACTION** 字符串的 **action** 属性，该广播接收器才能收到以下代码中发出的广播
@@ -54,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("Msg", "Hi");
         sendBroadcast(intent);
     }
-
 }
 ```
 
@@ -93,18 +90,17 @@ public class OrderReceiver_1 extends BroadcastReceiver {
 
     private final String TAG = "OrderReceiver_1";
 
-    public OrderReceiver_1() {
-    }
+    public OrderReceiver_1() {}
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.e(TAG, "OrderReceiver_1被调用了");
 
-        //取出Intent当中传递来的数据
+        // 取出Intent当中传递来的数据
         String msg = intent.getStringExtra("Msg");
         Log.e(TAG, "OrderReceiver_1接收到的值： " + msg);
 
-        //向下一优先级的Receiver传递数据
+        // 向下一优先级的Receiver传递数据
         Bundle bundle = new Bundle();
         bundle.putString("Data", "（Hello）");
         setResultExtras(bundle);
@@ -117,18 +113,17 @@ public class OrderReceiver_2 extends BroadcastReceiver {
 
     private final String TAG = "OrderReceiver_2";
 
-    public OrderReceiver_2() {
-    }
+    public OrderReceiver_2() {}
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.e(TAG, "OrderReceiver_2被调用了");
 
-        //取出上一优先级的Receiver传递来的数据
+        // 取出上一优先级的Receiver传递来的数据
         String data = getResultExtras(true).getString("Data");
         Log.e(TAG, "从上一优先级的Receiver传递来的数据--" + data);
 
-        //向下一优先级的Receiver传递数据
+        // 向下一优先级的Receiver传递数据
         Bundle bundle = new Bundle();
         bundle.putString("Data", "（leavesc）");
         setResultExtras(bundle);
@@ -141,14 +136,13 @@ public class OrderReceiver_3 extends BroadcastReceiver {
 
     private final String TAG = "OrderReceiver_3";
 
-    public OrderReceiver_3() {
-    }
+    public OrderReceiver_3() {}
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.e(TAG, "OrderReceiver_3被调用了");
 
-        //取出上一优先级的Receiver传递来的数据
+        // 取出上一优先级的Receiver传递来的数据
         String data = getResultExtras(true).getString("Data");
         Log.e(TAG, "从上一优先级的Receiver传递来的数据--" + data);
     }
@@ -157,7 +151,7 @@ public class OrderReceiver_3 extends BroadcastReceiver {
 
 在清单文件中对三个 Receiver 进行注册，指定相同的 **action** 属性值，Receiver 之间的优先级使用 **priority** 属性来判定，数值越大，优先级越高
 ```java
-	<application
+    <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -171,25 +165,25 @@ public class OrderReceiver_3 extends BroadcastReceiver {
             </intent-filter>
         </activity>
 
-		
+        
         <receiver android:name=".OrderReceiver_1">
             <intent-filter android:priority="100">
                 <action android:name="com.example.order.receiver" />
             </intent-filter>
         </receiver>
-		
+        
         <receiver android:name=".OrderReceiver_2">
             <intent-filter android:priority="99">
                 <action android:name="com.example.order.receiver" />
             </intent-filter>
         </receiver>
-		
+        
         <receiver android:name=".OrderReceiver_3">
             <intent-filter android:priority="98">
                 <action android:name="com.example.order.receiver" />
             </intent-filter>
         </receiver>
-		
+        
     </application>
 ```
 
@@ -219,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("Msg", "Hi");
         sendOrderedBroadcast(intent, null);
     }
-
 }
 ```
 
@@ -251,19 +244,19 @@ public class BroadcastService extends Service {
 
     private final String TAG = "BroadcastService";
 
-    public BroadcastService() {
-    }
+    public BroadcastService() {}
 
     @Override
     public void onCreate() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MainActivity.ACTION);
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.e(TAG, "BroadcastService接收到了广播");
-            }
-        };
+        receiver =
+                new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        Log.e(TAG, "BroadcastService接收到了广播");
+                    }
+                };
         registerReceiver(receiver, intentFilter);
         Log.e(TAG, "BroadcastService注册了接收器");
         super.onCreate();
@@ -280,7 +273,6 @@ public class BroadcastService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-
 }
 ```
 
@@ -313,7 +305,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
-
 ```
 运行结果如下所示
 
@@ -353,49 +344,46 @@ public class LocalReceiver extends BroadcastReceiver {
 
     private final String TAG = "LocalReceiver";
 
-    public LocalReceiver() {
-    }
+    public LocalReceiver() {}
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.e(TAG, "接收到了本地广播");
     }
-    
 }
 ```
 
 之后就是使用 LocalBroadcastManager 对 LocalReceiver 进行注册和解除注册了
 
 ```java
-	private LocalBroadcastManager localBroadcastManager;
+private LocalBroadcastManager localBroadcastManager;
 
-    private LocalReceiver localReceiver;
+private LocalReceiver localReceiver;
 
-    private final String LOCAL_ACTION = "com.example.local.receiver";
+private final String LOCAL_ACTION = "com.example.local.receiver";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        
-        localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        localReceiver = new LocalReceiver();
-        IntentFilter filter = new IntentFilter(LOCAL_ACTION);
-        localBroadcastManager.registerReceiver(localReceiver, filter);
-    }
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(batteryReceiver);
-        localBroadcastManager.unregisterReceiver(localReceiver);
-    }
-	
-	public void sendLocalBroadcast(View view) {
-        Intent intent = new Intent(LOCAL_ACTION);
-        localBroadcastManager.sendBroadcast(intent);
-    }
+    localBroadcastManager = LocalBroadcastManager.getInstance(this);
+    localReceiver = new LocalReceiver();
+    IntentFilter filter = new IntentFilter(LOCAL_ACTION);
+    localBroadcastManager.registerReceiver(localReceiver, filter);
+}
 
+@Override
+protected void onDestroy() {
+    super.onDestroy();
+    unregisterReceiver(batteryReceiver);
+    localBroadcastManager.unregisterReceiver(localReceiver);
+}
+
+public void sendLocalBroadcast(View view) {
+    Intent intent = new Intent(LOCAL_ACTION);
+    localBroadcastManager.sendBroadcast(intent);
+}
 ```
 需要注意的是，本地广播是无法通过静态注册的方式来接收的，因为静态注册广播主要是为了在程序未启动的情况下也能接收广播，而本地广播是应用自己发送的，此时应用肯定是启动的了
 
@@ -434,17 +422,17 @@ public class LocalReceiver extends BroadcastReceiver {
 然后，发送含有该权限声明的 Broadcast 。这样，只有使用相同证书签名且声明该权限的应用才能接收到该 Broadcast 了
 
 ```java
-    private final String PERMISSION_PRIVATE = "com.example.permission.receiver";
+private final String PERMISSION_PRIVATE = "com.example.permission.receiver";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-    }
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+}
 
-    public void sendPermissionBroadcast(View view) {
-        sendBroadcast(new Intent("Hi"), PERMISSION_PRIVATE);
-    }
+public void sendPermissionBroadcast(View view) {
+    sendBroadcast(new Intent("Hi"), PERMISSION_PRIVATE);
+}
 ```
 
 回到之前的工程
@@ -460,8 +448,7 @@ public class PermissionReceiver extends BroadcastReceiver {
 
     private final String TAG = "PermissionReceiver";
 
-    public PermissionReceiver() {
-    }
+    public PermissionReceiver() {}
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -472,25 +459,25 @@ public class PermissionReceiver extends BroadcastReceiver {
 然后注册广播接收器。因为 Android Studio 在调试的时候会使用相同的证书为每个应用签名，所以，在之前新安装的App发送出广播后，PermissionReceiver 就会输出 Log 日志
 
 ```java
-	private final String PERMISSION_PRIVATE = "com.example.permission.receiver";
+private final String PERMISSION_PRIVATE = "com.example.permission.receiver";
 
-    private PermissionReceiver permissionReceiver;
+private PermissionReceiver permissionReceiver;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
 
-        IntentFilter intentFilter1 = new IntentFilter("Hi");
-        permissionReceiver = new PermissionReceiver();
-        registerReceiver(permissionReceiver, intentFilter1, PERMISSION_PRIVATE, null);
-    }
+    IntentFilter intentFilter1 = new IntentFilter("Hi");
+    permissionReceiver = new PermissionReceiver();
+    registerReceiver(permissionReceiver, intentFilter1, PERMISSION_PRIVATE, null);
+}
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(permissionReceiver);
-    }
+@Override
+protected void onDestroy() {
+    super.onDestroy();
+    unregisterReceiver(permissionReceiver);
+}
 ```
 
 ## **五、实战演练**
@@ -583,8 +570,7 @@ public class NetworkReceiver extends BroadcastReceiver {
 
     private static final String TAG = "NetworkReceiver";
 
-    public NetworkReceiver() {
-    }
+    public NetworkReceiver() {}
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -600,7 +586,6 @@ public class NetworkReceiver extends BroadcastReceiver {
                 break;
         }
     }
-
 }
 ```
 在清单文件中注册广播接收器，“**android.net.conn.CONNECTIVITY_CHANGE**”是系统预定义好的 **action** 值，只要系统网络状态发生变化，NetworkReceiver 就能收到广播
@@ -625,32 +610,33 @@ public class NetworkReceiver extends BroadcastReceiver {
 ```java
 private final String TAG = "MainActivity";
 
-    private BroadcastReceiver batteryReceiver;
+private BroadcastReceiver batteryReceiver;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        batteryReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                // 当前电量
-                int currentBattery = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-                // 总电量
-                int totalBattery = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 0);         
-                Log.e(TAG, "当前电量:" + currentBattery + "-总电量：" + totalBattery);
-            }
-        };
-        registerReceiver(batteryReceiver, intentFilter);
-    }
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    IntentFilter intentFilter = new IntentFilter();
+    intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+    batteryReceiver =
+            new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    // 当前电量
+                    int currentBattery = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+                    // 总电量
+                    int totalBattery = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 0);
+                    Log.e(TAG, "当前电量:" + currentBattery + "-总电量：" + totalBattery);
+                }
+            };
+    registerReceiver(batteryReceiver, intentFilter);
+}
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(batteryReceiver);
-    }
+@Override
+protected void onDestroy() {
+    super.onDestroy();
+    unregisterReceiver(batteryReceiver);
+}
 ```
 在 **onReceive(Context , Intent )** 中的 Intent 值包含了一些额外信息，可以取出当前电量和总电量
 
@@ -660,21 +646,20 @@ private final String TAG = "MainActivity";
 
 ### **5.3、应用安装更新卸载监听**
 
-首先，创建 BroadcastReceiver 
+首先，创建 BroadcastReceiver
 
 ```java
 public class AppReceiver extends BroadcastReceiver {
 
     private final String TAG = "AppReceiver";
 
-    public AppReceiver() {
-    }
+    public AppReceiver() {}
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //判断广播类型
+        // 判断广播类型
         String action = intent.getAction();
-        //获取包名
+        // 获取包名
         Uri appName = intent.getData();
         if (Intent.ACTION_PACKAGE_ADDED.equals(action)) {
             Log.e(TAG, "安装了：" + appName);
@@ -685,7 +670,6 @@ public class AppReceiver extends BroadcastReceiver {
         }
     }
 }
-
 ```
 
 注册广播接收器

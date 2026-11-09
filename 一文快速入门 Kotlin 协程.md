@@ -1,4 +1,4 @@
-在今年的三月份，我因为需要为项目搭建一个新的网络请求框架开始接触 Kotlin 协程。那时我司项目中同时存在着两种网络请求方式，采用的技术栈各不相同，Java、Kotlin、RxJava、LiveData 各种混搭，技术栈的不统一长远来看肯定是会造成很多不便的，所以就打算封装一个新的网络请求框架来作为项目的统一规范（前面的人估计也是这么想的，所以就造成了同个项目中的网络请求方式越来越多 😂😂），那么就需要考虑采用什么技术栈来实现了
+在今年的三月份，我因为需要为项目搭建一个新的网络请求框架开始接触 Kotlin 协程。那时我司项目中同时存在着两种网络请求方式，采用的技术栈各不相同，Java、Kotlin、RxJava、LiveData 各种混搭，技术栈的不统一长远来看肯定是会造成很多不便的，所以就打算封装一个新的网络请求框架来作为项目的统一规范（前面的人估计也是这么想的，所以就造成了同个项目中的网络请求方式越来越多），那么就需要考虑采用什么技术栈来实现了
 
 采用 Kotlin 语言来实现必不可少，都这年头了还用 Java 也说不过去。Retrofit 也必不可少，而目前 Retrofit 也已经支持 Kotlin 协程了，Google 官方推出的 Jetpack 协程扩展库也越来越多，就最终决定弃用 RxJava 拥抱 Kotlin 协程，将协程作为技术栈之一
 
@@ -79,13 +79,13 @@ public suspend fun delay(timeMillis: Long)
 
 读者在网上看关于协程的文章的时候，应该经常会看到这么一句话：**挂起函数不会阻塞其所在线程，而是会将协程挂起，在特定的时候才再恢复执行**
 
-对于这句话我的理解是：`delay()` 函数类似于 Java 中的 `Thread.sleep()`，而之所以说 `delay()` 函数是非阻塞的，是因为它和单纯的线程休眠有着本质的区别。例如，当在 ThreadA 上运行的 CoroutineA 调用了`delay(1000L)`函数指定延迟一秒后再运行，ThreadA 会转而去执行 CoroutineB，等到一秒后再来继续执行 CoroutineA。所以，ThreadA 并不会因为 CoroutineA 的延时而阻塞，而是能继续去执行其它任务，所以挂起函数并不会阻塞其所在线程，这样就极大地提高了线程的并发灵活度，最大化了线程的利用效率。而如果是使用`Thread.sleep()`的话，线程就只能干等着而不能去执行其它任务，降低了线程的利用效率
+对于这句话我的理解是：`delay()` 函数类似于 Java 中的 `Thread.sleep()`，而之所以说 `delay()` 函数是非阻塞的，是因为它和单纯的线程休眠有着本质的区别。例如，当在 ThreadA 上运行的 CoroutineA 调用了 `delay(1000L)` 函数指定延迟一秒后再运行，ThreadA 会转而去执行 CoroutineB，等到一秒后再来继续执行 CoroutineA。所以，ThreadA 并不会因为 CoroutineA 的延时而阻塞，而是能继续去执行其它任务，所以挂起函数并不会阻塞其所在线程，这样就极大地提高了线程的并发灵活度，最大化了线程的利用效率。而如果是使用 `Thread.sleep()` 的话，线程就只能干等着而不能去执行其它任务，降低了线程的利用效率
 
 协程是运行于线程上的，一个线程可以运行多个（几千上万个）协程。线程的调度行为是由操作系统来管理的，而协程的调度行为是可以由开发者来指定并由编译器来实现的，协程能够细粒度地控制多个任务的执行时机和执行线程，当线程所执行的当前协程被 suspend 后，该线程也可以腾出资源去处理其他任务
 
 # 四、suspend 挂起与恢复
 
-协程在常规函数的基础上添加了两项操作用于处理长时间运行的任务，在`invoke`（或 `call`）和`return`之外，协程添加了`suspend`和 `resume`：
+协程在常规函数的基础上添加了两项操作用于处理长时间运行的任务，在 `invoke`（或 `call`）和 `return` 之外，协程添加了 `suspend` 和 `resume`：
 
 - `suspend` 用于暂停执行当前协程，并保存所有局部变量
 - `resume` 用于让已暂停的协程从暂停处继续执行
@@ -112,7 +112,7 @@ Kotlin 使用 **堆栈帧** 来管理要运行哪个函数以及所有局部变�
 1. 处理耗时任务 (Long running tasks)，这种任务常常会阻塞主线程
 2. 保证主线程安全 (Main-safety)，即确保安全地从主线程调用任何 suspend 函数
 
-# 五、CoroutineScope 
+# 五、CoroutineScope
 
 CoroutineScope 即 **协程作用域**，用于对协程进行追踪。如果我们启动了多个协程但是没有一个可以对其进行统一管理的途径的话，就会导致我们的代码臃肿杂乱，甚至发生**内存泄露**或者**任务泄露**。为了确保所有的协程都会被追踪，Kotlin 不允许在没有 CoroutineScope 的情况下启动协程。CoroutineScope 可被看作是一个具有超能力的 ExecutorService 的轻量级版本。它能启动协程，同时这个协程还具备上文所说的 suspend 和 resume 的优势
 
@@ -165,7 +165,7 @@ fun main() {
 
 ```kotlin
 public fun <T> runBlocking(context: CoroutineContext = 
-	EmptyCoroutineContext, block: suspend CoroutineScope.() -> T): T
+    EmptyCoroutineContext, block: suspend CoroutineScope.() -> T): T
 ```
 
 runBlocking 的一个方便之处就是：只有当内部**相同作用域**的所有协程都运行结束后，声明在 runBlocking 之后的代码才能执行，即 runBlocking 会阻塞其所在线程
@@ -240,7 +240,7 @@ fun main() {
 
 ## 3、coroutineScope
 
-`coroutineScope` 函数用于创建一个独立的协程作用域，直到所有启动的协程都完成后才结束自身。`runBlocking` 和 `coroutineScope` 看起来很像，因为它们都需要等待其内部所有相同作用域的协程结束后才会结束自己。两者的主要区别在于 `runBlocking` 方法会阻塞当前线程，而 `coroutineScope`不会，而是会挂起并释放底层线程以供其它协程使用。基于这个差别，`runBlocking` 是一个普通函数，而 `coroutineScope` 是一个挂起函数
+`coroutineScope` 函数用于创建一个独立的协程作用域，直到所有启动的协程都完成后才结束自身。`runBlocking` 和 `coroutineScope` 看起来很像，因为它们都需要等待其内部所有相同作用域的协程结束后才会结束自己。两者的主要区别在于 `runBlocking` 方法会阻塞当前线程，而 `coroutineScope` 不会，而是会挂起并释放底层线程以供其它协程使用。基于这个差别，`runBlocking` 是一个普通函数，而 `coroutineScope` 是一个挂起函数
 
 ```kotlin
 fun main() = runBlocking {
@@ -301,7 +301,7 @@ fun main() = runBlocking {
 
 ## 5、自定义 CoroutineScope
 
-假设我们在 Activity 中先后启动了多个协程用于执行异步耗时操作，那么当 Activity 退出时，必须取消所有协程以避免内存泄漏。我们可以通过保留每一个 Job 引用然后在 `onDestroy`方法里来手动取消，但这种方式相当来说会比较繁琐和低效。kotlinx.coroutines 提供了 CoroutineScope 来管理多个协程的生命周期
+假设我们在 Activity 中先后启动了多个协程用于执行异步耗时操作，那么当 Activity 退出时，必须取消所有协程以避免内存泄漏。我们可以通过保留每一个 Job 引用然后在 `onDestroy` 方法里来手动取消，但这种方式相当来说会比较繁琐和低效。kotlinx.coroutines 提供了 CoroutineScope 来管理多个协程的生命周期
 
 我们可以通过创建与 Activity 生命周期相关联的协程作用域来管理协程的生命周期。CoroutineScope 的实例可以通过 `CoroutineScope()` 或 `MainScope()` 的工厂函数来构建。前者创建通用作用域，后者创建 UI 应用程序的作用域并使用 Dispatchers.Main 作为默认的调度器
 
@@ -325,7 +325,7 @@ class Activity {
 }
 ```
 
-或者，我们可以通过委托模式来让 Activity 实现 CoroutineScope 接口，从而可以在 Activity 内直接启动协程而不必显示地指定它们的上下文，并且在 `onDestroy()`中自动取消所有协程
+或者，我们可以通过委托模式来让 Activity 实现 CoroutineScope 接口，从而可以在 Activity 内直接启动协程而不必显示地指定它们的上下文，并且在 `onDestroy()` 中自动取消所有协程
 
 ```kotlin
 class Activity : CoroutineScope by CoroutineScope(Dispatchers.Default) {
@@ -356,7 +356,7 @@ fun main() = runBlocking {
 }
 ```
 
-从输出结果可以看出，当回调了`onDestroy()`方法后协程就不会再输出日志了
+从输出结果可以看出，当回调了 `onDestroy()` 方法后协程就不会再输出日志了
 
 ```kotlin
 [main] Activity Created
@@ -385,7 +385,7 @@ public fun CoroutineScope.launch(
 `launch` 函数共包含三个参数：
 
 1. context。用于指定协程的上下文
-2. start。用于指定协程的启动方式，默认值为 `CoroutineStart.DEFAULT`，即协程会在声明的同时就立即进入等待调度的状态，即可以立即执行的状态。可以通过将其设置为`CoroutineStart.LAZY`来实现延迟启动，即懒加载
+2. start。用于指定协程的启动方式，默认值为 `CoroutineStart.DEFAULT`，即协程会在声明的同时就立即进入等待调度的状态，即可以立即执行的状态。可以通过将其设置为 `CoroutineStart.LAZY` 来实现延迟启动，即懒加载
 3. block。用于传递协程的执行体，即希望交由协程执行的任务
 
 可以看到 launchA 和 launchB 是并行交叉执行的
@@ -517,7 +517,7 @@ public fun <T> CoroutineScope.async(
 ): Deferred<T>
 ```
 
-通过`await()`方法可以拿到 async 协程的执行结果，可以看到两个协程的总耗时是远少于七秒的，总耗时基本等于耗时最长的协程
+通过 `await()` 方法可以拿到 async 协程的执行结果，可以看到两个协程的总耗时是远少于七秒的，总耗时基本等于耗时最长的协程
 
 ```kotlin
 fun main() {
@@ -573,9 +573,9 @@ fun main() {
 [main] 7077
 ```
 
-会造成这不同区别是因为 `CoroutineStart.LAZY` 不会主动启动协程，而是直到调用`async.await()`或者`async.satrt()`后才会启动（即懒加载模式），所以`asyncA.await() + asyncB.await()`会导致两个协程其实是在顺序执行。而默认值 `CoroutineStart.DEFAULT` 参数会使得协程在声明的同时就被启动了（实际上还需要等待被调度执行，但可以看做是立即就执行了），所以此时调用第一个 `async.await()`时两个协程其实都是处于运行状态，所以总耗时就是四秒左右
+会造成这不同区别是因为 `CoroutineStart.LAZY` 不会主动启动协程，而是直到调用 `async.await()` 或者 `async.satrt()` 后才会启动（即懒加载模式），所以 `asyncA.await() + asyncB.await()` 会导致两个协程其实是在顺序执行。而默认值 `CoroutineStart.DEFAULT` 参数会使得协程在声明的同时就被启动了（实际上还需要等待被调度执行，但可以看做是立即就执行了），所以此时调用第一个 `async.await()` 时两个协程其实都是处于运行状态，所以总耗时就是四秒左右
 
-此时可以通过先调用`start()`再调用`await()`来实现第一个例子的效果
+此时可以通过先调用 `start()` 再调用 `await()` 来实现第一个例子的效果
 
 ```kotlin
 asyncA.start()
@@ -598,7 +598,7 @@ suspend fun fetchTwoDocs() = coroutineScope {
 }
 ```
 
-还可以对集合使用 `awaitAll()`来达到相同效果。虽然 `fetchTwoDocs()` 使用 `async` 启动新协程，但该函数使用 `awaitAll()` 等待启动的协程完成后才会返回结果。不过，即使我们没有调用 `awaitAll()`，`coroutineScope` 构建器也会等到所有内部协程都完成后才会恢复名为 `fetchTwoDocs` 的协程。此外，`coroutineScope` 会捕获协程抛出的所有异常，并将其传送给调用方
+还可以对集合使用 `awaitAll()` 来达到相同效果。虽然 `fetchTwoDocs()` 使用 `async` 启动新协程，但该函数使用 `awaitAll()` 等待启动的协程完成后才会返回结果。不过，即使我们没有调用 `awaitAll()`，`coroutineScope` 构建器也会等到所有内部协程都完成后才会恢复名为 `fetchTwoDocs` 的协程。此外，`coroutineScope` 会捕获协程抛出的所有异常，并将其传送给调用方
 
 ```kotlin
 suspend fun fetchTwoDocs() = coroutineScope {
@@ -612,7 +612,7 @@ suspend fun fetchTwoDocs() = coroutineScope {
 
 ## 6、Deferred
 
-`async` 函数的返回值是一个 Deferred 对象。Deferred 是一个接口类型，继承于 Job 接口，所以 Job 包含的属性和方法 Deferred 都有，其主要是在 Job 的基础上扩展了 `await()`方法
+`async` 函数的返回值是一个 Deferred 对象。Deferred 是一个接口类型，继承于 Job 接口，所以 Job 包含的属性和方法 Deferred 都有，其主要是在 Job 的基础上扩展了 `await()` 方法
 
 # 七、CoroutineContext
 
@@ -727,7 +727,7 @@ fun main() = runBlocking<Unit> {
 
 ## 3、withContext
 
-对于以下代码，`get`方法内使用`withContext(Dispatchers.IO)` 创建了一个指定在 IO 线程池中运行的代码块，该区间内的任何代码都始终通过 IO 线程来执行。由于 `withContext` 方法本身就是一个挂起函数，因此 `get` 方法也必须定义为挂起函数
+对于以下代码，`get` 方法内使用 `withContext(Dispatchers.IO)` 创建了一个指定在 IO 线程池中运行的代码块，该区间内的任何代码都始终通过 IO 线程来执行。由于 `withContext` 方法本身就是一个挂起函数，因此 `get` 方法也必须定义为挂起函数
 
 ```kotlin
 suspend fun fetchDocs() {                      // Dispatchers.Main
@@ -742,9 +742,9 @@ suspend fun get(url: String) =                 // Dispatchers.Main
 }
 ```
 
-借助协程，你可以细粒度地来调度线程。由于`withContext()`支持在不引入回调的情况下控制任何代码的执行线程池，因此你可以将其应用于非常小的函数，例如从数据库中读取数据或执行网络请求。一种不错的做法是使用 `withContext()` 来确保每个函数都是主线程安全的，这意味着，你可以从主线程调用每个函数。这样，调用方就从不需要考虑应该使用哪个线程来执行函数了
+借助协程，你可以细粒度地来调度线程。由于 `withContext()` 支持在不引入回调的情况下控制任何代码的执行线程池，因此你可以将其应用于非常小的函数，例如从数据库中读取数据或执行网络请求。一种不错的做法是使用 `withContext()` 来确保每个函数都是主线程安全的，这意味着，你可以从主线程调用每个函数。这样，调用方就从不需要考虑应该使用哪个线程来执行函数了
 
-在前面的示例中，`fetchDocs()` 方法在主线程上执行，不过它可以安全地调用 `get`方法，因为`get`方法已确保网络请求会在子线程中执行。由于协程支持 `suspend` 和 `resume`操作，因此 `withContext` 块完成后，主线程上的协程会立即根据 `get` 结果恢复
+在前面的示例中，`fetchDocs()` 方法在主线程上执行，不过它可以安全地调用 `get` 方法，因为 `get` 方法已确保网络请求会在子线程中执行。由于协程支持 `suspend` 和 `resume` 操作，因此 `withContext` 块完成后，主线程上的协程会立即根据 `get` 结果恢复
 
 与基于回调的等效实现相比，`withContext()` 不会增加额外的开销。此外，在某些情况下，还可以优化 `withContext()` 调用，使其超越基于回调的等效实现。例如，如果某个函数需要先后调用十次网络请求，你可以在最外层调用 `withContext()` 让协程只切换一次线程，这样即使每个网络请求内部均会使用 `withContext()`，它也会留在同一调度程序上，从而避免频率切换线程。此外，协程还优化了 `Dispatchers.Default` 与 `Dispatchers.IO` 之间的切换，以尽可能避免线程切换
 
@@ -792,7 +792,7 @@ fun main() = runBlocking<Unit> {
 
 如果用户退出启动了协程的 Activity / Fragment，那正常情况下就应该取消所有协程
 
-`job.cancel()`就用于取消协程，`job.join()`用于阻塞等待协程运行结束。因为 `cancel()` 函数调用后会马上返回而不是等待协程结束后再返回，所以此时协程不一定就是已经停止运行了。如果需要确保协程结束运行后再执行后续代码，就需要调用 `join()` 方法来阻塞等待。也可以通过调用 Job 的扩展函数 `cancelAndJoin()` 来完成相同操作，它结合了 `cancel` 和 `join`两个操作
+`job.cancel()` 就用于取消协程，`job.join()` 用于阻塞等待协程运行结束。因为 `cancel()` 函数调用后会马上返回而不是等待协程结束后再返回，所以此时协程不一定就是已经停止运行了。如果需要确保协程结束运行后再执行后续代码，就需要调用 `join()` 方法来阻塞等待。也可以通过调用 Job 的扩展函数 `cancelAndJoin()` 来完成相同操作，它结合了 `cancel` 和 `join` 两个操作
 
 ```kotlin
 fun main() = runBlocking {
@@ -880,13 +880,13 @@ fun main() = runBlocking {
 }
 ```
 
-取消协程这个操作类似于在 Java 中调用`Thread.interrupt()`方法来向线程发起中断请求，这两个操作都不会强制停止协程和线程，外部只是相当于发起一个停止运行的请求，需要依靠协程和线程响应请求后主动停止运行
+取消协程这个操作类似于在 Java 中调用 `Thread.interrupt()` 方法来向线程发起中断请求，这两个操作都不会强制停止协程和线程，外部只是相当于发起一个停止运行的请求，需要依靠协程和线程响应请求后主动停止运行
 
-Java 和 Kotlin 之所以均没有提供一个可以直接强制停止线程或协程的方法，是因为这个操作可能会带来各种意想不到的情况。例如，在停止线程或协程的时候，它们可能还持有着某些排他性资源（例如：锁，数据库链接），如果强制性地停止，它们持有的锁就会一直无法得到释放，导致其它线程或协程一直无法得到目标资源，最终就可能导致线程死锁。所以`Thread.stop()`方法目前也是处于废弃状态，Java 官方并没有提供一个可靠的停止线程的方法
+Java 和 Kotlin 之所以均没有提供一个可以直接强制停止线程或协程的方法，是因为这个操作可能会带来各种意想不到的情况。例如，在停止线程或协程的时候，它们可能还持有着某些排他性资源（例如：锁，数据库链接），如果强制性地停止，它们持有的锁就会一直无法得到释放，导致其它线程或协程一直无法得到目标资源，最终就可能导致线程死锁。所以 `Thread.stop()` 方法目前也是处于废弃状态，Java 官方并没有提供一个可靠的停止线程的方法
 
 ## 2、用 finally 释放资源
 
-可取消的挂起函数在取消时会抛出 CancellationException，可以依靠`try {...} finally {...}` 或者 Kotlin 的 `use` 函数在取消协程后释放持有的资源
+可取消的挂起函数在取消时会抛出 CancellationException，可以依靠 `try {...} finally {...}` 或者 Kotlin 的 `use` 函数在取消协程后释放持有的资源
 
 ```kotlin
 fun main() = runBlocking {
@@ -921,7 +921,7 @@ fun main() = runBlocking {
 
 ## 3、NonCancellable
 
-如果在上一个例子中的 `finally` 块中再调用挂起函数的话，将会导致抛出 CancellationException，因为此时协程已经被取消了。通常我们并不会遇到这种情况，因为常见的资源释放操作都是非阻塞的，且不涉及任何挂起函数。但在极少数情况下我们需要在取消的协程中再调用挂起函数，此时可以使用 `withContext` 函数和 `NonCancellable`上下文将相应的代码包装在 `withContext(NonCancellable) {...}` 代码块中，NonCancellable 就用于创建一个无法取消的协程作用域
+如果在上一个例子中的 `finally` 块中再调用挂起函数的话，将会导致抛出 CancellationException，因为此时协程已经被取消了。通常我们并不会遇到这种情况，因为常见的资源释放操作都是非阻塞的，且不涉及任何挂起函数。但在极少数情况下我们需要在取消的协程中再调用挂起函数，此时可以使用 `withContext` 函数和 `NonCancellable` 上下文将相应的代码包装在 `withContext(NonCancellable) {...}` 代码块中，NonCancellable 就用于创建一个无法取消的协程作用域
 
 ```kotlin
 fun main() = runBlocking {
@@ -1064,17 +1064,17 @@ fun main() = runBlocking {
 ```kotlin
 [main] start
 Exception in thread "main" kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 300 ms
-	at kotlinx.coroutines.TimeoutKt.TimeoutCancellationException(Timeout.kt:186)
-	at kotlinx.coroutines.TimeoutCoroutine.run(Timeout.kt:156)
-	at kotlinx.coroutines.EventLoopImplBase$DelayedRunnableTask.run(EventLoop.common.kt:497)
-	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:274)
-	at kotlinx.coroutines.DefaultExecutor.run(DefaultExecutor.kt:69)
-	at java.lang.Thread.run(Thread.java:748)
+    at kotlinx.coroutines.TimeoutKt.TimeoutCancellationException(Timeout.kt:186)
+    at kotlinx.coroutines.TimeoutCoroutine.run(Timeout.kt:156)
+    at kotlinx.coroutines.EventLoopImplBase$DelayedRunnableTask.run(EventLoop.common.kt:497)
+    at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:274)
+    at kotlinx.coroutines.DefaultExecutor.run(DefaultExecutor.kt:69)
+    at java.lang.Thread.run(Thread.java:748)
 ```
 
-`withTimeout`方法抛出的 TimeoutCancellationException 是 CancellationException 的子类，之前我们并未在输出日志上看到关于 CancellationException 这类异常的堆栈信息，这是因为对于一个已取消的协程来说，CancellationException 被认为是触发协程结束的正常原因。但对于`withTimeout`方法来说，抛出异常是其上报超时情况的一种手段，所以该异常不会被协程内部消化掉
+`withTimeout` 方法抛出的 TimeoutCancellationException 是 CancellationException 的子类，之前我们并未在输出日志上看到关于 CancellationException 这类异常的堆栈信息，这是因为对于一个已取消的协程来说，CancellationException 被认为是触发协程结束的正常原因。但对于 `withTimeout` 方法来说，抛出异常是其上报超时情况的一种手段，所以该异常不会被协程内部消化掉
 
-如果不希望因为异常导致协程结束，可以改用`withTimeoutOrNull`方法，如果超时就会返回 null
+如果不希望因为异常导致协程结束，可以改用 `withTimeoutOrNull` 方法，如果超时就会返回 null
 
 # 九、异常处理
 
@@ -1206,7 +1206,7 @@ class MyActivity : AppCompatActivity() {
 }
 ```
 
-`lifecycleScope` 和 `lifecycle.coroutineScope` 两者是等价的，`lifecycleScope`只是 ktx 库提供的一种简便写法。从源码也可以看到，lifecycleScope 是存储在抽象类 Lifecycle 的 `mInternalScopeRef`字段中，且使用的是 SupervisorJob 和 `Dispatchers.Main.immediate`，因此我们不必担心任意子协程的异常情况会影响到全局的协程任务，且其默认就是在主线程运行协程
+`lifecycleScope` 和 `lifecycle.coroutineScope` 两者是等价的，`lifecycleScope` 只是 ktx 库提供的一种简便写法。从源码也可以看到，lifecycleScope 是存储在抽象类 Lifecycle 的 `mInternalScopeRef` 字段中，且使用的是 SupervisorJob 和 `Dispatchers.Main.immediate`，因此我们不必担心任意子协程的异常情况会影响到全局的协程任务，且其默认就是在主线程运行协程
 
 ```kotlin
 public val LifecycleOwner.lifecycleScope: LifecycleCoroutineScope
@@ -1233,7 +1233,7 @@ public val Lifecycle.coroutineScope: LifecycleCoroutineScope
 
 ## 2、ViewModel ktx
 
-ViewModel ktx 库提供了一个 viewModelScope，用于在 ViewModel 中启动协程，该作用域的生命周期和 ViewModel 相等，当 ViewModel 回调了 `onCleared()`方法时会自动取消该作用域
+ViewModel ktx 库提供了一个 viewModelScope，用于在 ViewModel 中启动协程，该作用域的生命周期和 ViewModel 相等，当 ViewModel 回调了 `onCleared()` 方法时会自动取消该作用域
 
 引入依赖
 
@@ -1260,7 +1260,7 @@ class MyViewModel : ViewModel() {
 }
 ```
 
-从源码可以看到其大体实现思路和`lifecycleScope` 类似，存储在 ViewModel 类的 `mBagOfTags` 这个 Map 中，且使用的也是 SupervisorJob 和 `Dispatchers.Main.immediate`
+从源码可以看到其大体实现思路和 `lifecycleScope` 类似，存储在 ViewModel 类的 `mBagOfTags` 这个 Map 中，且使用的也是 SupervisorJob 和 `Dispatchers.Main.immediate`
 
 ```kotlin
 public val ViewModel.viewModelScope: CoroutineScope

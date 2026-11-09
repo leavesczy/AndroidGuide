@@ -19,18 +19,18 @@
 public class Lambda {
 
     private void lambda() {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("Hello World!");
-            }
-        };
+        Runnable runnable =
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("Hello World!");
+                    }
+                };
     }
-
 }
 ```
 
-将 `Lambda.java`文件编译为字节码
+将 `Lambda.java` 文件编译为字节码
 
 ```java
 javac Lambda.java
@@ -52,7 +52,6 @@ public class Lambda {
     private void lambda() {
         Runnable runnable = () -> System.out.println("Hello World!");
     }
-
 }
 ```
 
@@ -93,7 +92,7 @@ public class Lambda {
 - Lambda 表达式原本所要执行的代码块，也即自动生成的静态方法 `lambda$lambda$0()` 的签名信息，当中包含了 Lambda 表达式原本所要执行的代码块
 - 原始方法泛型擦除前的方法签名信息，也即 run 方法。由于 run 方法不包含泛型，所以和第一个参数的签名信息一样
 
-可以通过反射调用 `lambda$lambda$0()`方法来验证该方法是否真的存在，运行以下代码就会发现 Hello World! 打印了两次
+可以通过反射调用 `lambda$lambda$0()` 方法来验证该方法是否真的存在，运行以下代码就会发现 Hello World! 打印了两次
 
 ```java
 public class Lambda {
@@ -112,7 +111,6 @@ public class Lambda {
             throwable.printStackTrace();
         }
     }
-
 }
 ```
 
@@ -140,7 +138,6 @@ public class Lambda {
         String log = "Hello World!";
         Runnable runnable3 = () -> System.out.println(log);
     }
-
 }
 ```
 
@@ -264,7 +261,7 @@ public final class MainActivity extends AppCompatActivity {
     /* renamed from: onCreate$lambda-0  reason: not valid java name */
     public static final void m60onCreate$lambda0(MainActivity this$0, View view) {
         if (ViewDoubleClickCheck.canClick(view)) {
-        	//TODO
+            //TODO
         }
     }
 
@@ -290,7 +287,7 @@ val clickDemoAdapter = ClickDemoAdapter()
 clickDemoAdapter.setOnItemClickListener(object : OnItemClickListener {
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>, view: View, position: Int) {
         if (ViewDoubleClickCheck.canClick(view)) {
-        	//TODO
+            //TODO
         }
     }
 })

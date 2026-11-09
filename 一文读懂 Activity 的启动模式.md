@@ -1,6 +1,6 @@
 Activity 的启动模式本身是一个挺难理解的知识点，大多数开发者对这个概念的了解可能只限于四种 launchMode 属性值，但启动模式其实还需要受 Intent flag 的影响。而且 Activity 启动模式并不只是单纯地用来启动一个 Activity，实际上还会直接影响到用户的直观感受和使用体验，因为启动模式直接就决定了应用的任务栈和返回栈，这都是用户能直接接触到的
 
-本篇文章就来简单介绍下 Activity 的启动模式，希望对你有所帮助 🤣🤣
+本篇文章就来简单介绍下 Activity 的启动模式，希望对你有所帮助
 
 # 1、任务栈
 
@@ -228,12 +228,12 @@ startActivity(intent)
 
 Intent flag 有很多个，比较常见的有四个，这里就简单介绍下这几种 Intent flag
 
-- FLAG_ACTIVITY_NEW_TASK 
+- FLAG_ACTIVITY_NEW_TASK
 - FLAG_ACTIVITY_SINGLE_TOP
 - FLAG_ACTIVITY_CLEAR_TOP
 - FLAG_ACTIVITY_CLEAR_TASK
 
-## FLAG_ACTIVITY_NEW_TASK 
+## FLAG_ACTIVITY_NEW_TASK
 
 FLAG_ACTIVITY_NEW_TASK 应该是大多数开发者最熟悉的一个 flag，比较常用的一个场景就是用于在非 ActivityContext 环境下启动 Activity。Android 系统默认情况下是会将待启动的 Activity 加入到启动者所在的任务栈，而如果启动 Activity 的是 ServiceContext 的话，此时系统就不确定该如何存放目标 Activity 了，此时就会抛出一个 RuntimeException
 
@@ -254,7 +254,7 @@ FLAG_ACTIVITY_NEW_TASK 和 standard 模式的组合情况可以总结为：
 - standard 没有设置 taskAffinity。此时系统就会去复用或者创建一个默认任务栈，然后直接在该任务栈上新建一个 Activity 实例入栈
 - standard 有设置 taskAffinity。此时又可以分为当前系统是否存在 taskAffinity 关联的任务栈两种情况
   - 不存在目标任务栈。此时系统就会创建目标任务栈，然后直接在该任务栈上新建一个 Activity 实例入栈
-  - 存在目标任务栈。此时系统会判断任务栈中是否已经存在目标 Activity 的实例，如果不存在的话则新建一个 Activity 实例入栈。如果存在目标实例的话，则只是将该任务栈转到前台而已，既不会新建 Activity 实例，也不会回调 `onNewIntent`方法，甚至也不管该 Activity 实例是否处于栈顶，总之只要存在相同实例就不做任何响应。。。。。。。
+  - 存在目标任务栈。此时系统会判断任务栈中是否已经存在目标 Activity 的实例，如果不存在的话则新建一个 Activity 实例入栈。如果存在目标实例的话，则只是将该任务栈转到前台而已，既不会新建 Activity 实例，也不会回调 `onNewIntent` 方法，甚至也不管该 Activity 实例是否处于栈顶，总之只要存在相同实例就不做任何响应。。。。。。。
 
 可以看到，FLAG_ACTIVITY_NEW_TASK 的语义还是有点费解的，该标记位可以使得 taskAffinity 生效，创建或者复用任务栈并将其转到前台，但并不要求必须创建一个新的 Activity 实例，而是只要 Activity 实例有存在即可，而且也无需该 Activity 实例就在栈顶
 
@@ -262,7 +262,7 @@ FLAG_ACTIVITY_NEW_TASK 和 standard 模式的组合情况可以总结为：
 
 FLAG_ACTIVITY_SINGLE_TOP 这个 flag 看名字就很容易和 singleTop 联系在一起，实际上该 flag 也的确起到了和 singleTop 相同的作用
 
-只要待启动的 Activity 添加了该标记位，且当前任务栈的栈顶就是目标 Activity，那么该 Activity 实例就会被复用，并且回调其`onNewIntent`方法，即使该 Activity 声明了 standard 模式，这相当于将 Activity 的 launchMode 覆盖为了 singleTop
+只要待启动的 Activity 添加了该标记位，且当前任务栈的栈顶就是目标 Activity，那么该 Activity 实例就会被复用，并且回调其 `onNewIntent` 方法，即使该 Activity 声明了 standard 模式，这相当于将 Activity 的 launchMode 覆盖为了 singleTop
 
 ## FLAG_ACTIVITY_CLEAR_TOP
 
@@ -281,7 +281,7 @@ E/StandardActivity: onDestroy hashCode: 76763823 taskId: 39
 E/StandardActivity: onCreate hashCode: 51163106 taskId: 39
 E/SingleTopActivity: onDestroy hashCode: 217068130 taskId: 39
 ```
-而如果同时加上 FLAG_ACTIVITY_SINGLE_TOP 和 FLAG_ACTIVITY_CLEAR_TOP 两个 flag 的话，那么 SingleTopActivity 就会被弹出，StandardActivity 会被复用，并且回调其`onNewIntent`方法，两个 flag 相当于组合出了 singleTask 的效果。这一个效果读者可以自行验证
+而如果同时加上 FLAG_ACTIVITY_SINGLE_TOP 和 FLAG_ACTIVITY_CLEAR_TOP 两个 flag 的话，那么 SingleTopActivity 就会被弹出，StandardActivity 会被复用，并且回调其 `onNewIntent` 方法，两个 flag 相当于组合出了 singleTask 的效果。这一个效果读者可以自行验证
 
 ## FLAG_ACTIVITY_CLEAR_TASK
 

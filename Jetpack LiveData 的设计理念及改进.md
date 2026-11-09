@@ -7,7 +7,7 @@
 - 关注点分离。关注点分离指的是架构中的每一层应只专注于实现某一特定目的。一种常见的错误就是在 `Activity` 或 `Fragment` 中编写所有代码（例如，直接在界面层完成网络请求），这种基于界面的类应仅包含与系统和用户交互的逻辑，你应该使这些类尽可能保持精简，这样可以避免许多与生命周期相关的问题
 - 通过模型驱动界面。模型是指负责处理应用数据的组件，模型应独立于应用的界面层和其它应用组件，这样才能不受应用的生命周期以及相关的关注点的影响
 
-关于第一点。对于一个移动设备来说，其拥有的资源是固定且极其有限的，系统可能会随时终止某些应用进程以便为前台进程腾出内存空间。而且，即使是对于前台进程来说，我们也并非拥有`Activity` 和`Fragment`的完全所有权，系统也可能会随时因为**内存空间不足**或者**系统配置更改**等意外情况而销毁它们。做到关注点分离，就是将各个层次的职责划分开，避免将用户数据和界面的生命周期强绑定，这样当意外情况发生时用户数据才不会随之一起被销毁
+关于第一点。对于一个移动设备来说，其拥有的资源是固定且极其有限的，系统可能会随时终止某些应用进程以便为前台进程腾出内存空间。而且，即使是对于前台进程来说，我们也并非拥有 `Activity` 和 `Fragment` 的完全所有权，系统也可能会随时因为**内存空间不足**或者**系统配置更改**等意外情况而销毁它们。做到关注点分离，就是将各个层次的职责划分开，避免将用户数据和界面的生命周期强绑定，这样当意外情况发生时用户数据才不会随之一起被销毁
 
 关于第二点。通过模型驱动界面，即界面对模型来说应该是相当于一个观察者而独立存在，界面不应该直接持有数据。界面通过观察数据的变化来驱动自身，模型也可以通过改变自身来驱动界面更改。这里指的模型最好是**持久性模型**，即模型的生命周期需要比界面甚至应用进程更加长，典型代表即 Jetpack 中的 ViewModel 和 Room。这样当有意外情况发生时，用户也不会丢失数据，我们可以在随后就为用户恢复数据
 
@@ -21,7 +21,7 @@ Google 推荐的应用架构图如下所示
 
 本文想要讨论的就是 ViewModel 所包含的 LiveData
 
-从 Google 官方推荐的应用架构图可以看到，[LiveData](https://developer.android.google.cn/topic/libraries/architecture/livedata) 是包含在 ViewModel 中的。LiveData 是一种可观察的数据存储器，Activity/Fragment 是观察者，LiveData 是被观察者。LiveData 具有生命周期感知能力，当我们向 LiveData 注册了一个和 LifecycleOwner 相绑定的 Observer 时，如果 LifecycleOwner 的生命周期处于[`STARTED`](https://developer.android.google.cn/reference/androidx/lifecycle/Lifecycle.State#STARTED) 或 [`RESUMED`](https://developer.android.google.cn/reference/androidx/lifecycle/Lifecycle.State#RESUMED) 状态，则认为该观察者当前处于活跃状态，此时 LiveData 才会向观察者发送事件通知，非活跃状态的观察者不会收到任何事件通知。且当 LifecycleOwner  的状态变为[`DESTROYED`](https://developer.android.google.cn/reference/androidx/lifecycle/Lifecycle.State#DESTROYED)时，LiveData 会自动解除和观察者之间的绑定关系，以防止内存泄漏和过多的内存消耗。所以说，LiveData 具有生命周期感知能力，Activity/Fragment 无需和 LiveData 创建明确且严格的依赖路径
+从 Google 官方推荐的应用架构图可以看到，[LiveData](https://developer.android.google.cn/topic/libraries/architecture/livedata) 是包含在 ViewModel 中的。LiveData 是一种可观察的数据存储器，Activity/Fragment 是观察者，LiveData 是被观察者。LiveData 具有生命周期感知能力，当我们向 LiveData 注册了一个和 LifecycleOwner 相绑定的 Observer 时，如果 LifecycleOwner 的生命周期处于[`STARTED`](https://developer.android.google.cn/reference/androidx/lifecycle/Lifecycle.State#STARTED) 或 [`RESUMED`](https://developer.android.google.cn/reference/androidx/lifecycle/Lifecycle.State#RESUMED) 状态，则认为该观察者当前处于活跃状态，此时 LiveData 才会向观察者发送事件通知，非活跃状态的观察者不会收到任何事件通知。且当 LifecycleOwner 的状态变为[`DESTROYED`](https://developer.android.google.cn/reference/androidx/lifecycle/Lifecycle.State#DESTROYED)时，LiveData 会自动解除和观察者之间的绑定关系，以防止内存泄漏和过多的内存消耗。所以说，LiveData 具有生命周期感知能力，Activity/Fragment 无需和 LiveData 创建明确且严格的依赖路径
 
 ViewModel 和 LiveData 可以看做是对**关注点分离**和**通过模型驱动界面**原则的一个共同实现，ViewModel 提供了让用户数据独立于界面而存在的能力，LiveData 提供了安全地通知并驱动界面变化的能力
 
@@ -179,19 +179,18 @@ private fun setValue(value: T) {
 ```java
 private abstract class ObserverWrapper {
 
-    //外部传进来的对 LiveData 进行数据监听的 Observer
+    // 外部传进来的对 LiveData 进行数据监听的 Observer
     final Observer<? super T> mObserver;
 
-    //用于标记 mObserver 是否处于活跃状态
+    // 用于标记 mObserver 是否处于活跃状态
     boolean mActive;
 
-    //用于标记 Observer 内最后一个被回调的 value 的新旧程度
+    // 用于标记 Observer 内最后一个被回调的 value 的新旧程度
     int mLastVersion = START_VERSION;
 
     ObserverWrapper(Observer<? super T> observer) {
         mObserver = observer;
     }
-
 }
 ```
 
@@ -212,8 +211,7 @@ private void considerNotify(ObserverWrapper observer) {
 
 ```java
 class LifecycleBoundObserver extends ObserverWrapper implements LifecycleEventObserver {
-    @NonNull
-    final LifecycleOwner mOwner;
+    @NonNull final LifecycleOwner mOwner;
 
     LifecycleBoundObserver(@NonNull LifecycleOwner owner, Observer<? super T> observer) {
         super(observer);
@@ -224,7 +222,6 @@ class LifecycleBoundObserver extends ObserverWrapper implements LifecycleEventOb
     boolean shouldBeActive() {
         return mOwner.getLifecycle().getCurrentState().isAtLeast(STARTED);
     }
-
 }
 ```
 

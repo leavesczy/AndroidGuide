@@ -1,4 +1,4 @@
-> 本系列文章会陆续对 Java 和 Android 的集合框架（JDK 1.8，Android SDK 30）中的几个常见容器结合源码进行介绍，了解不同容器在**数据结构、适用场景、优势点**上的不同，希望对你有所帮助 🤣🤣🤣
+> 本系列文章会陆续对 Java 和 Android 的集合框架（JDK 1.8，Android SDK 30）中的几个常见容器结合源码进行介绍，了解不同容器在**数据结构、适用场景、优势点**上的不同，希望对你有所帮助
 
 # 一、数组和链表
 
@@ -30,7 +30,7 @@ ArrayList 底层就是用数组来存储数据
 
 LinkedList 底层就是用链表来存储数据
 
-# 二、ArrayList 
+# 二、ArrayList
 
 ArrayList 应该是大多数开发者使用得最为频繁的集合容器了，ArrayList 实现了 List 接口，是一个有序容器，即元素的存放顺序与添加顺序保持一致，允许添加相同元素，包括 null 。ArrayList 底层通过数组来进行数据存储，当向 ArrayList 中添加元素时如果发现数组空间不足，ArrayList 会自动对底层数组进行扩容并迁移现有数据
 
@@ -48,25 +48,25 @@ public class ArrayList<E> extends AbstractList<E>
 ArrayList 一共包含以下几个成员变量，主要看 elementData。elementData 是用于存放数据的底层数组，由于其数据类型声明为 Object，所以可以用来存放任何类型的数据。而 ArrayList 属于泛型类，如果我们在初始化时就指定了数据类型的话，依靠 Java 泛型为我们提供的语法糖，我们在向 elementData 存取数据时编译器就会自动进行类型校验和类型转换，确保存入和取出的数据类型是安全的
 
 ```java
-//序列化ID
+// 序列化ID
 private static final long serialVersionUID = 8683452581122892189L;
 
-//进行扩容操作后的最小容量
+// 进行扩容操作后的最小容量
 private static final int DEFAULT_CAPACITY = 10;
 
-//如果外部为集合设置的初始化大小为 0，则将 elementData 指向此空数组
+// 如果外部为集合设置的初始化大小为 0，则将 elementData 指向此空数组
 private static final Object[] EMPTY_ELEMENTDATA = {};
 
-//如果在初始化集合时使用的是无参构造函数，则将 elementData 指向此空数组
+// 如果在初始化集合时使用的是无参构造函数，则将 elementData 指向此空数组
 private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};
 
-//用来存放元素的数组
+// 用来存放元素的数组
 transient Object[] elementData;
 
-//集合大小
+// 集合大小
 private int size;
 
-//ArrayList 的快照版本号
+// ArrayList 的快照版本号
 protected transient int modCount = 0;
 ```
 
@@ -77,23 +77,23 @@ protected transient int modCount = 0;
 如果我们使用的是无参构造函数或者是指定的 initialCapacity 为 0，此时也只会将 elementData 指向空数组，并不会新建一个数组变量
 
 ```java
-//指定集合的初始容量，以此来进行数组的初始化操作
+// 指定集合的初始容量，以此来进行数组的初始化操作
 public ArrayList(int initialCapacity) {
     if (initialCapacity > 0) {
         this.elementData = new Object[initialCapacity];
     } else if (initialCapacity == 0) {
         this.elementData = EMPTY_ELEMENTDATA;
     } else {
-        throw new IllegalArgumentException("Illegal Capacity: "+initialCapacity);
+        throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
     }
 }
 
-//外部没有指定初始容量，暂且使用空数组
+// 外部没有指定初始容量，暂且使用空数组
 public ArrayList() {
     this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
 }
 
-//传入一份初始数据来进行初始化
+// 传入一份初始数据来进行初始化
 public ArrayList(Collection<? extends E> c) {
     elementData = c.toArray();
     if ((size = elementData.length) != 0) {
@@ -117,7 +117,7 @@ E elementData(int index) {
 }
 
 public E get(int index) {
-    //判断取值范围是否合法
+    // 判断取值范围是否合法
     rangeCheck(index);
     return elementData(index);
 }
@@ -131,7 +131,7 @@ ArrayList 添加元素的操作就不是那么理想了。如果是直接向集�
 
 ```java
 public boolean add(E e) {
-    //在需要的时候进行扩容
+    // 在需要的时候进行扩容
     ensureCapacityInternal(size + 1);
     elementData[size++] = e;
     return true;
@@ -139,10 +139,10 @@ public boolean add(E e) {
 
 public void add(int index, E element) {
     rangeCheckForAdd(index);
-    //在需要的时候进行扩容
+    // 在需要的时候进行扩容
     ensureCapacityInternal(size + 1);
-    //将索引 index 后的所有数值向后推移一位 
-    System.arraycopy(elementData, index, elementData, index + 1,size - index);
+    // 将索引 index 后的所有数值向后推移一位
+    System.arraycopy(elementData, index, elementData, index + 1, size - index);
     elementData[index] = element;
     size++;
 }
@@ -151,30 +151,30 @@ public void add(int index, E element) {
 以上说的是存入单个数据的情况，此外还有存入整个集合的情况
 
 ```java
-//如果待添加的数据不为空则返回 true，否则返回 false
+// 如果待添加的数据不为空则返回 true，否则返回 false
 public boolean addAll(Collection<? extends E> c) {
     Object[] a = c.toArray();
     int numNew = a.length;
     ensureCapacityInternal(size + numNew);
-    //将数组 a 复制到 elementData 的尾端
+    // 将数组 a 复制到 elementData 的尾端
     System.arraycopy(a, 0, elementData, size, numNew);
     size += numNew;
     return numNew != 0;
 }
 
-//从指定索引处添加数据，如果待添加的数据不为空则返回 true，否则返回 false
+// 从指定索引处添加数据，如果待添加的数据不为空则返回 true，否则返回 false
 public boolean addAll(int index, Collection<? extends E> c) {
     rangeCheckForAdd(index);
     Object[] a = c.toArray();
     int numNew = a.length;
     ensureCapacityInternal(size + numNew);
-    //需要移动的数组元素数量
+    // 需要移动的数组元素数量
     int numMoved = size - index;
-    //因为要添加的数据可能刚好是从数组最尾端开始添加，所以 numMoved 可能为 0
-    //所以只在 numMoved > 0 的时候才需要对数组的元素值进行移动，以此空出位置给数组 a
+    // 因为要添加的数据可能刚好是从数组最尾端开始添加，所以 numMoved 可能为 0
+    // 所以只在 numMoved > 0 的时候才需要对数组的元素值进行移动，以此空出位置给数组 a
     if (numMoved > 0)
         System.arraycopy(elementData, index, elementData, index + numNew, numMoved);
-    //将数组 a 包含的数据添加到 elementData 中
+    // 将数组 a 包含的数据添加到 elementData 中
     System.arraycopy(a, 0, elementData, index, numNew);
     size += numNew;
     return numNew != 0;
@@ -186,26 +186,25 @@ public boolean addAll(int index, Collection<? extends E> c) {
 因为数组是一种内存地址连续的数据结构，所以移除某个元素同样可能导致大量元素移动
 
 ```java
-//移除指定索引处的元素值，并返回该值
+// 移除指定索引处的元素值，并返回该值
 public E remove(int index) {
     rangeCheck(index);
     modCount++;
-    //待移除的元素值
+    // 待移除的元素值
     E oldValue = elementData(index);
-    //因为要移除元素导致需要移动的元素数量
+    // 因为要移除元素导致需要移动的元素数量
     int numMoved = size - index - 1;
-    //因为要移除的元素可能刚好是数组最后一位，所以 numMoved 可能为 0
-    //所以只在 numMoved > 0 的时候才需要对数组的元素值进行移动
-    if (numMoved > 0)
-        System.arraycopy(elementData, index+1, elementData, index, numMoved);
-    //不管数组是否需要对元素值进行移动，数组的最后一位都是无效数据了
-    //此处将之置为 null 以帮助GC回收                
+    // 因为要移除的元素可能刚好是数组最后一位，所以 numMoved 可能为 0
+    // 所以只在 numMoved > 0 的时候才需要对数组的元素值进行移动
+    if (numMoved > 0) System.arraycopy(elementData, index + 1, elementData, index, numMoved);
+    // 不管数组是否需要对元素值进行移动，数组的最后一位都是无效数据了
+    // 此处将之置为 null 以帮助GC回收
     elementData[--size] = null;
     return oldValue;
 }
 
-//移除集合中包含的第一位元素值为 o 的对象
-//如果包含该对象，则返回 true ，否则返回 false
+// 移除集合中包含的第一位元素值为 o 的对象
+// 如果包含该对象，则返回 true ，否则返回 false
 public boolean remove(Object o) {
     if (o == null) {
         for (int index = 0; index < size; index++)
@@ -230,13 +229,11 @@ public boolean remove(Object o) {
 
 `ensureCapacity` 方法的入参参数 minCapacity 就用于指定希望扩容后的最小空间，但 minCapacity 最终不会小于 DEFAULT_CAPACITY，即扩容后的数组容量不会小于 10。之所以要进行最小容量的限制，是为了减少多次扩容的可能性，10 以内的数组很容易就发生扩容
 
-如果在初始化 ArrayList 前已知目标数据的数据量，最好就使用`ArrayList(int initialCapacity)`来进行初始化，直接让底层数组扩充到目标大小，或者是在添加数据前就调用 `ensureCapacity` 方法直接让数组扩容到目标大小，避免之后赋值过程中多次扩容
+如果在初始化 ArrayList 前已知目标数据的数据量，最好就使用 `ArrayList(int initialCapacity)` 来进行初始化，直接让底层数组扩充到目标大小，或者是在添加数据前就调用 `ensureCapacity` 方法直接让数组扩容到目标大小，避免之后赋值过程中多次扩容
 
 ```java
 public void ensureCapacity(int minCapacity) {
-    int minExpand = (elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA)
-        ? 0
-        : DEFAULT_CAPACITY;
+    int minExpand = (elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA) ? 0 : DEFAULT_CAPACITY;
     if (minCapacity > minExpand) {
         ensureExplicitCapacity(minCapacity);
     }
@@ -251,9 +248,8 @@ private void ensureCapacityInternal(int minCapacity) {
 
 private void ensureExplicitCapacity(int minCapacity) {
     modCount++;
-    //如果当前数组大小的确是比需要的最小空间 minCapacity 小，则进行扩容
-    if (minCapacity - elementData.length > 0)
-        grow(minCapacity);
+    // 如果当前数组大小的确是比需要的最小空间 minCapacity 小，则进行扩容
+    if (minCapacity - elementData.length > 0) grow(minCapacity);
 }
 ```
 
@@ -262,17 +258,15 @@ private void ensureExplicitCapacity(int minCapacity) {
 构建出一个新的符合大小的数组后，就将原数组中的元素复制到新数组中，至此就完成了扩容
 
 ```java
-//数组可扩容到的最大容量
+// 数组可扩容到的最大容量
 private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
 private void grow(int minCapacity) {
     int oldCapacity = elementData.length;
-    //假设扩容后的空间大小是原先的1.5倍
+    // 假设扩容后的空间大小是原先的1.5倍
     int newCapacity = oldCapacity + (oldCapacity >> 1);
-    if (newCapacity - minCapacity < 0)
-        newCapacity = minCapacity;
-    if (newCapacity - MAX_ARRAY_SIZE > 0)
-        newCapacity = hugeCapacity(minCapacity);
+    if (newCapacity - minCapacity < 0) newCapacity = minCapacity;
+    if (newCapacity - MAX_ARRAY_SIZE > 0) newCapacity = hugeCapacity(minCapacity);
     elementData = Arrays.copyOf(elementData, newCapacity);
 }
 ```
@@ -280,7 +274,7 @@ private void grow(int minCapacity) {
 ## 8、修改元素
 
 ```java
-//将索引 index 出的元素值置为 element，并返回原始数值
+// 将索引 index 出的元素值置为 element，并返回原始数值
 public E set(int index, E element) {
     rangeCheck(index);
     E oldValue = elementData(index);
@@ -301,58 +295,58 @@ public void forEach(Consumer<? super E> action) {
     @SuppressWarnings("unchecked")
     final E[] elementData = (E[]) this.elementData;
     final int size = this.size;
-    for (int i=0; modCount == expectedModCount && i < size; i++) {
-        //将集合元素依次传递给 accept 方法
+    for (int i = 0; modCount == expectedModCount && i < size; i++) {
+        // 将集合元素依次传递给 accept 方法
         action.accept(elementData[i]);
     }
-    //如果 modCount 值被改动了，说明遍历过程中数组有被改动到
-    //那么就停止遍历并抛出异常
+    // 如果 modCount 值被改动了，说明遍历过程中数组有被改动到
+    // 那么就停止遍历并抛出异常
     if (modCount != expectedModCount) {
         throw new ConcurrentModificationException();
     }
 }
 
-//按照给定规则对集合元素进行过滤，如果元素符合过滤规则那就将之移除
+// 按照给定规则对集合元素进行过滤，如果元素符合过滤规则那就将之移除
 @Override
 public boolean removeIf(Predicate<? super E> filter) {
     Objects.requireNonNull(filter);
-    //要移除的元素个数
+    // 要移除的元素个数
     int removeCount = 0;
-    //用于标记集合是哪个索引位置需要被移除
+    // 用于标记集合是哪个索引位置需要被移除
     final BitSet removeSet = new BitSet(size);
     final int expectedModCount = modCount;
     final int size = this.size;
-    for (int i=0; modCount == expectedModCount && i < size; i++) {
+    for (int i = 0; modCount == expectedModCount && i < size; i++) {
         @SuppressWarnings("unchecked")
         final E element = (E) elementData[i];
-        //依次判断集合元素是否符合过滤规则
+        // 依次判断集合元素是否符合过滤规则
         if (filter.test(element)) {
-            //set 方法将导致索引位置 i 的元素变为 true
+            // set 方法将导致索引位置 i 的元素变为 true
             removeSet.set(i);
             removeCount++;
         }
     }
-    //不允许在排序的过程中集合被其它方法修改了数组（例如：移除元素）
+    // 不允许在排序的过程中集合被其它方法修改了数组（例如：移除元素）
     if (modCount != expectedModCount) {
         throw new ConcurrentModificationException();
     }
-    //只有 removeCount > 0 才说明需要移除元素
+    // 只有 removeCount > 0 才说明需要移除元素
     final boolean anyToRemove = removeCount > 0;
     if (anyToRemove) {
-        //集合移除指定元素后的大小
+        // 集合移除指定元素后的大小
         final int newSize = size - removeCount;
-        for (int i=0, j=0; (i < size) && (j < newSize); i++, j++) {
-            //略过被标记为 true 的位置，直接跳到不需要移除元素的数组索引位
+        for (int i = 0, j = 0; (i < size) && (j < newSize); i++, j++) {
+            // 略过被标记为 true 的位置，直接跳到不需要移除元素的数组索引位
             i = removeSet.nextClearBit(i);
-            //有效数据逐渐从尾部向头部聚集
+            // 有效数据逐渐从尾部向头部聚集
             elementData[j] = elementData[i];
         }
-        //移除尾部的无效数据，有利于GC回收
-        for (int k=newSize; k < size; k++) {
+        // 移除尾部的无效数据，有利于GC回收
+        for (int k = newSize; k < size; k++) {
             elementData[k] = null;
         }
         this.size = newSize;
-        //不允许在排序的过程中集合被其它方法修改了数组（例如：移除元素）
+        // 不允许在排序的过程中集合被其它方法修改了数组（例如：移除元素）
         if (modCount != expectedModCount) {
             throw new ConcurrentModificationException();
         }
@@ -361,18 +355,18 @@ public boolean removeIf(Predicate<? super E> filter) {
     return anyToRemove;
 }
 
-//将集合元素遍历传递给 operator，并将原始数据替换为 operator 的返回值
+// 将集合元素遍历传递给 operator，并将原始数据替换为 operator 的返回值
 @Override
 @SuppressWarnings("unchecked")
 public void replaceAll(UnaryOperator<E> operator) {
     Objects.requireNonNull(operator);
     final int expectedModCount = modCount;
     final int size = this.size;
-    for (int i=0; modCount == expectedModCount && i < size; i++) {
-        //依次传递数组元素给 apply 方法，并将其返回值替换原始数据
+    for (int i = 0; modCount == expectedModCount && i < size; i++) {
+        // 依次传递数组元素给 apply 方法，并将其返回值替换原始数据
         elementData[i] = operator.apply((E) elementData[i]);
     }
-    //不允许在排序的过程中集合被其它方法修改了数组（例如：移除元素）
+    // 不允许在排序的过程中集合被其它方法修改了数组（例如：移除元素）
     if (modCount != expectedModCount) {
         throw new ConcurrentModificationException();
     }
@@ -409,55 +403,52 @@ public Iterator<E> iterator() {
 
 private class Itr implements Iterator<E> {
 
-    //lastRet 指向的元素的下一个元素的索引
+    // lastRet 指向的元素的下一个元素的索引
     int cursor;
 
-    //最后一个返回的元素的索引
-    //如果值为 -1，说明还未返回过元素或者改元素被移除了
+    // 最后一个返回的元素的索引
+    // 如果值为 -1，说明还未返回过元素或者改元素被移除了
     int lastRet = -1;
 
-    //用于验证集合的数据结构在迭代的过程中是否被修改了
+    // 用于验证集合的数据结构在迭代的过程中是否被修改了
     int expectedModCount = modCount;
 
-    //是否还有元素未被遍历
+    // 是否还有元素未被遍历
     public boolean hasNext() {
         return cursor != size;
     }
 
-    //获取下一个元素
+    // 获取下一个元素
     @SuppressWarnings("unchecked")
     public E next() {
         checkForComodification();
         int i = cursor;
-        //如果索引值超出取值范围则抛出异常
-        if (i >= size)
-            throw new NoSuchElementException();
+        // 如果索引值超出取值范围则抛出异常
+        if (i >= size) throw new NoSuchElementException();
         Object[] elementData = ArrayList.this.elementData;
-        //如果索引值超出数组的可索引范围则抛出异常
-        if (i >= elementData.length)
-            throw new ConcurrentModificationException();
+        // 如果索引值超出数组的可索引范围则抛出异常
+        if (i >= elementData.length) throw new ConcurrentModificationException();
         cursor = i + 1;
         return (E) elementData[lastRet = i];
     }
 
-    //移除 lastRet 指向的元素
+    // 移除 lastRet 指向的元素
     public void remove() {
-        if (lastRet < 0)
-            throw new IllegalStateException();
+        if (lastRet < 0) throw new IllegalStateException();
         checkForComodification();
         try {
             ArrayList.this.remove(lastRet);
-            //因为 lastRet 位置原始的元素被移除了，所以此时 lastRet 指向的元素是原先 lastRet+1 位置的元素
+            // 因为 lastRet 位置原始的元素被移除了，所以此时 lastRet 指向的元素是原先 lastRet+1 位置的元素
             cursor = lastRet;
             lastRet = -1;
-            //因为是 Itr 主动对集合进行修改，所以此处需要主动更新 expectedModCount 值，避免之后抛出异常
+            // 因为是 Itr 主动对集合进行修改，所以此处需要主动更新 expectedModCount 值，避免之后抛出异常
             expectedModCount = modCount;
         } catch (IndexOutOfBoundsException ex) {
             throw new ConcurrentModificationException();
         }
     }
 
-    //遍历从索引 cursor 开始之后剩下的元素
+    // 遍历从索引 cursor 开始之后剩下的元素
     @Override
     @SuppressWarnings("unchecked")
     public void forEachRemaining(Consumer<? super E> consumer) {
@@ -471,7 +462,7 @@ private class Itr implements Iterator<E> {
         if (i >= elementData.length) {
             throw new ConcurrentModificationException();
         }
-        //遍历调用 accept 方法
+        // 遍历调用 accept 方法
         while (i != size && modCount == expectedModCount) {
             consumer.accept((E) elementData[i++]);
         }
@@ -480,11 +471,10 @@ private class Itr implements Iterator<E> {
         checkForComodification();
     }
 
-    //判断迭代器在遍历集合的过程中，集合是否被外部改动了（例如被其它迭代器移除了元素）
-    //如果是的话则抛出异常
+    // 判断迭代器在遍历集合的过程中，集合是否被外部改动了（例如被其它迭代器移除了元素）
+    // 如果是的话则抛出异常
     final void checkForComodification() {
-        if (modCount != expectedModCount)
-            throw new ConcurrentModificationException();
+        if (modCount != expectedModCount) throw new ConcurrentModificationException();
     }
 }
 ```
@@ -505,7 +495,6 @@ public static void main(String[] args) {
     long endTime = System.currentTimeMillis();
     System.out.println("初始容量为0，所用时间：" + (endTime - startTime) + "毫秒");
 
-
     startTime = System.currentTimeMillis();
     List<String> stringList2 = new ArrayList<>(100000);
     for (int i = 0; i < 300000; i++) {
@@ -513,7 +502,6 @@ public static void main(String[] args) {
     }
     endTime = System.currentTimeMillis();
     System.out.println("初始容量为100000，所用时间：" + (endTime - startTime) + "毫秒");
-
 
     startTime = System.currentTimeMillis();
     List<String> stringList3 = new ArrayList<>(300000);
@@ -551,13 +539,13 @@ LinkedList 内部通过双向链表的数据结构来实现的，每个链表结
 ```java
 private static class Node<E> {
 
-    //当前结点包含的实际元素
+    // 当前结点包含的实际元素
     E item;
 
-    //指向下一个结点
+    // 指向下一个结点
     Node<E> next;
 
-    //指向上一个结点
+    // 指向上一个结点
     Node<E> prev;
 
     Node(Node<E> prev, E element, Node<E> next) {
@@ -571,16 +559,16 @@ private static class Node<E> {
 ## 2、成员变量
 
 ```java
-//双向链表包含的结点总数，即数据总量
+// 双向链表包含的结点总数，即数据总量
 transient int size = 0;
 
-//双向链表的头结点
+// 双向链表的头结点
 transient Node<E> first;
 
-//双向链表的尾结点
+// 双向链表的尾结点
 transient Node<E> last;
 
-//序列化ID
+// 序列化ID
 private static final long serialVersionUID = 876323262645176354L;
 ```
 
@@ -593,10 +581,9 @@ private static final long serialVersionUID = 876323262645176354L;
 LinkedList 不需要去请求一片连续的内存空间来存储数据，而是在每次有新的元素需要添加时再来动态请求内存空间，因此 LinkedList 的两个构造函数都很简单
 
 ```java
-public LinkedList() {
-}
+public LinkedList() {}
 
-//传入初始数据
+// 传入初始数据
 public LinkedList(Collection<? extends E> c) {
     this();
     addAll(c);
@@ -608,27 +595,25 @@ public LinkedList(Collection<? extends E> c) {
 `add(E e)` 方法用于向链表的尾部添加结点，因为有 `last` 指向链表的尾结点，因此向尾部添加新元素只需要修改几个引用即可，效率较高
 
 ```java
-//将元素 e 作为尾结点添加
-//因为 LinkedList 允许添加相同元素，所以此方法固定返回 true
+// 将元素 e 作为尾结点添加
+// 因为 LinkedList 允许添加相同元素，所以此方法固定返回 true
 public boolean add(E e) {
     linkLast(e);
     return true;
 }
 
-//将元素 e 置为尾结点
+// 将元素 e 置为尾结点
 void linkLast(E e) {
-    //先保存原尾结点
+    // 先保存原尾结点
     final Node<E> l = last;
-    //构建新的尾结点，并指向原尾结点
+    // 构建新的尾结点，并指向原尾结点
     final Node<E> newNode = new Node<>(l, e, null);
     last = newNode;
-    //如果原尾结点为 null，说明原链表包含的元素个数为 0，则此时插入的尾结点同时即为头结点
-    //如果原尾结点不为 null，则将 next 指向新的尾结点
-    if (l == null)
-        first = newNode;
-    else
-        l.next = newNode;
-    //元素个数加1
+    // 如果原尾结点为 null，说明原链表包含的元素个数为 0，则此时插入的尾结点同时即为头结点
+    // 如果原尾结点不为 null，则将 next 指向新的尾结点
+    if (l == null) first = newNode;
+    else l.next = newNode;
+    // 元素个数加1
     size++;
     modCount++;
 }
@@ -639,32 +624,28 @@ void linkLast(E e) {
 `add(int index, E element)` 方法用于向指定索引处添加元素，需要先通过索引 index 获取相应位置的结点，并在该位置开辟一个新的结点来存储元素 element，最后还需要修改相邻结点间的引用
 
 ```java
-//在索引 index 处插入元素 element
+// 在索引 index 处插入元素 element
 public void add(int index, E element) {
-    //判断索引大小是否合法，不合法则抛出 IndexOutOfBoundsException
+    // 判断索引大小是否合法，不合法则抛出 IndexOutOfBoundsException
     checkPositionIndex(index);
-    //如果 index == size，则将 element 作为尾结点来添加
-    //否则则在索引 index 前开辟一个新结点
-    if (index == size)
-        linkLast(element);
-    else
-        linkBefore(element, node(index));
+    // 如果 index == size，则将 element 作为尾结点来添加
+    // 否则则在索引 index 前开辟一个新结点
+    if (index == size) linkLast(element);
+    else linkBefore(element, node(index));
 }
 
-//将元素 e 置为 succ 结点的上一个结点
+// 将元素 e 置为 succ 结点的上一个结点
 void linkBefore(E e, Node<E> succ) {
-    //保存 succ 的上一个结点信息
+    // 保存 succ 的上一个结点信息
     final Node<E> pred = succ.prev;
-    //构建元素 e 对应的结点
+    // 构建元素 e 对应的结点
     final Node<E> newNode = new Node<>(pred, e, succ);
-    //将结点 succ 的上一个结点指向 newNode
+    // 将结点 succ 的上一个结点指向 newNode
     succ.prev = newNode;
-    //如果 pred 为 null，说明 succ 是头结点，则将 newNode 置为新的头结点
-    if (pred == null)
-        first = newNode;
-    else
-        pred.next = newNode;
-    //元素个数加1
+    // 如果 pred 为 null，说明 succ 是头结点，则将 newNode 置为新的头结点
+    if (pred == null) first = newNode;
+    else pred.next = newNode;
+    // 元素个数加1
     size++;
     modCount++;
 }
@@ -677,20 +658,20 @@ void linkBefore(E e, Node<E> succ) {
 `remove()` 方法有两种重载形式，其内部都是通过调用 `unlink(Node<E> x)` 方法来移除指定结点在链表中的引用，不同于 ArrayList 在移除元素时可能导致的大量数据移动，LinkedList 只需要通过移除引用即可将指定元素从链表中移除
 
 ```java
-//移除索引 index 处的结点
+// 移除索引 index 处的结点
 public E remove(int index) {
-    //判断索引大小是否合法，不合法则抛出 IndexOutOfBoundsException
+    // 判断索引大小是否合法，不合法则抛出 IndexOutOfBoundsException
     checkElementIndex(index);
     return unlink(node(index));
 }
 
-//对链表进行正向遍历，移除第一个元素值为 o 的结点
-//如果移除成功则返回 true，否则返回 false
+// 对链表进行正向遍历，移除第一个元素值为 o 的结点
+// 如果移除成功则返回 true，否则返回 false
 public boolean remove(Object o) {
     if (o == null) {
         for (Node<E> x = first; x != null; x = x.next) {
             if (x.item == null) {
-                //移除结点 x
+                // 移除结点 x
                 unlink(x);
                 return true;
             }
@@ -698,7 +679,7 @@ public boolean remove(Object o) {
     } else {
         for (Node<E> x = first; x != null; x = x.next) {
             if (o.equals(x.item)) {
-                //移除结点 x
+                // 移除结点 x
                 unlink(x);
                 return true;
             }
@@ -707,30 +688,30 @@ public boolean remove(Object o) {
     return false;
 }
 
-//移除结点 x 并返回其包含的元素值
+// 移除结点 x 并返回其包含的元素值
 E unlink(Node<E> x) {
     final E element = x.item;
     final Node<E> next = x.next;
     final Node<E> prev = x.prev;
-    //如果 prev == null，说明结点 x 为头结点，则将头结点置为原先的第二个结点
-    //如果 prev != null，则移除对结点 x 的引用
+    // 如果 prev == null，说明结点 x 为头结点，则将头结点置为原先的第二个结点
+    // 如果 prev != null，则移除对结点 x 的引用
     if (prev == null) {
         first = next;
     } else {
         prev.next = next;
         x.prev = null;
     }
-    //如果 next == null，则说明结点 x 为尾结点，则将尾结点置为原先的倒数第二个结点
-    //如果 next != null，则移除对结点 x 的引用
+    // 如果 next == null，则说明结点 x 为尾结点，则将尾结点置为原先的倒数第二个结点
+    // 如果 next != null，则移除对结点 x 的引用
     if (next == null) {
         last = prev;
     } else {
         next.prev = prev;
         x.next = null;
     }
-    //帮助GC回收
+    // 帮助GC回收
     x.item = null;
-    //元素个数减1
+    // 元素个数减1
     size--;
     modCount++;
     return element;
@@ -742,16 +723,16 @@ E unlink(Node<E> x) {
 对于单向链表来说，如果想随机定位到某个结点，那么只能通过从头结点开始遍历的方式来定位，最极端的情况下需要遍历整个链表才能定位到目标结点。如果是双向链表，则可以选择正向遍历或者反向遍历，最极端的情况下需要遍历一半链表才能定位到目标结点。所以，相比数组来说 LinkedList 的随机访问效率并不高
 
 ```java
-//获取索引 index 处的结点元素
+// 获取索引 index 处的结点元素
 public E get(int index) {
-    //判断索引大小是否合法，不合法则抛出 IndexOutOfBoundsException
+    // 判断索引大小是否合法，不合法则抛出 IndexOutOfBoundsException
     checkElementIndex(index);
     return node(index).item;
 }
 
-//将索引 index 处的结点包含的元素修改为 element，并返回旧元素
+// 将索引 index 处的结点包含的元素修改为 element，并返回旧元素
 public E set(int index, E element) {
-    //判断索引大小是否合法，不合法则抛出 IndexOutOfBoundsException
+    // 判断索引大小是否合法，不合法则抛出 IndexOutOfBoundsException
     checkElementIndex(index);
     Node<E> x = node(index);
     E oldVal = x.item;
@@ -759,21 +740,19 @@ public E set(int index, E element) {
     return oldVal;
 }
 
-//获取索引 index 处的结点
+// 获取索引 index 处的结点
 Node<E> node(int index) {
-    //size >> 1 的含义即为：将 size 值除以 2
-    //如果 index 靠近链表的头部，则从头部向尾部正向遍历查找结点
-    //如果 index 靠近链表的尾部，则从尾部向头部反向遍历查找结点
-    //最极端的情况下遍历一半元素才能定位到目标节点
+    // size >> 1 的含义即为：将 size 值除以 2
+    // 如果 index 靠近链表的头部，则从头部向尾部正向遍历查找结点
+    // 如果 index 靠近链表的尾部，则从尾部向头部反向遍历查找结点
+    // 最极端的情况下遍历一半元素才能定位到目标节点
     if (index < (size >> 1)) {
         Node<E> x = first;
-        for (int i = 0; i < index; i++)
-            x = x.next;
+        for (int i = 0; i < index; i++) x = x.next;
         return x;
     } else {
         Node<E> x = last;
-        for (int i = size - 1; i > index; i--)
-            x = x.prev;
+        for (int i = size - 1; i > index; i--) x = x.prev;
         return x;
     }
 }
@@ -782,17 +761,17 @@ Node<E> node(int index) {
 ## 7、几个常用的方法
 
 ```java
-//判断是否包含元素 o
+// 判断是否包含元素 o
 public boolean contains(Object o) {
     return indexOf(o) != -1;
 }
 
-//获取元素个数
+// 获取元素个数
 public int size() {
     return size;
 }
 
-//清空链表元素，将各个结点之间的引用都切断
+// 清空链表元素，将各个结点之间的引用都切断
 public void clear() {
     for (Node<E> x = first; x != null; ) {
         Node<E> next = x.next;
@@ -806,41 +785,37 @@ public void clear() {
     modCount++;
 }
 
-//返回第一个元素值为 o 的结点所在的索引值
-//如果查找不到，则返回 -1
+// 返回第一个元素值为 o 的结点所在的索引值
+// 如果查找不到，则返回 -1
 public int indexOf(Object o) {
     int index = 0;
     if (o == null) {
         for (Node<E> x = first; x != null; x = x.next) {
-            if (x.item == null)
-                return index;
+            if (x.item == null) return index;
             index++;
         }
     } else {
         for (Node<E> x = first; x != null; x = x.next) {
-            if (o.equals(x.item))
-                return index;
+            if (o.equals(x.item)) return index;
             index++;
         }
     }
     return -1;
 }
 
-//返回最后一个元素值为 o 的结点所在的索引值
-//如果查找不到，则返回 -1
+// 返回最后一个元素值为 o 的结点所在的索引值
+// 如果查找不到，则返回 -1
 public int lastIndexOf(Object o) {
     int index = size;
     if (o == null) {
         for (Node<E> x = last; x != null; x = x.prev) {
             index--;
-            if (x.item == null)
-                return index;
+            if (x.item == null) return index;
         }
     } else {
         for (Node<E> x = last; x != null; x = x.prev) {
             index--;
-            if (o.equals(x.item))
-                return index;
+            if (o.equals(x.item)) return index;
         }
     }
     return -1;
@@ -854,75 +829,75 @@ public int lastIndexOf(Object o) {
 其实 Deque 接口中很多方法的含义都是类似的，且一些方法都是相互调用的，并不算复杂
 
 ```java
-//将元素 e 置为头结点
+// 将元素 e 置为头结点
 public void addFirst(E e) {
     linkFirst(e);
 }
 
-//将元素 e 置为尾结点
+// 将元素 e 置为尾结点
 public void addLast(E e) {
     linkLast(e);
 }
 
-//将元素 e 作为尾结点添加
+// 将元素 e 作为尾结点添加
 public boolean offer(E e) {
     return add(e);
 }
 
-//将元素 e 作为头结点添加
+// 将元素 e 作为头结点添加
 public boolean offerFirst(E e) {
     addFirst(e);
     return true;
 }
 
-//将元素 e 作为尾结点添加
+// 将元素 e 作为尾结点添加
 public boolean offerLast(E e) {
     addLast(e);
     return true;
 }
 
-//获取头部结点的元素值
+// 获取头部结点的元素值
 public E peekFirst() {
     final Node<E> f = first;
     return (f == null) ? null : f.item;
 }
 
-//获取尾部结点的元素值
+// 获取尾部结点的元素值
 public E peekLast() {
     final Node<E> l = last;
     return (l == null) ? null : l.item;
 }
 
-//获取头部结点的元素值，并将之从链表中移除
+// 获取头部结点的元素值，并将之从链表中移除
 public E pollFirst() {
     final Node<E> f = first;
     return (f == null) ? null : unlinkFirst(f);
 }
 
-//获取尾部结点的元素值，并将之从链表中移除
+// 获取尾部结点的元素值，并将之从链表中移除
 public E pollLast() {
     final Node<E> l = last;
     return (l == null) ? null : unlinkLast(l);
 }
 
-//将元素 e 作为头结点添加
+// 将元素 e 作为头结点添加
 public void push(E e) {
     addFirst(e);
 }
 
-//获取头部结点的元素值，并将之从链表中移除
+// 获取头部结点的元素值，并将之从链表中移除
 public E pop() {
     return removeFirst();
 }
 
-//从链表头部向尾部正向遍历，移除第一个元素值为 o 的结点
-//如果移除成功则返回 true，否则返回 false
+// 从链表头部向尾部正向遍历，移除第一个元素值为 o 的结点
+// 如果移除成功则返回 true，否则返回 false
 public boolean removeFirstOccurrence(Object o) {
     return remove(o);
 }
 
-//从链表尾部向头部反向遍历，移除第一个元素值为 o 的结点
-//如果移除成功则返回 true，否则返回 false
+// 从链表尾部向头部反向遍历，移除第一个元素值为 o 的结点
+// 如果移除成功则返回 true，否则返回 false
 public boolean removeLastOccurrence(Object o) {
     if (o == null) {
         for (Node<E> x = last; x != null; x = x.prev) {
@@ -997,7 +972,6 @@ public static void main(String[] args) {
     endTime = System.currentTimeMillis();
     System.out.println("遍历 LinkedList 中的10000个元素,用时：" + (endTime - startTime) + "毫秒");
 }
-
 ```
 
 可以看出来两者之间的差距还是非常大的，在使用集合框架前需要根据实际应用场景来决定使用哪一个

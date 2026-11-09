@@ -1,4 +1,4 @@
-> Google Jetpack 自从推出以后，极大地改变了 Android 开发者们的开发模式，并降低了开发难度。这也要求我们对当中一些子组件的实现原理具有一定的了解，所以我就打算来写一系列 Jetpack 源码解析的文章，希望对你有所帮助 🤣🤣🤣
+> Google Jetpack 自从推出以后，极大地改变了 Android 开发者们的开发模式，并降低了开发难度。这也要求我们对当中一些子组件的实现原理具有一定的了解，所以我就打算来写一系列 Jetpack 源码解析的文章，希望对你有所帮助
 
 最近，Google Jetpack 官网上新增了一个名为 [Startup](https://developer.android.com/topic/libraries/app-startup) 的组件。根据官方文档的介绍，Startup 提供了一种直接高效的方式用来在应用程序启动时对多个组件进行初始化，开发者可以依靠它来显式地设置多个组件间的初始化顺序并优化应用的启动时间
 
@@ -20,7 +20,7 @@ Startup 允许 Library 开发者和 App 开发者共享同一个 ContentProvider
 
 假设我们的项目中一共有三个 Library 需要进行初始化。当中，Library A 依赖于 Library B，Library B 依赖于 Library C，Library C 不需要其它依赖项，则此时可以分别为三个 Library 建立三个 `Initializer` 实现类
 
-Initializer 是 Startup 提供的用于声明初始化逻辑和初始化顺序的接口，在 `create(context: Context)`方法中完成初始化过程并返回结果值，在`dependencies()`中指定初始化此 Initializer 前需要先初始化的其它 Initializer 
+Initializer 是 Startup 提供的用于声明初始化逻辑和初始化顺序的接口，在 `create(context: Context)` 方法中完成初始化过程并返回结果值，在 `dependencies()` 中指定初始化此 Initializer 前需要先初始化的其它 Initializer
 
 ```kotlin
 class InitializerA : Initializer<A> {
@@ -67,7 +67,7 @@ Startup 提供了两种初始化方法，分别是自动初始化和手动初始
 
 ## 自动初始化
 
-在 AndroidManifest 文件中对 Startup 提供的 `InitializationProvider` 进行声明，并且用 meta-data 标签声明 Initializer 实现类的包名路径，value 必须是 `androidx.startup`。在这里我们只需要声明 InitializerA 即可，因为 InitializerB 和 InitializerC 均可以通过 InitializerA 的 `dependencies()`方法的返回值链式定位到
+在 AndroidManifest 文件中对 Startup 提供的 `InitializationProvider` 进行声明，并且用 meta-data 标签声明 Initializer 实现类的包名路径，value 必须是 `androidx.startup`。在这里我们只需要声明 InitializerA 即可，因为 InitializerB 和 InitializerC 均可以通过 InitializerA 的 `dependencies()` 方法的返回值链式定位到
 
 ```xml
 <provider
@@ -93,15 +93,15 @@ Startup 提供了两种初始化方法，分别是自动初始化和手动初始
 val result = AppInitializer.getInstance(this).initializeComponent(InitializerA::class.java)
 ```
 
-由于 Startup 内部会缓存 Initializer 的初始化结果值，所以重复调用 `initializeComponent`方法不会导致多次初始化，该方法也可用于自动初始化时获取初始化结果值
+由于 Startup 内部会缓存 Initializer 的初始化结果值，所以重复调用 `initializeComponent` 方法不会导致多次初始化，该方法也可用于自动初始化时获取初始化结果值
 
-如果应用内的所有 Initializer 都不需要进行自动初始化的话，也可以不在 AndroidManifest 中声明 InitializationProvider 
+如果应用内的所有 Initializer 都不需要进行自动初始化的话，也可以不在 AndroidManifest 中声明 InitializationProvider
 
 # 三、注意事项
 
-## 移除 Initializer 
+## 移除 Initializer
 
-假设我们在项目中引入的某个第三方依赖库自身使用到了 Startup 进行自动初始化，我们希望将之改为懒加载的方式，但我们无法直接修改第三方依赖库的 AndroidManifest 文件，此时就可以通过 AndroidManifest 的合并规则来移除指定的 Initializer 
+假设我们在项目中引入的某个第三方依赖库自身使用到了 Startup 进行自动初始化，我们希望将之改为懒加载的方式，但我们无法直接修改第三方依赖库的 AndroidManifest 文件，此时就可以通过 AndroidManifest 的合并规则来移除指定的 Initializer
 
 假设第三方依赖库的 Initializer 的包名路径是 `xxx.xxx.InitializerImpl`，在主项目工程的 AndroidManifest 文件中主动对其进行声明，并添加 `tools:node="remove"` 语句要求在合并 AndroidManifest 文件时移除自身，这样 Startup 就不会自动初始化 InitializerImpl 了
 
@@ -212,7 +212,7 @@ public final class StartupException extends RuntimeException {
 
 ## Initializer
 
-Initiaizer 是 Startup 提供的用于声明初始化逻辑和初始化顺序的接口，在 `create(context: Context)`方法中完成初始化过程并返回结果值，在`dependencies()`中指定初始化此 Initializer 前需要先初始化的其它 Initializer 
+Initiaizer 是 Startup 提供的用于声明初始化逻辑和初始化顺序的接口，在 `create(context: Context)` 方法中完成初始化过程并返回结果值，在 `dependencies()` 中指定初始化此 Initializer 前需要先初始化的其它 Initializer
 
 ```java
 public interface Initializer<T> {
@@ -281,9 +281,7 @@ public final class InitializationProvider extends ContentProvider {
 
     @Override
     public int delete(
-            @NonNull Uri uri,
-            @Nullable String selection,
-            @Nullable String[] selectionArgs) {
+            @NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
         throw new IllegalStateException("Not allowed.");
     }
 
@@ -304,7 +302,7 @@ AppInitializer 是 Startup 整个库的核心重点，整体代码量不足两�
 
 - 由 InitializationProvider 传入 Context 对象以此来获得 AppInitializer 唯一实例，并调用 `discoverAndInitialize()` 方法完成所有的自动初始化逻辑
 - `discoverAndInitialize()` 方法会先对 InitializationProvider 进行解析，获取到包含的所有 metadata，然后按声明顺序依次反射构建每个 metadata 指向的 Initializer 对象
-- 当在初始化某个 Initializer 对象之前，会首先判断其关联的依赖项 dependencies 是否为空。如果为空的话则直接调用其 `create(Context)` 方法进行初始化。如果不为空的话则先对 dependencies 进行初始化，对每个 dependency 均重复此遍历操作，直到不包含  dependencies 的 Initializer 最先初始化完成后才原路返回依次进行初始化，从而保证了 Initializer 之间初始化顺序的有序性
+- 当在初始化某个 Initializer 对象之前，会首先判断其关联的依赖项 dependencies 是否为空。如果为空的话则直接调用其 `create(Context)` 方法进行初始化。如果不为空的话则先对 dependencies 进行初始化，对每个 dependency 均重复此遍历操作，直到不包含 dependencies 的 Initializer 最先初始化完成后才原路返回依次进行初始化，从而保证了 Initializer 之间初始化顺序的有序性
 - 当存在这几种情况时，Startup 会抛出异常：Initializer 实现类不包含无参构造方法、Initializer 之间存在循环依赖关系、Initializer 的初始化过程（`create(Context)` 方法）抛出了异常
 
 AppInitializer 对外开放了 `getInstance(@NonNull Context context)` 方法用于获取唯一的静态实例
@@ -369,35 +367,36 @@ void discoverAndInitialize() {
     try {
         Trace.beginSection(SECTION_NAME);
 
-        //获取 InitializationProvider 包含的所有 metadata
-        ComponentName provider = new ComponentName(mContext.getPackageName(),
-                InitializationProvider.class.getName());
-        ProviderInfo providerInfo = mContext.getPackageManager()
-                .getProviderInfo(provider, GET_META_DATA);
+        // 获取 InitializationProvider 包含的所有 metadata
+        ComponentName provider =
+                new ComponentName(
+                        mContext.getPackageName(), InitializationProvider.class.getName());
+        ProviderInfo providerInfo =
+                mContext.getPackageManager().getProviderInfo(provider, GET_META_DATA);
         Bundle metadata = providerInfo.metaData;
 
-        //获取到字符串 androidx.startup
-        //因为 Startup 是以该字符串作为 metaData 的固定 value 来进行遍历的
-        //所以如果在 AndroidManifest 文件中声明了不同 value 则不会被初始化
+        // 获取到字符串 androidx.startup
+        // 因为 Startup 是以该字符串作为 metaData 的固定 value 来进行遍历的
+        // 所以如果在 AndroidManifest 文件中声明了不同 value 则不会被初始化
         String startup = mContext.getString(R.string.androidx_startup);
 
         if (metadata != null) {
-            //用于标记正在准备进行初始化的 Initializer
-            //用于判断是否存在循环依赖的情况
+            // 用于标记正在准备进行初始化的 Initializer
+            // 用于判断是否存在循环依赖的情况
             Set<Class<?>> initializing = new HashSet<>();
             Set<String> keys = metadata.keySet();
             for (String key : keys) {
                 String value = metadata.getString(key, null);
                 if (startup.equals(value)) {
                     Class<?> clazz = Class.forName(key);
-                    //确保 metaData 声明的包名路径指向的是 Initializer 的实现类
+                    // 确保 metaData 声明的包名路径指向的是 Initializer 的实现类
                     if (Initializer.class.isAssignableFrom(clazz)) {
                         Class<? extends Initializer<?>> component =
                                 (Class<? extends Initializer<?>>) clazz;
                         if (StartupLogger.DEBUG) {
                             StartupLogger.i(String.format("Discovered %s", key));
                         }
-                        //进行实际的初始化过程
+                        // 进行实际的初始化过程
                         doInitialize(component, initializing);
                     }
                 }
@@ -411,7 +410,7 @@ void discoverAndInitialize() {
 }
 ```
 
-`doInitialize()` 方法是实际调用了 Initializer 的 `create(context: Context)`的地方，其主要逻辑就是通过嵌套调用的方式来完成所有依赖项的初始化，当判断出存在循环依赖的情况时将抛出异常
+`doInitialize()` 方法是实际调用了 Initializer 的 `create(context: Context)` 的地方，其主要逻辑就是通过嵌套调用的方式来完成所有依赖项的初始化，当判断出存在循环依赖的情况时将抛出异常
 
 ```java
 @NonNull
@@ -427,28 +426,28 @@ void discoverAndInitialize() {
                 Trace.beginSection(component.getSimpleName());
             }
             if (initializing.contains(component)) {
-                //initializing 包含 component，说明 Initializer 之间存在循环依赖
-                //直接抛出异常
-                String message = String.format(
-                        "Cannot initialize %s. Cycle detected.", component.getName()
-                );
+                // initializing 包含 component，说明 Initializer 之间存在循环依赖
+                // 直接抛出异常
+                String message =
+                        String.format(
+                                "Cannot initialize %s. Cycle detected.", component.getName());
                 throw new IllegalStateException(message);
             }
             Object result;
             if (!mInitialized.containsKey(component)) {
-                //如果 mInitialized 不包含 component
-                //说明 component 指向的 Initializer 还未进行初始化
+                // 如果 mInitialized 不包含 component
+                // 说明 component 指向的 Initializer 还未进行初始化
                 initializing.add(component);
                 try {
-                    //通过反射调用 component 的无参构造方法并初始化
+                    // 通过反射调用 component 的无参构造方法并初始化
                     Object instance = component.getDeclaredConstructor().newInstance();
                     Initializer<?> initializer = (Initializer<?>) instance;
-                    //获取 initializer 的依赖项
+                    // 获取 initializer 的依赖项
                     List<Class<? extends Initializer<?>>> dependencies =
                             initializer.dependencies();
 
-                    //如果 initializer 的依赖项 dependencies 不为空
-                    //则遍历 dependencies 每个 item 进行初始化
+                    // 如果 initializer 的依赖项 dependencies 不为空
+                    // 则遍历 dependencies 每个 item 进行初始化
                     if (!dependencies.isEmpty()) {
                         for (Class<? extends Initializer<?>> clazz : dependencies) {
                             if (!mInitialized.containsKey(clazz)) {
@@ -459,22 +458,22 @@ void discoverAndInitialize() {
                     if (StartupLogger.DEBUG) {
                         StartupLogger.i(String.format("Initializing %s", component.getName()));
                     }
-                    //进行初始化
+                    // 进行初始化
                     result = initializer.create(mContext);
                     if (StartupLogger.DEBUG) {
                         StartupLogger.i(String.format("Initialized %s", component.getName()));
                     }
-                    //将已经进行初始化的 component 从 initializing 中移除掉
-                    //避免误判循环依赖
+                    // 将已经进行初始化的 component 从 initializing 中移除掉
+                    // 避免误判循环依赖
                     initializing.remove(component);
-                    //将初始化结果保存起来
+                    // 将初始化结果保存起来
                     mInitialized.put(component, result);
                 } catch (Throwable throwable) {
                     throw new StartupException(throwable);
                 }
             } else {
-                //component 指向的 Initializer 已经进行初始化
-                //此处直接获取缓存值直接返回即可
+                // component 指向的 Initializer 已经进行初始化
+                // 此处直接获取缓存值直接返回即可
                 result = mInitialized.get(component);
             }
             return (T) result;

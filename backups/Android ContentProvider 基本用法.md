@@ -8,8 +8,8 @@ ContentProvider是Android系统中提供的专门用户不同应用间进行数�
 在 Context.java 的源码中如下抽象方法
 
 ```java
-    /** Return a ContentResolver instance for your application's package. */
-    public abstract ContentResolver getContentResolver();
+/** Return a ContentResolver instance for your application's package. */
+public abstract ContentResolver getContentResolver();
 ```
 所以可以在所有继承Context的类中通过 getContentResovler() 方法获取ContentResolver
 
@@ -26,8 +26,7 @@ ContentProvider中的几个抽象方法在ContentResolver中均有着一一对�
 ```java
 public class MyContentProvider extends ContentProvider {
 
-    public MyContentProvider() {
-    }
+    public MyContentProvider() {}
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
@@ -55,21 +54,22 @@ public class MyContentProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection,
-                        String[] selectionArgs, String sortOrder) {
+    public Cursor query(
+            Uri uri,
+            String[] projection,
+            String selection,
+            String[] selectionArgs,
+            String sortOrder) {
         // TODO: Implement this to handle query requests from clients.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection,
-                      String[] selectionArgs) {
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         // TODO: Implement this to handle requests to update one or more rows.
         throw new UnsupportedOperationException("Not yet implemented");
     }
-    
 }
-
 ```
 之后，需要在AdnroidManifest.xml中对ContentProvider进行注册
 
@@ -121,25 +121,29 @@ URI 代表了要操作的数据对象，主要包含了两部分信息：
 ```java
 public class DbOpenHelper extends SQLiteOpenHelper {
 
-    //数据库名
+    // 数据库名
     private static final String DATA_BASE_NAME = "book.db";
 
-    //数据库版本号
+    // 数据库版本号
     private static final int DATE_BASE_VERSION = 1;
 
-    //表名-书
+    // 表名-书
     public static final String BOOK_TABLE_NAME = "book";
 
-    //表名-用户
+    // 表名-用户
     public static final String USER_TABLE_NAME = "user";
 
-    //创建表-书（两列：主键自增长、书名）
-    private final String CREATE_BOOK_TABLE = "create table " + BOOK_TABLE_NAME
-            + "(_id integer primary key autoincrement, bookName text)";
+    // 创建表-书（两列：主键自增长、书名）
+    private final String CREATE_BOOK_TABLE =
+            "create table "
+                    + BOOK_TABLE_NAME
+                    + "(_id integer primary key autoincrement, bookName text)";
 
-    //创建表-用户（三列：主键自增长、用户名、性别）
-    private final String CREATE_USER_TABLE = "create table " + USER_TABLE_NAME
-            + "(_id integer primary key autoincrement, userName text, sex text)";
+    // 创建表-用户（三列：主键自增长、用户名、性别）
+    private final String CREATE_USER_TABLE =
+            "create table "
+                    + USER_TABLE_NAME
+                    + "(_id integer primary key autoincrement, userName text, sex text)";
 
     public DbOpenHelper(Context context) {
         super(context, DATA_BASE_NAME, null, DATE_BASE_VERSION);
@@ -152,10 +156,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-    }
-
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 }
 ```
 自定义ContentProvider
@@ -195,9 +196,7 @@ public class BookProvider extends ContentProvider {
         return tableName;
     }
 
-    public BookProvider() {
-
-    }
+    public BookProvider() {}
 
     @Override
     public boolean onCreate() {
@@ -206,7 +205,7 @@ public class BookProvider extends ContentProvider {
         return false;
     }
 
-    //初始化原始数据
+    // 初始化原始数据
     private void initProviderData() {
         sqLiteDatabase = new DbOpenHelper(context).getWritableDatabase();
         sqLiteDatabase.beginTransaction();
@@ -249,12 +248,18 @@ public class BookProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(
+            Uri uri,
+            String[] projection,
+            String selection,
+            String[] selectionArgs,
+            String sortOrder) {
         String tableName = getTableName(uri);
         if (tableName == null) {
             throw new IllegalArgumentException("Unsupported URI:" + uri);
         }
-        return sqLiteDatabase.query(tableName, projection, selection, selectionArgs, null, null, sortOrder, null);
+        return sqLiteDatabase.query(
+                tableName, projection, selection, selectionArgs, null, null, sortOrder, null);
     }
 
     @Override
@@ -282,7 +287,6 @@ public class BookProvider extends ContentProvider {
         }
         return count;
     }
-
 }
 ```
 注册ContentProvider
@@ -307,11 +311,17 @@ public class MainActivity extends AppCompatActivity {
         ContentValues contentValues = new ContentValues();
         contentValues.put("bookName", "叫什么名字好呢");
         getContentResolver().insert(bookUri, contentValues);
-        Cursor bookCursor = getContentResolver().query(bookUri, new String[]{"_id", "bookName"}, null, null, null);
+        Cursor bookCursor =
+                getContentResolver()
+                        .query(bookUri, new String[] {"_id", "bookName"}, null, null, null);
         if (bookCursor != null) {
             while (bookCursor.moveToNext()) {
-                Log.e(TAG, "ID:" + bookCursor.getInt(bookCursor.getColumnIndex("_id"))
-                        + "  BookName:" + bookCursor.getString(bookCursor.getColumnIndex("bookName")));
+                Log.e(
+                        TAG,
+                        "ID:"
+                                + bookCursor.getInt(bookCursor.getColumnIndex("_id"))
+                                + "  BookName:"
+                                + bookCursor.getString(bookCursor.getColumnIndex("bookName")));
             }
             bookCursor.close();
         }
@@ -321,17 +331,23 @@ public class MainActivity extends AppCompatActivity {
         contentValues.put("userName", "叶叶叶");
         contentValues.put("sex", "男");
         getContentResolver().insert(userUri, contentValues);
-        Cursor userCursor = getContentResolver().query(userUri, new String[]{"_id", "userName", "sex"}, null, null, null);
+        Cursor userCursor =
+                getContentResolver()
+                        .query(userUri, new String[] {"_id", "userName", "sex"}, null, null, null);
         if (userCursor != null) {
             while (userCursor.moveToNext()) {
-                Log.e(TAG, "ID:" + userCursor.getInt(userCursor.getColumnIndex("_id"))
-                        + "  UserName:" + userCursor.getString(userCursor.getColumnIndex("userName"))
-                        + "  Sex:" + userCursor.getString(userCursor.getColumnIndex("sex")));
+                Log.e(
+                        TAG,
+                        "ID:"
+                                + userCursor.getInt(userCursor.getColumnIndex("_id"))
+                                + "  UserName:"
+                                + userCursor.getString(userCursor.getColumnIndex("userName"))
+                                + "  Sex:"
+                                + userCursor.getString(userCursor.getColumnIndex("sex")));
             }
             userCursor.close();
         }
     }
-
 }
 ```
 得到的输出结果是：
@@ -352,71 +368,94 @@ public class MainActivity extends AppCompatActivity {
 
 ```java
 public void showContacts(View view) {
-        ContentResolver contentResolver = getContentResolver();
-        Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        if (cursor == null) {
-            tv_contacts.setText("显示联系人错误");
-            return;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        while (cursor.moveToNext()) {
-            stringBuilder.append("ID：");
-            String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-            stringBuilder.append(contactId);
-
-            stringBuilder.append("\t\t");
-            stringBuilder.append("名字：");
-            String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-            stringBuilder.append(contactName);
-
-            // 根据联系人ID查询对应的电话号码
-            Cursor phonesCursor = contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                    null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId, null, null);
-            // 取得电话号码(可能会存在多个号码)
-            if (phonesCursor != null) {
-                stringBuilder.append("\t\t");
-                stringBuilder.append("号码：");
-                while (phonesCursor.moveToNext()) {
-                    String phoneNumber = phonesCursor.getString(phonesCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    stringBuilder.append(phoneNumber);
-                    stringBuilder.append("\n");
-                }
-                phonesCursor.close();
-            }
-        }
-        cursor.close();
-        tv_contacts.setText(stringBuilder.toString());
+    ContentResolver contentResolver = getContentResolver();
+    Cursor cursor =
+            contentResolver.query(
+                    ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+    if (cursor == null) {
+        tv_contacts.setText("显示联系人错误");
+        return;
     }
+    StringBuilder stringBuilder = new StringBuilder();
+    while (cursor.moveToNext()) {
+        stringBuilder.append("ID：");
+        String contactId =
+                cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+        stringBuilder.append(contactId);
+
+        stringBuilder.append("\t\t");
+        stringBuilder.append("名字：");
+        String contactName =
+                cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+        stringBuilder.append(contactName);
+
+        // 根据联系人ID查询对应的电话号码
+        Cursor phonesCursor =
+                contentResolver.query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId,
+                        null,
+                        null);
+        // 取得电话号码(可能会存在多个号码)
+        if (phonesCursor != null) {
+            stringBuilder.append("\t\t");
+            stringBuilder.append("号码：");
+            while (phonesCursor.moveToNext()) {
+                String phoneNumber =
+                        phonesCursor.getString(
+                                phonesCursor.getColumnIndex(
+                                        ContactsContract.CommonDataKinds.Phone.NUMBER));
+                stringBuilder.append(phoneNumber);
+                stringBuilder.append("\n");
+            }
+            phonesCursor.close();
+        }
+    }
+    cursor.close();
+    tv_contacts.setText(stringBuilder.toString());
+}
 ```
 添加指定名字的联系人
 
 ```java
- public void addContact(View view) {
-        ContentValues values = new ContentValues();
-        //首先向RawContacts.CONTENT_URI执行一个空值插入，目的是获取系统返回的rawContactId
-        Uri rawContactUri = getContentResolver().insert(ContactsContract.RawContacts.CONTENT_URI, values);
-        long rawContactId = ContentUris.parseId(rawContactUri);
-        //往data表入姓名数据
-        values.clear();
-        values.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);
-        values.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
-        values.put(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, "leavesc");
-        getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
-        //往data表入电话数据
-        values.clear();
-        values.put(android.provider.ContactsContract.Contacts.Data.RAW_CONTACT_ID, rawContactId);
-        values.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
-        values.put(ContactsContract.CommonDataKinds.Phone.NUMBER, "19950724");
-        values.put(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
-        getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
-        //往data表入Email数据
-        values.clear();
-        values.put(android.provider.ContactsContract.Contacts.Data.RAW_CONTACT_ID, rawContactId);
-        values.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE);
-        values.put(ContactsContract.CommonDataKinds.Email.DATA, "qq@qq.com");
-        values.put(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_WORK);
-        getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
-    }
+public void addContact(View view) {
+    ContentValues values = new ContentValues();
+    // 首先向RawContacts.CONTENT_URI执行一个空值插入，目的是获取系统返回的rawContactId
+    Uri rawContactUri =
+            getContentResolver().insert(ContactsContract.RawContacts.CONTENT_URI, values);
+    long rawContactId = ContentUris.parseId(rawContactUri);
+    // 往data表入姓名数据
+    values.clear();
+    values.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);
+    values.put(
+            ContactsContract.Data.MIMETYPE,
+            ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
+    values.put(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, "leavesc");
+    getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
+    // 往data表入电话数据
+    values.clear();
+    values.put(android.provider.ContactsContract.Contacts.Data.RAW_CONTACT_ID, rawContactId);
+    values.put(
+            ContactsContract.Data.MIMETYPE,
+            ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+    values.put(ContactsContract.CommonDataKinds.Phone.NUMBER, "19950724");
+    values.put(
+            ContactsContract.CommonDataKinds.Phone.TYPE,
+            ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
+    getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
+    // 往data表入Email数据
+    values.clear();
+    values.put(android.provider.ContactsContract.Contacts.Data.RAW_CONTACT_ID, rawContactId);
+    values.put(
+            ContactsContract.Data.MIMETYPE,
+            ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE);
+    values.put(ContactsContract.CommonDataKinds.Email.DATA, "qq@qq.com");
+    values.put(
+            ContactsContract.CommonDataKinds.Email.TYPE,
+            ContactsContract.CommonDataKinds.Email.TYPE_WORK);
+    getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
+}
 ```
 需要添加联系人读写权限
 

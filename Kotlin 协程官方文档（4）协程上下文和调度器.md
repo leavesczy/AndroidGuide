@@ -1,5 +1,5 @@
 > 最近一直在了解关于 **Kotlin协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
-> 
+>
 > 协程官方文档：[coroutines-guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/coroutines-guide.md)
 
 协程总是在由 Kotlin 标准库中定义的 CoroutineContext 表示的某个上下文中执行
@@ -56,7 +56,7 @@ newSingleThreadContext 用于为协程专门创建一个新的线程来运行。
 
 Dispatchers.Unconfined 调度器在调用者线程中启动一个协程，但它仅仅只是运行到第一个挂起点。在挂起之后，它将恢复线程中的协程，该协程完全由调用的挂起函数决定。Unconfined 调度器适用于既不消耗CPU时间和不更新任何受限于特定线程的共享数据（如UI）的协程
 
-另一方面，调度器是默认继承于外部的协程作用域的。尤其是 runBlocking 启动的协程的调度器只能是调用者所在的线程，因此继承 runBlocking 的结果是在此线程上的调度执行操作是可预测的 FIFO 
+另一方面，调度器是默认继承于外部的协程作用域的。尤其是 runBlocking 启动的协程的调度器只能是调用者所在的线程，因此继承 runBlocking 的结果是在此线程上的调度执行操作是可预测的 FIFO
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -88,7 +88,7 @@ main runBlocking: After delay in thread main
 
 因此，从 ```runBlocking{...}``` 继承了上下文的协程继续在主线程中执行，而调度器是 unconfined 的协程，在 delay 函数之后的代码则默认运行于 delay 函数所使用的运行线程
 
->  unconfined 调度器是一种高级机制，可以在某些极端情况下提供帮助而不需要调度协程以便稍后执行或产生不希望的副作用， 因为某些操作必须立即在协程中执行。 非受限调度器不应该在一般的代码中使用
+> unconfined 调度器是一种高级机制，可以在某些极端情况下提供帮助而不需要调度协程以便稍后执行或产生不希望的副作用， 因为某些操作必须立即在协程中执行。 非受限调度器不应该在一般的代码中使用
 
 # 三、调试协程和线程
 
@@ -166,7 +166,7 @@ fun main() {
 
 # 五、上下文中的 Job
 
-协程中的 Job 是其上下文中的一部分，可以通过 ```coroutineContext[Job]```  表达式从上下文中获取到
+协程中的 Job 是其上下文中的一部分，可以通过 ```coroutineContext[Job]``` 表达式从上下文中获取到
 
 ```kotlin
 import kotlinx.coroutines.*

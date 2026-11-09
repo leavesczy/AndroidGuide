@@ -1,4 +1,4 @@
-> 目前，多线程编程可以说是在大部分平台和应用上都需要实现的一个基本需求。本系列文章就来对 **Java 平台下的多线程编程知识** 进行讲解，从 **概念入门**、**底层实现** 到 **上层应用** 都会涉及到，预计一共会有五篇文章，希望对你有所帮助 😎😎😎
+> 目前，多线程编程可以说是在大部分平台和应用上都需要实现的一个基本需求。本系列文章就来对 **Java 平台下的多线程编程知识** 进行讲解，从 **概念入门**、**底层实现** 到 **上层应用** 都会涉及到，预计一共会有五篇文章，希望对你有所帮助
 >
 > 本篇文章是第四篇，来介绍 Java 平台下的锁机制，锁是 Java 开发者实现线程同步最为简单的一种方式
 
@@ -34,18 +34,17 @@ CAS 算法涉及到三个操作数：
 
 ```java
 public class AtomicInteger extends Number implements java.io.Serializable {
-  
-  private static final Unsafe unsafe = Unsafe.getUnsafe();
-  
-  /**
-    * Atomically increments by one the current value.
-    *
-    * @return the updated value
-   */
-  public final int incrementAndGet() {
-  		return unsafe.getAndAddInt(this, valueOffset, 1) + 1;
-  }
-  
+
+    private static final Unsafe unsafe = Unsafe.getUnsafe();
+
+    /**
+     * Atomically increments by one the current value.
+     *
+     * @return the updated value
+     */
+    public final int incrementAndGet() {
+        return unsafe.getAndAddInt(this, valueOffset, 1) + 1;
+    }
 }
 ```
 
@@ -76,9 +75,7 @@ private synchronized void doSomething1() {
     doSomething2();
 }
 
-private synchronized void doSomething2() {
-
-}
+private synchronized void doSomething2() {}
 ```
 
 这里也以 ReentrantLock 作为例子来从看下其重入流程
@@ -164,16 +161,14 @@ protected final int tryAcquireShared(int unused) {
     Thread current = Thread.currentThread();
     int c = getState();
     if (exclusiveCount(c) != 0 && getExclusiveOwnerThread() != current)
-        //如果当前已经有线程持有了写锁，且该线程并非当前线程
-        //则返回 -1，表示读锁获取失败
-        //这里之所以要判断线程是否相等，是因为 ReentrantReadWriteLock 支持锁的降级，可以在已经持有写锁的时候申请读锁
+        // 如果当前已经有线程持有了写锁，且该线程并非当前线程
+        // 则返回 -1，表示读锁获取失败
+        // 这里之所以要判断线程是否相等，是因为 ReentrantReadWriteLock 支持锁的降级，可以在已经持有写锁的时候申请读锁
         return -1;
 
-    //下面就是多个线程前来申请读锁或者是同个线程多次申请读锁的流程了
+    // 下面就是多个线程前来申请读锁或者是同个线程多次申请读锁的流程了
     int r = sharedCount(c);
-    if (!readerShouldBlock() &&
-        r < MAX_COUNT &&
-        compareAndSetState(c, c + SHARED_UNIT)) {
+    if (!readerShouldBlock() && r < MAX_COUNT && compareAndSetState(c, c + SHARED_UNIT)) {
         if (r == 0) {
             firstReader = current;
             firstReaderHoldCount = 1;
@@ -183,8 +178,7 @@ protected final int tryAcquireShared(int unused) {
             HoldCounter rh = cachedHoldCounter;
             if (rh == null || rh.tid != getThreadId(current))
                 cachedHoldCounter = rh = readHolds.get();
-            else if (rh.count == 0)
-                readHolds.set(rh);
+            else if (rh.count == 0) readHolds.set(rh);
             rh.count++;
         }
         return 1;
@@ -200,29 +194,25 @@ protected final boolean tryReleaseShared(int unused) {
     Thread current = Thread.currentThread();
     if (firstReader == current) {
         // assert firstReaderHoldCount > 0;
-        if (firstReaderHoldCount == 1)
-            firstReader = null;
-        else
-            firstReaderHoldCount--;
+        if (firstReaderHoldCount == 1) firstReader = null;
+        else firstReaderHoldCount--;
     } else {
         HoldCounter rh = cachedHoldCounter;
-        if (rh == null || rh.tid != getThreadId(current))
-            rh = readHolds.get();
+        if (rh == null || rh.tid != getThreadId(current)) rh = readHolds.get();
         int count = rh.count;
         if (count <= 1) {
             readHolds.remove();
-            if (count <= 0)
-                throw unmatchedUnlockException();
+            if (count <= 0) throw unmatchedUnlockException();
         }
         --rh.count;
     }
-    for (;;) {
+    for (; ; ) {
         int c = getState();
-        //SHARED_UNIT 等于 1 << 16
-        //c - SHARED_UNIT 就想当于 c 的高16位减1，低16位保持不变
-        //从而使得读线程数量减1，写线程数量不变
+        // SHARED_UNIT 等于 1 << 16
+        // c - SHARED_UNIT 就想当于 c 的高16位减1，低16位保持不变
+        // 从而使得读线程数量减1，写线程数量不变
         int nextc = c - SHARED_UNIT;
-        //通过 CAS 来更新 state
+        // 通过 CAS 来更新 state
         if (compareAndSetState(c, nextc))
             // Releasing the read lock has no effect on readers,
             // but it may allow waiting writers to proceed if
@@ -251,26 +241,23 @@ protected final boolean tryAcquire(int acquires) {
      */
     Thread current = Thread.currentThread();
     int c = getState();
-    int w = exclusiveCount(c); //获取当前写线程数量
+    int w = exclusiveCount(c); // 获取当前写线程数量
     if (c != 0) {
         // (Note: if c != 0 and w == 0 then shared count != 0)
-        //1. 如果 c != 0 && w == 0 成立，说明当前存在读线程，返回 false，写锁获取失败
-        //2. 如果 c != 0 && w != 0 && current != getExclusiveOwnerThread() 成立
-        //说明当前写锁已经被持有了，且持有写锁的线程并非当前线程，返回 false，写锁获取失败
-        if (w == 0 || current != getExclusiveOwnerThread())
-            return false;
+        // 1. 如果 c != 0 && w == 0 成立，说明当前存在读线程，返回 false，写锁获取失败
+        // 2. 如果 c != 0 && w != 0 && current != getExclusiveOwnerThread() 成立
+        // 说明当前写锁已经被持有了，且持有写锁的线程并非当前线程，返回 false，写锁获取失败
+        if (w == 0 || current != getExclusiveOwnerThread()) return false;
         if (w + exclusiveCount(acquires) > MAX_COUNT)
             throw new Error("Maximum lock count exceeded");
         // Reentrant acquire
-        //能走到这一步，说明当前线程已经持有了写锁，由于写锁是可重入的
-        //所以这里这里更新下写锁被持有的次数后就返回了 true
+        // 能走到这一步，说明当前线程已经持有了写锁，由于写锁是可重入的
+        // 所以这里这里更新下写锁被持有的次数后就返回了 true
         setState(c + acquires);
         return true;
     }
-    //能走到这一步，说明当前写锁还未被持有，则根据读写锁的公平性与否来完成写锁的申请
-    if (writerShouldBlock() ||
-        !compareAndSetState(c, c + acquires))
-        return false;
+    // 能走到这一步，说明当前写锁还未被持有，则根据读写锁的公平性与否来完成写锁的申请
+    if (writerShouldBlock() || !compareAndSetState(c, c + acquires)) return false;
     setExclusiveOwnerThread(current);
     return true;
 }
@@ -281,13 +268,13 @@ protected final boolean tryAcquire(int acquires) {
 ```java
 protected final boolean tryRelease(int releases) {
     if (!isHeldExclusively())
-         //如果当前线程并非写锁的持有线程，则抛出异常
+        // 如果当前线程并非写锁的持有线程，则抛出异常
         throw new IllegalMonitorStateException();
     int nextc = getState() - releases;
-    //由于写锁是可重入的，所以这里也要判断线程是否已经撤销了所有的申请操作
+    // 由于写锁是可重入的，所以这里也要判断线程是否已经撤销了所有的申请操作
     boolean free = exclusiveCount(nextc) == 0;
     if (free)
-        //只有在写锁已经撤销了所有的申请操作后才会真正释放锁
+        // 只有在写锁已经撤销了所有的申请操作后才会真正释放锁
         setExclusiveOwnerThread(null);
     setState(nextc);
     return free;
@@ -324,7 +311,7 @@ protected final boolean tryRelease(int releases) {
 
 ## 2、偏向锁
 
-JVM 在实现  monitorenter（申请锁） 和 monitorexit（释放锁） 这两个字节码指令时需要借助一个原子操作（CAS 操作），这个操作代价相对来说比较昂贵。而如果在一段时间内一个锁实例先后只会由同一个线程来申请并使用的话，那么该线程每次申请和释放锁的代价就会被放大，显得很不值得了。而偏向锁的实现出发点就基于这么一种观测结果：大多数锁并没有被争用，并且在其整个生命周期内总是同一个线程来进行申请
+JVM 在实现 monitorenter（申请锁） 和 monitorexit（释放锁） 这两个字节码指令时需要借助一个原子操作（CAS 操作），这个操作代价相对来说比较昂贵。而如果在一段时间内一个锁实例先后只会由同一个线程来申请并使用的话，那么该线程每次申请和释放锁的代价就会被放大，显得很不值得了。而偏向锁的实现出发点就基于这么一种观测结果：大多数锁并没有被争用，并且在其整个生命周期内总是同一个线程来进行申请
 
 偏向锁的执行流程是这样的：
 
@@ -359,7 +346,7 @@ JVM 在实现  monitorenter（申请锁） 和 monitorexit（释放锁） 这两
 
 锁消除是 JIT 编译器对内部锁的具体实现所做的一种优化。在动态编译同步块的时候，编译器会借助**逃逸分析**技术来判断同步块所使用的锁对象是否只会被一个线程使用。如果判断出该锁对象的确只能被一个线程访问，编译器在编译这个同步块的时候就不会生成 synchronize 所表示的 monitorenter 和 monitorexit 两个机器码，而仅生成临界区内的代码所对应的机器码，从而消除了锁的使用。这种优化措施就称为锁消除，锁消除使得在特定情况下可以完全消除锁的开销
 
-例如，对于以下方法。StringBuffer 类本身是线程安全的，其内部多个方法（例如，append 方法）都使用到了内部锁，而在`toJson()`方法里 StringBuffer 是作为一个局部变量存在的，并不会存在多个线程同时访问的情况，此时 append 方法所使用到的内部锁就成了一种无谓的消耗。所以，编译器在编译 toJson 方法的时候就会将其调用的 StringBuffer.append 方法内联到该方法之中，相当于把 StringBuffer.append 方法的方法体中的指令复制到 toJson 方法体中，此时就可以避免 append 方法所声明的内部锁所带来的消耗
+例如，对于以下方法。StringBuffer 类本身是线程安全的，其内部多个方法（例如，append 方法）都使用到了内部锁，而在 `toJson()` 方法里 StringBuffer 是作为一个局部变量存在的，并不会存在多个线程同时访问的情况，此时 append 方法所使用到的内部锁就成了一种无谓的消耗。所以，编译器在编译 toJson 方法的时候就会将其调用的 StringBuffer.append 方法内联到该方法之中，相当于把 StringBuffer.append 方法的方法体中的指令复制到 toJson 方法体中，此时就可以避免 append 方法所声明的内部锁所带来的消耗
 
 ```java
 public String toJson() {
@@ -378,7 +365,7 @@ public String toJson() {
 例如，对于以下代码。通过锁粗化技术就可以将多个同步代码块合并为一个，且同步代码块之间的代码也会被合并在一起，使得临界区的长度变长。而原本在锁 lockX 的持有线程执行完第一个同步代码块之后（即释放 lockX 后），其它等待线程是有机会获得 lockX 的，但是经过锁粗化后使得 lockX 的持有线程只有执行完全部同步代码块之后才会释放 lockX，使得等待线程申请 lockX 的时间相应变长了。因此，为了避免一个线程持有锁的时间过长，锁粗化不会被应用到循环体内的相邻同步代码块
 
 ```java
-//锁粗化前
+// 锁粗化前
 public void test() {
     synchronized (lockX) {
         doSomethind1();
@@ -393,7 +380,7 @@ public void test() {
     }
 }
 
-//锁粗化后
+// 锁粗化后
 public void test() {
     synchronized (lockX) {
         doSomethind1();
@@ -443,7 +430,6 @@ class Printer {
             System.out.println(msg);
         }
     }
-
 }
 
 class LogPrinter {
@@ -460,10 +446,9 @@ class LogPrinter {
             printer.print(msg);
         }
     }
-
 }
 ```
 
 # 十、参考资料
 
-1. [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html) 
+1. [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)

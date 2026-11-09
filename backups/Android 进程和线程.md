@@ -71,12 +71,14 @@ Android 系统会尽量长时间地保持应用进程，但为了新建进程或
 
 ```java
 public void onClick(View v) {
-    new Thread(new Runnable() {
-        public void run() {
-            Bitmap b = loadImageFromNetwork("http://example.com/image.png");
-            mImageView.setImageBitmap(b);
-        }
-    }).start();
+    new Thread(
+                    new Runnable() {
+                        public void run() {
+                            Bitmap b = loadImageFromNetwork("http://example.com/image.png");
+                            mImageView.setImageBitmap(b);
+                        }
+                    })
+            .start();
 }
 ```
 可以看出它创建了一个新线程来处理网络操作，但是它违反了单线程模式的第二条规则：不要在 UI 线程之外访问 Android UI 工具包。在工作线程中修改了 ImageView， 这将使应用运行时出现错误
@@ -91,16 +93,20 @@ public void onClick(View v) {
 
 ```java
 public void onClick(View v) {
-    new Thread(new Runnable() {
-        public void run() {
-            final Bitmap bitmap = loadImageFromNetwork("http://example.com/image.png");
-            mImageView.post(new Runnable() {
-                public void run() {
-                    mImageView.setImageBitmap(bitmap);
-                }
-            });
-        }
-    }).start();
+    new Thread(
+                    new Runnable() {
+                        public void run() {
+                            final Bitmap bitmap =
+                                    loadImageFromNetwork("http://example.com/image.png");
+                            mImageView.post(
+                                    new Runnable() {
+                                        public void run() {
+                                            mImageView.setImageBitmap(bitmap);
+                                        }
+                                    });
+                        }
+                    })
+            .start();
 }
 ```
 现在，上述实现属于线程安全型：在单独的线程中完成网络操作，而在 UI 线程中操纵 ImageView
@@ -115,7 +121,7 @@ public void onClick(View v) {
 }
 
 private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
- 
+
     protected Bitmap doInBackground(String... urls) {
         return loadImageFromNetwork(urls[0]);
     }
@@ -123,7 +129,6 @@ private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     protected void onPostExecute(Bitmap result) {
         mImageView.setImageBitmap(result);
     }
-	
 }
 ```
 

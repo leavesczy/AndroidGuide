@@ -1,4 +1,4 @@
-> 本系列文章会陆续对 Java 和 Android 的集合框架（JDK 1.8，Android SDK 30）中的几个常见容器结合源码进行介绍，了解不同容器在**数据结构、适用场景、优势点**上的不同，希望对你有所帮助 🤣🤣🤣
+> 本系列文章会陆续对 Java 和 Android 的集合框架（JDK 1.8，Android SDK 30）中的几个常见容器结合源码进行介绍，了解不同容器在**数据结构、适用场景、优势点**上的不同，希望对你有所帮助
 
 本篇文章再来分析下 SparseArray 和 ArrayMap 这两个 Android 系统独有的集合框架类，这两个容器在使用上类似于 HashMap，都是用于存储键值对。由于 Android 系统对于内存比较敏感，所以 SparseArray 和 ArrayMap 在内存使用方面会比较克制，这里就来分析下其实现原理和优势点
 
@@ -43,19 +43,19 @@ public class SparseArray<E> implements Cloneable
 `mGarbage` 是 SparseArray 的一个优化点之一，用于标记**当前是否有需要垃圾回收(GC)的元素**，当该值被置为 true 时，意味着当前存在无效元素，需要进行垃圾回收，但回收操作并不会马上进行，而是在后续操作中再统一进行
 
 ```java
-//键值对被移除后对应的 value 会变成此值，用来当做 GC 标记位
+// 键值对被移除后对应的 value 会变成此值，用来当做 GC 标记位
 private static final Object DELETED = new Object();
 
-//用于标记当前是否有待垃圾回收(GC)的元素
+// 用于标记当前是否有待垃圾回收(GC)的元素
 private boolean mGarbage = false;
 
 private int[] mKeys;
 
 private Object[] mValues;
 
-//当前集合元素的数量
-//该值并不一定是时时处于正确状态，因为有可能出现只删除 key 和 value 两者之一的情况
-//所以 size() 方法内都会先进行 GC
+// 当前集合元素的数量
+// 该值并不一定是时时处于正确状态，因为有可能出现只删除 key 和 value 两者之一的情况
+// 所以 size() 方法内都会先进行 GC
 private int mSize;
 ```
 
@@ -64,7 +64,7 @@ private int mSize;
 key 数组和 value 数组的默认大小都是 10，如果在初始化时已知最终数据量的大小，则可以直接指定初始容量，这样可以避免后续的扩容操作
 
 ```java
-//设置数组的默认初始容量为10
+// 设置数组的默认初始容量为10
 public SparseArray() {
     this(10);
 }
@@ -107,10 +107,10 @@ static int binarySearch(int[] array, int size, int value) {
         } else if (midVal > value) {
             hi = mid - 1;
         } else {
-            return mid;  // value found
+            return mid; // value found
         }
     }
-    return ~lo;  // value not present
+    return ~lo; // value not present
 }
 ```
 
@@ -120,51 +120,51 @@ static int binarySearch(int[] array, int size, int value) {
 
 ```java
 public void put(int key, E value) {
-    //用二分查找法查找指定 key 在 mKeys 中的索引值
+    // 用二分查找法查找指定 key 在 mKeys 中的索引值
     int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
-    if (i >= 0) { //对应已经存在相同 key 的情况
+    if (i >= 0) { // 对应已经存在相同 key 的情况
         mValues[i] = value;
     } else {
-        //取反，拿到真实的索引位置
+        // 取反，拿到真实的索引位置
         i = ~i;
-        //如果目标位置还未赋值，则直接存入数据即可
+        // 如果目标位置还未赋值，则直接存入数据即可
         if (i < mSize && mValues[i] == DELETED) {
             mKeys[i] = key;
             mValues[i] = value;
             return;
         }
-        //如果存在冗余数据，那么就先进行 GC
+        // 如果存在冗余数据，那么就先进行 GC
         if (mGarbage && mSize >= mKeys.length) {
             gc();
-            //GC 后再次进行查找，因为值可能已经发生变化了
+            // GC 后再次进行查找，因为值可能已经发生变化了
             i = ~ContainerHelpers.binarySearch(mKeys, mSize, key);
         }
-        //索引 i 位置已经用于存储其它数据了，此时就需要对数组元素进行迁移
-        //所以从索引 i 开始的所有数据都需要向后移动一位，并将 key 存到 mKeys[i]
+        // 索引 i 位置已经用于存储其它数据了，此时就需要对数组元素进行迁移
+        // 所以从索引 i 开始的所有数据都需要向后移动一位，并将 key 存到 mKeys[i]
         mKeys = GrowingArrayUtils.insert(mKeys, mSize, i, key);
         mValues = GrowingArrayUtils.insert(mValues, mSize, i, value);
         mSize++;
     }
 }
 
-//将索引 index 处的元素赋值为 value
-//知道目标位置的话可以直接向 mValues 赋值
+// 将索引 index 处的元素赋值为 value
+// 知道目标位置的话可以直接向 mValues 赋值
 public void setValueAt(int index, E value) {
     if (index >= mSize && UtilConfig.sThrowExceptionForUpperArrayOutOfBounds) {
         // The array might be slightly bigger than mSize, in which case, indexing won't fail.
         // Check if exception should be thrown outside of the critical path.
         throw new ArrayIndexOutOfBoundsException(index);
     }
-    //如果需要则先进行垃圾回收
+    // 如果需要则先进行垃圾回收
     if (mGarbage) {
         gc();
     }
     mValues[index] = value;
 }
 
-//和 put 方法类似
-//但在存入数据前先对数据大小进行了判断，有利于减少对 mKeys 进行二分查找的次数
-//所以在“存入的 key 比现有的 mKeys 值都大”的情况下会比 put 方法性能高
+// 和 put 方法类似
+// 但在存入数据前先对数据大小进行了判断，有利于减少对 mKeys 进行二分查找的次数
+// 所以在“存入的 key 比现有的 mKeys 值都大”的情况下会比 put 方法性能高
 public void append(int key, E value) {
     if (mSize != 0 && key <= mKeys[mSize - 1]) {
         put(key, value);
@@ -187,12 +187,12 @@ public void append(int key, E value) {
 
 ```java
 public void delete(int key) {
-    //用二分查找法查找指定 key 在 mKeys 中的索引值
+    // 用二分查找法查找指定 key 在 mKeys 中的索引值
     int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
     if (i >= 0) {
         if (mValues[i] != DELETED) {
             mValues[i] = DELETED;
-            //标记当前需要进行垃圾回收
+            // 标记当前需要进行垃圾回收
             mGarbage = true;
         }
     }
@@ -202,7 +202,7 @@ public void remove(int key) {
     delete(key);
 }
 
-//和 delete 方法基本相同，差别在于会返回 key 对应的元素值
+// 和 delete 方法基本相同，差别在于会返回 key 对应的元素值
 public E removeReturnOld(int key) {
     int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
     if (i >= 0) {
@@ -216,7 +216,7 @@ public E removeReturnOld(int key) {
     return null;
 }
 
-//删除指定索引对应的元素值
+// 删除指定索引对应的元素值
 public void removeAt(int index) {
     if (index >= mSize && UtilConfig.sThrowExceptionForUpperArrayOutOfBounds) {
         // The array might be slightly bigger than mSize, in which case, indexing won't fail.
@@ -225,21 +225,21 @@ public void removeAt(int index) {
     }
     if (mValues[index] != DELETED) {
         mValues[index] = DELETED;
-        //标记当前需要进行垃圾回收
+        // 标记当前需要进行垃圾回收
         mGarbage = true;
     }
 }
 
-//删除从起始索引值 index 开始之后的 size 个元素值
+// 删除从起始索引值 index 开始之后的 size 个元素值
 public void removeAtRange(int index, int size) {
-    //避免发生数组越界的情况
+    // 避免发生数组越界的情况
     final int end = Math.min(mSize, index + size);
     for (int i = index; i < end; i++) {
         removeAt(i);
     }
 }
 
-//移除所有元素值
+// 移除所有元素值
 public void clear() {
     int n = mSize;
     Object[] values = mValues;
@@ -256,12 +256,12 @@ public void clear() {
 查找元素的方法较多，逻辑都挺简单的
 
 ```java
-//根据 key 查找相应的元素值，查找不到则返回默认值
+// 根据 key 查找相应的元素值，查找不到则返回默认值
 @SuppressWarnings("unchecked")
 public E get(int key, E valueIfKeyNotFound) {
-    //用二分查找法查找指定 key 在 mKeys 中的索引值
+    // 用二分查找法查找指定 key 在 mKeys 中的索引值
     int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
-    //如果找不到该 key 或者该 key 尚未赋值，则返回默认值
+    // 如果找不到该 key 或者该 key 尚未赋值，则返回默认值
     if (i < 0 || mValues[i] == DELETED) {
         return valueIfKeyNotFound;
     } else {
@@ -269,13 +269,13 @@ public E get(int key, E valueIfKeyNotFound) {
     }
 }
 
-//根据 key 查找相应的元素值，查找不到则返回 null
+// 根据 key 查找相应的元素值，查找不到则返回 null
 public E get(int key) {
     return get(key, null);
 }
 
-//因为 mValues 中的元素值并非一定是连贯的，有可能掺杂着 DELETED 
-//所以在遍历前需要先进行 GC，这样通过数组取出的值才是正确的
+// 因为 mValues 中的元素值并非一定是连贯的，有可能掺杂着 DELETED
+// 所以在遍历前需要先进行 GC，这样通过数组取出的值才是正确的
 @SuppressWarnings("unchecked")
 public E valueAt(int index) {
     if (mGarbage) {
@@ -284,7 +284,7 @@ public E valueAt(int index) {
     return (E) mValues[index];
 }
 
-//根据索引值 index 查找对应的 key 
+// 根据索引值 index 查找对应的 key
 public int keyAt(int index) {
     if (mGarbage) {
         gc();
@@ -292,7 +292,7 @@ public int keyAt(int index) {
     return mKeys[index];
 }
 
-//根据 key 对应的索引值
+// 根据 key 对应的索引值
 public int indexOfKey(int key) {
     if (mGarbage) {
         gc();
@@ -300,7 +300,7 @@ public int indexOfKey(int key) {
     return ContainerHelpers.binarySearch(mKeys, mSize, key);
 }
 
-//根据 value 查找对应的索引值
+// 根据 value 查找对应的索引值
 public int indexOfValue(E value) {
     if (mGarbage) {
         gc();
@@ -313,8 +313,8 @@ public int indexOfValue(E value) {
     return -1;
 }
 
-//与 indexOfValue 方法类似，但 indexOfValue 方法是通过比较 == 来判断是否同个对象
-//而此方法是通过 equals 方法来判断是否同个对象
+// 与 indexOfValue 方法类似，但 indexOfValue 方法是通过比较 == 来判断是否同个对象
+// 而此方法是通过 equals 方法来判断是否同个对象
 public int indexOfValueByValue(E value) {
     if (mGarbage) {
         gc();
@@ -346,10 +346,10 @@ private void gc() {
     Object[] values = mValues;
     for (int i = 0; i < n; i++) {
         Object val = values[i];
-        //val 非 DELETED ，说明该位置可能需要移动数据
+        // val 非 DELETED ，说明该位置可能需要移动数据
         if (val != DELETED) {
-            //将索引 i 处的值赋值到索引 o 处
-            //所以如果 i == o ，则不需要执行代码了
+            // 将索引 i 处的值赋值到索引 o 处
+            // 所以如果 i == o ，则不需要执行代码了
             if (i != o) {
                 keys[o] = keys[i];
                 values[o] = val;
@@ -426,32 +426,34 @@ public V put(K key, V value) {
     final int hash;
     int index;
 
-    //第一步
+    // 第一步
     if (key == null) {
-        hash = 0; 
+        hash = 0;
         index = indexOfNull();
     } else {
         hash = mIdentityHashCode ? System.identityHashCode(key) : key.hashCode();
         index = indexOf(key, hash);
     }
 
-    //第二步
+    // 第二步
     if (index >= 0) {
-        index = (index<<1) + 1;
-        final V old = (V)mArray[index];
+        index = (index << 1) + 1;
+        final V old = (V) mArray[index];
         mArray[index] = value;
         return old;
     }
 
-    //第三步
+    // 第三步
     index = ~index;
 
-    //第四步
+    // 第四步
     if (osize >= mHashes.length) {
-        //ArrayMap 的扩容机制相比 HashMap 会比较克制
-        //当数组长度已超出 BASE_SIZE*2 后，数组容量按照 1.5 倍来扩容
-        final int n = osize >= (BASE_SIZE*2) ? (osize+(osize>>1))
-                : (osize >= BASE_SIZE ? (BASE_SIZE*2) : BASE_SIZE);
+        // ArrayMap 的扩容机制相比 HashMap 会比较克制
+        // 当数组长度已超出 BASE_SIZE*2 后，数组容量按照 1.5 倍来扩容
+        final int n =
+                osize >= (BASE_SIZE * 2)
+                        ? (osize + (osize >> 1))
+                        : (osize >= BASE_SIZE ? (BASE_SIZE * 2) : BASE_SIZE);
 
         if (DEBUG) Log.d(TAG, "put: grow from " + mHashes.length + " to " + n);
 
@@ -472,10 +474,10 @@ public V put(K key, V value) {
         freeArrays(ohashes, oarray, osize);
     }
 
-    //第五步
+    // 第五步
     if (index < osize) {
-        if (DEBUG) Log.d(TAG, "put: move " + index + "-" + (osize-index)
-                + " to " + (index+1));
+        if (DEBUG)
+            Log.d(TAG, "put: move " + index + "-" + (osize - index) + " to " + (index + 1));
         System.arraycopy(mHashes, index, mHashes, index + 1, osize - index);
         System.arraycopy(mArray, index << 1, mArray, (index + 1) << 1, (mSize - index) << 1);
     }
@@ -486,8 +488,8 @@ public V put(K key, V value) {
         }
     }
     mHashes[index] = hash;
-    mArray[index<<1] = key;
-    mArray[(index<<1)+1] = value;
+    mArray[index << 1] = key;
+    mArray[(index << 1) + 1] = value;
     mSize++;
     return null;
 }
@@ -498,33 +500,43 @@ public V put(K key, V value) {
 ```java
 public void append(K key, V value) {
     int index = mSize;
-    final int hash = key == null ? 0
-            : (mIdentityHashCode ? System.identityHashCode(key) : key.hashCode());
+    final int hash =
+            key == null
+                    ? 0
+                    : (mIdentityHashCode ? System.identityHashCode(key) : key.hashCode());
     if (index >= mHashes.length) {
         throw new IllegalStateException("Array is full");
     }
-    //如果 mHashes 当前的最后一个值比 hash 大，hash 没法直接插到尾部，那么就还是需要调用 put 方法
-    if (index > 0 && mHashes[index-1] > hash) {
+    // 如果 mHashes 当前的最后一个值比 hash 大，hash 没法直接插到尾部，那么就还是需要调用 put 方法
+    if (index > 0 && mHashes[index - 1] > hash) {
         RuntimeException e = new RuntimeException("here");
         e.fillInStackTrace();
-        Log.w(TAG, "New hash " + hash
-                + " is before end of array hash " + mHashes[index-1]
-                + " at index " + index + " key " + key, e);
+        Log.w(
+                TAG,
+                "New hash "
+                        + hash
+                        + " is before end of array hash "
+                        + mHashes[index - 1]
+                        + " at index "
+                        + index
+                        + " key "
+                        + key,
+                e);
         put(key, value);
         return;
     }
-    //将 key-value 直接插入到数组尾部
-    mSize = index+1;
+    // 将 key-value 直接插入到数组尾部
+    mSize = index + 1;
     mHashes[index] = hash;
     index <<= 1;
     mArray[index] = key;
-    mArray[index+1] = value;
+    mArray[index + 1] = value;
 }
 ```
 
 ## 3、获取元素
 
-获取元素的方法主要看 `indexOf(Object key, int hash)`方法即可，只要理解了该方法是如何获取 keyIndex 的，那么就能够对 ArrayMap 的存储结构有更明确的认知
+获取元素的方法主要看 `indexOf(Object key, int hash)` 方法即可，只要理解了该方法是如何获取 keyIndex 的，那么就能够对 ArrayMap 的存储结构有更明确的认知
 
 `indexOf` 方法用于获取和 key，hash 均能对应上的元素的哈希值在 mHashes 中的索引位置。我们知道，keyHash 是存储在 mHashes 中的，而 key-value 又是存储在 mArray 中的，但我们无法只根据 keyHash 就准确对应上 key-value，因为不同的 key 有可能有相同的 hash 值，即需要考虑哈希冲突的情况，所以 `indexOf` 方法除了需要对比 hash 值大小是否相等外还需要对比 key 的相等性
 
@@ -542,22 +554,22 @@ int indexOf(Object key, int hash) {
     if (N == 0) {
         return ~0;
     }
-    //第一步
+    // 第一步
     int index = binarySearchHashes(mHashes, N, hash);
 
     // If the hash code wasn't found, then we have no entry for this key.
-    //第二步
+    // 第二步
     if (index < 0) {
         return index;
     }
 
     // If the key at the returned index matches, that's what we want.
-    //第四步
-    if (key.equals(mArray[index<<1])) {
+    // 第四步
+    if (key.equals(mArray[index << 1])) {
         return index;
     }
 
-    //第五步
+    // 第五步
     // Search for a matching key after the index.
     int end;
     for (end = index + 1; end < N && mHashes[end] == hash; end++) {
@@ -572,7 +584,7 @@ int indexOf(Object key, int hash) {
     // new entry for this key should go.  We use the end of the
     // hash chain to reduce the number of array entries that will
     // need to be copied when inserting.
-    //第六步
+    // 第六步
     return ~end;
 }
 ```
@@ -583,10 +595,9 @@ ArrayMap 内部包含了对 mHashes 和 mArray 这两个数组进行缓存的机
 
 ```java
 public class BaseBundle {
-    
-    @UnsupportedAppUsage
-    ArrayMap<String, Object> mMap = null;
-    
+
+    @UnsupportedAppUsage ArrayMap<String, Object> mMap = null;
+
     public void putBoolean(@Nullable String key, boolean value) {
         unparcel();
         mMap.put(key, value);
@@ -601,9 +612,9 @@ public class BaseBundle {
         unparcel();
         mMap.put(key, value);
     }
-    
+
     ···
-    
+
 }
 ```
 
@@ -614,14 +625,16 @@ public class BaseBundle {
 public V put(K key, V value) {
     ···
     if (osize >= mHashes.length) {
-        final int n = osize >= (BASE_SIZE*2) ? (osize+(osize>>1))
-                : (osize >= BASE_SIZE ? (BASE_SIZE*2) : BASE_SIZE);
+        final int n =
+                osize >= (BASE_SIZE * 2)
+                        ? (osize + (osize >> 1))
+                        : (osize >= BASE_SIZE ? (BASE_SIZE * 2) : BASE_SIZE);
 
         if (DEBUG) Log.d(TAG, "put: grow from " + mHashes.length + " to " + n);
 
         final int[] ohashes = mHashes;
         final Object[] oarray = mArray;
-        //尝试通过数组复用机制来初始化 mHashes 和 mArray
+        // 尝试通过数组复用机制来初始化 mHashes 和 mArray
         allocArrays(n);
 
         if (CONCURRENT_MODIFICATION_EXCEPTIONS && osize != mSize) {
@@ -633,7 +646,7 @@ public V put(K key, V value) {
             System.arraycopy(ohashes, 0, mHashes, 0, ohashes.length);
             System.arraycopy(oarray, 0, mArray, 0, oarray.length);
         }
-        //尝试回收 ohashes 和 oarray
+        // 尝试回收 ohashes 和 oarray
         freeArrays(ohashes, oarray, osize);
     }
     ···
@@ -645,48 +658,54 @@ public V put(K key, V value) {
 
 实现数组缓存逻辑对应的是 `freeArrays` 方法，该方法就用于缓存 mHashes 和 mArray。每当 ArrayMap 完成数组扩容后就会调用此方法对扩容前的数组进行缓存，但也不是所有数组都会进行缓存，而是有着数组长度和缓存总数这两方面的限制
 
-首先，ArrayMap 包含了多个全局的静态变量和静态常量用于控制及实现数组缓存。从`freeArrays`方法可以看出来，if 和 else 语句块的逻辑是基本完全一样的，其区别只在于触发缓存的条件和使用的缓存池不一样
+首先，ArrayMap 包含了多个全局的静态变量和静态常量用于控制及实现数组缓存。从 `freeArrays` 方法可以看出来，if 和 else 语句块的逻辑是基本完全一样的，其区别只在于触发缓存的条件和使用的缓存池不一样
 
 例如，如果 hashes 的数组长度是 BASE_SIZE * 2，且当前缓存总数没有超出 CACHE_SIZE，那么缓存的数组就保存在 mTwiceBaseCache 所构造的的单向链表中。mTwiceBaseCache 采用单向链表的结构来串联多个数组，要缓存的 mArray 的第一个数组元素值会先指向 mTwiceBaseCache，第二个数组元素值会指向 mHashes，之后 mArray 会成为单向链表的新的头结点，即 mArray 成为了新的 mTwiceBaseCache。在这种缓存机制下，最终 mTwiceBaseCache 指向的其实是本次缓存的 mArray，mArray 的第一个元素值指向的又是上一次缓存的 mArray，第二个元素值指向的是本次缓存的 mHashes，从而形成了一个单向链表结构
 
 ```java
-//用于缓存长度为 BASE_SIZE 的数组
+// 用于缓存长度为 BASE_SIZE 的数组
 static Object[] mBaseCache;
-//mBaseCache 已缓存的数组个数
+// mBaseCache 已缓存的数组个数
 static int mBaseCacheSize;
 
-//用于缓存长度为 BASE_SIZE * 2 的数组
+// 用于缓存长度为 BASE_SIZE * 2 的数组
 static Object[] mTwiceBaseCache;
-//mTwiceBaseCache 已缓存的数组个数
+// mTwiceBaseCache 已缓存的数组个数
 static int mTwiceBaseCacheSize;
 
 private static final int BASE_SIZE = 4;
 
-//mBaseCacheSize 和 mTwiceBaseCacheSize 的最大缓存个数
+// mBaseCacheSize 和 mTwiceBaseCacheSize 的最大缓存个数
 private static final int CACHE_SIZE = 10;
 
-//用来当做同步锁
+// 用来当做同步锁
 private static final Object sBaseCacheLock = new Object();
 private static final Object sTwiceBaseCacheLock = new Object();
 
-//缓存 hashes 和 array
+// 缓存 hashes 和 array
 private static void freeArrays(final int[] hashes, final Object[] array, final int size) {
-    if (hashes.length == (BASE_SIZE*2)) {
+    if (hashes.length == (BASE_SIZE * 2)) {
         synchronized (sTwiceBaseCacheLock) {
             if (mTwiceBaseCacheSize < CACHE_SIZE) {
-                  //第一个元素指向 mTwiceBaseCache
+                // 第一个元素指向 mTwiceBaseCache
                 array[0] = mTwiceBaseCache;
-                  //第二个元素指向 hashes
+                // 第二个元素指向 hashes
                 array[1] = hashes;
-                for (int i=(size<<1)-1; i>=2; i--) {
-                    //切除多余引用，避免内存泄漏，有利于 GC
+                for (int i = (size << 1) - 1; i >= 2; i--) {
+                    // 切除多余引用，避免内存泄漏，有利于 GC
                     array[i] = null;
                 }
-                //array 成为单链表的头结点
+                // array 成为单链表的头结点
                 mTwiceBaseCache = array;
                 mTwiceBaseCacheSize++;
-                if (DEBUG) Log.d(TAG, "Storing 2x cache " + array
-                        + " now have " + mTwiceBaseCacheSize + " entries");
+                if (DEBUG)
+                    Log.d(
+                            TAG,
+                            "Storing 2x cache "
+                                    + array
+                                    + " now have "
+                                    + mTwiceBaseCacheSize
+                                    + " entries");
             }
         }
     } else if (hashes.length == BASE_SIZE) {
@@ -694,13 +713,19 @@ private static void freeArrays(final int[] hashes, final Object[] array, final i
             if (mBaseCacheSize < CACHE_SIZE) {
                 array[0] = mBaseCache;
                 array[1] = hashes;
-                for (int i=(size<<1)-1; i>=2; i--) {
+                for (int i = (size << 1) - 1; i >= 2; i--) {
                     array[i] = null;
                 }
                 mBaseCache = array;
                 mBaseCacheSize++;
-                if (DEBUG) Log.d(TAG, "Storing 1x cache " + array
-                        + " now have " + mBaseCacheSize + " entries");
+                if (DEBUG)
+                    Log.d(
+                            TAG,
+                            "Storing 1x cache "
+                                    + array
+                                    + " now have "
+                                    + mBaseCacheSize
+                                    + " entries");
             }
         }
     }
@@ -714,22 +739,22 @@ private static void freeArrays(final int[] hashes, final Object[] array, final i
 在进行数组缓存的时候会判断数组长度，只有当长度是 BASE_SIZE * 2 或 BASE_SIZE 时才会进行缓存，那么自然只有当数组的目标长度 size 是这两个值之一才符合复用条件了。`allocArrays` 方法取出缓存的逻辑也很简单，只需要取出单向链表的头结点赋值给 mHashes 和 mArray，同时使链表的第二个结点成为新的头结点即可。如果不符合复用条件或者复用失败，那么就还是需要重新构建两个新的数组对象
 
 ```java
-//用于缓存长度为 BASE_SIZE 的数组
+// 用于缓存长度为 BASE_SIZE 的数组
 static Object[] mBaseCache;
-//mBaseCache 已缓存的数组个数
+// mBaseCache 已缓存的数组个数
 static int mBaseCacheSize;
 
-//用于缓存长度为 BASE_SIZE * 2 的数组
+// 用于缓存长度为 BASE_SIZE * 2 的数组
 static Object[] mTwiceBaseCache;
-//mTwiceBaseCache 已缓存的数组个数
+// mTwiceBaseCache 已缓存的数组个数
 static int mTwiceBaseCacheSize;
 
 private static final int BASE_SIZE = 4;
 
-//mBaseCacheSize 和 mTwiceBaseCacheSize 的最大缓存个数
+// mBaseCacheSize 和 mTwiceBaseCacheSize 的最大缓存个数
 private static final int CACHE_SIZE = 10;
 
-//用来当做同步锁
+// 用来当做同步锁
 private static final Object sBaseCacheLock = new Object();
 private static final Object sTwiceBaseCacheLock = new Object();
 
@@ -737,22 +762,27 @@ private void allocArrays(final int size) {
     if (mHashes == EMPTY_IMMUTABLE_INTS) {
         throw new UnsupportedOperationException("ArrayMap is immutable");
     }
-    if (size == (BASE_SIZE*2)) {
+    if (size == (BASE_SIZE * 2)) {
         synchronized (sTwiceBaseCacheLock) {
             if (mTwiceBaseCache != null) {
                 final Object[] array = mTwiceBaseCache;
                 mArray = array;
                 try {
-                    //指向头结点的下一个结点，即原先的第二个结点将成为链表新的头结点
+                    // 指向头结点的下一个结点，即原先的第二个结点将成为链表新的头结点
                     mTwiceBaseCache = (Object[]) array[0];
                     mHashes = (int[]) array[1];
                     if (mHashes != null) {
-                        //符合复用条件，切除多余引用
+                        // 符合复用条件，切除多余引用
                         array[0] = array[1] = null;
                         mTwiceBaseCacheSize--;
                         if (DEBUG) {
-                            Log.d(TAG, "Retrieving 2x cache " + mHashes
-                                    + " now have " + mTwiceBaseCacheSize + " entries");
+                            Log.d(
+                                    TAG,
+                                    "Retrieving 2x cache "
+                                            + mHashes
+                                            + " now have "
+                                            + mTwiceBaseCacheSize
+                                            + " entries");
                         }
                         return;
                     }
@@ -760,9 +790,10 @@ private void allocArrays(final int size) {
                 }
                 // Whoops!  Someone trampled the array (probably due to not protecting
                 // their access with a lock).  Our cache is corrupt; report and give up.
-                Slog.wtf(TAG, "Found corrupt ArrayMap cache: [0]=" + array[0]
-                        + " [1]=" + array[1]);
-                //会执行到这里，说明缓存机制发现问题，则弃用之前的所有缓存
+                Slog.wtf(
+                        TAG,
+                        "Found corrupt ArrayMap cache: [0]=" + array[0] + " [1]=" + array[1]);
+                // 会执行到这里，说明缓存机制发现问题，则弃用之前的所有缓存
                 mTwiceBaseCache = null;
                 mTwiceBaseCacheSize = 0;
             }
@@ -779,8 +810,13 @@ private void allocArrays(final int size) {
                         array[0] = array[1] = null;
                         mBaseCacheSize--;
                         if (DEBUG) {
-                            Log.d(TAG, "Retrieving 1x cache " + mHashes
-                                    + " now have " + mBaseCacheSize + " entries");
+                            Log.d(
+                                    TAG,
+                                    "Retrieving 1x cache "
+                                            + mHashes
+                                            + " now have "
+                                            + mBaseCacheSize
+                                            + " entries");
                         }
                         return;
                     }
@@ -788,8 +824,9 @@ private void allocArrays(final int size) {
                 }
                 // Whoops!  Someone trampled the array (probably due to not protecting
                 // their access with a lock).  Our cache is corrupt; report and give up.
-                Slog.wtf(TAG, "Found corrupt ArrayMap cache: [0]=" + array[0]
-                        + " [1]=" + array[1]);
+                Slog.wtf(
+                        TAG,
+                        "Found corrupt ArrayMap cache: [0]=" + array[0] + " [1]=" + array[1]);
                 mBaseCache = null;
                 mBaseCacheSize = 0;
             }
@@ -797,7 +834,7 @@ private void allocArrays(final int size) {
     }
 
     mHashes = new int[size];
-    mArray = new Object[size<<1];
+    mArray = new Object[size << 1];
 }
 ```
 
@@ -812,9 +849,11 @@ public V put(K key, V value) {
     final int hash;
     ···
     if (osize >= mHashes.length) {
-        //计算数组扩容后的大小
-        final int n = osize >= (BASE_SIZE*2) ? (osize+(osize>>1))
-                : (osize >= BASE_SIZE ? (BASE_SIZE*2) : BASE_SIZE);
+        // 计算数组扩容后的大小
+        final int n =
+                osize >= (BASE_SIZE * 2)
+                        ? (osize + (osize >> 1))
+                        : (osize >= BASE_SIZE ? (BASE_SIZE * 2) : BASE_SIZE);
 
         if (DEBUG) Log.d(TAG, "put: grow from " + mHashes.length + " to " + n);
 
@@ -834,7 +873,7 @@ public V put(K key, V value) {
 
 所以说，虽然 ArrayMap 的构造函数中并没有直接将 BASE_SIZE 作为数组的默认长度，但是在扩容过程中会尽量往 BASE_SIZE 和 BASE_SIZE * 2 这两个值靠拢，这就有利于尽量实现数组复用
 
-此外，ArrayMap 的扩容操作在申请内存时也显得比较克制，在数组长度超出 BASE_SIZE * 2  后，只是扩容到当前的 1.5 倍，且也只在 mHashes 容量不足时才会触发扩容机制。而 HashMap 在达到负载因子设定的比例后（此时数组未满）就会触发扩容机制，而且也是按照扩充到两倍容量的方式进行扩容。所以说，ArrayMap 对于内存空间的利用效率会更高一些
+此外，ArrayMap 的扩容操作在申请内存时也显得比较克制，在数组长度超出 BASE_SIZE * 2 后，只是扩容到当前的 1.5 倍，且也只在 mHashes 容量不足时才会触发扩容机制。而 HashMap 在达到负载因子设定的比例后（此时数组未满）就会触发扩容机制，而且也是按照扩充到两倍容量的方式进行扩容。所以说，ArrayMap 对于内存空间的利用效率会更高一些
 
 ## 5、优劣势总结
 

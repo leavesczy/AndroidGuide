@@ -1,8 +1,8 @@
-> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助 🤣🤣🤣
+> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/259d24d1611d454ea49d453844377df2~tplv-k3u1fbpfcp-zoom-1.image)
 
-Coil 是我最后一个要来分析的开源库，本篇也是我 **Android 主流开源库源码分析** 这个系列的最后一篇文章，包含 Coil 的入门介绍和源码分析。这一个系列的文章从动笔到结束花了要两个月时间，到今天也就结尾了，原创不易，觉得有用就请给个赞吧 😂😂😂
+Coil 是我最后一个要来分析的开源库，本篇也是我 **Android 主流开源库源码分析** 这个系列的最后一篇文章，包含 Coil 的入门介绍和源码分析。这一个系列的文章从动笔到结束花了要两个月时间，到今天也就结尾了，原创不易，觉得有用就请给个赞吧
 
 Coil 这个开源库我关注了蛮久的，因为其很多特性在我看来都挺有意思的。Coil 在 2020 年 10 月 22 日才发布了 1.0.0 版本，我当时在网上搜了搜 Coil 的资料，看到的文章都只是入门介绍，没看见到关于源码层次的分析，而本文的发表时间离 1.0.0 版本发布刚好才隔了一个月时间，应该没人比我还早了吧？就斗胆给文章起了这么个标题：**可能是全网第一篇 Coil 源码分析文章** ~
 
@@ -47,10 +47,10 @@ kotlinOptions {
     jvmTarget = "1.8"
 }
 ```
-Coil 一共包含五个组件，可以在 `mavenCentral()`上获取到
+Coil 一共包含五个组件，可以在 `mavenCentral()` 上获取到
 
 - `io.coil-kt:coil-base`。基础组件，提供了基本的图片请求、图片解码、图片缓存、Bitmap 复用等功能
-- `io.coil-kt:coil`。默认组件，依赖于`io.coil-kt:coil-base`，提供了 Coil 类的单例对象以及 ImageView 相关的扩展函数
+- `io.coil-kt:coil`。默认组件，依赖于 `io.coil-kt:coil-base`，提供了 Coil 类的单例对象以及 ImageView 相关的扩展函数
 - `io.coil-kt:coil-gif`。包含两个 [decoder](https://coil-kt.github.io/coil/api/coil-base/coil.decode/-decoder/) 用于支持解码 GIFs，有关更多详细信息，请参见 [GIF](https://coil-kt.github.io/coil/gifs/)
 - `io.coil-kt:coil-svg`。包含一个 [decoder](https://coil-kt.github.io/coil/api/coil-base/coil.decode/-decoder) 用于支持解码 SVG。有关更多详细信息，请参见 [SVG](https://coil-kt.github.io/coil/svgs/)
 - `io.coil-kt:coil-video`。包含两个 [fetchers](https://coil-kt.github.io/coil/api/coil-base/coil.fetch/-fetcher) 用于支持读取和解码 [任何 Android 的支持的视频格式](https://developer.android.com/guide/topics/media/media-formats#video-codecs) 的视频帧。有关更多详细信息，请参见 [videos](https://coil-kt.github.io/coil/videos/)
@@ -71,7 +71,7 @@ implementation("io.coil-kt:coil-video:1.0.0")
 
 ## 1、load
 
-要将图片显示到 ImageView 上，直接使用`ImageView`的扩展函数`load`即可
+要将图片显示到 ImageView 上，直接使用 `ImageView` 的扩展函数 `load` 即可
 
 ```kotlin
 // URL
@@ -109,7 +109,7 @@ context.imageLoader.enqueue(request)
 ```
 ## 3、ImageLoader
 
-`imageView.load`使用单例对象 imageLoader 来执行 ImageRequest，可以使用 Context 的扩展函数来访问 ImageLoader
+`imageView.load` 使用单例对象 imageLoader 来执行 ImageRequest，可以使用 Context 的扩展函数来访问 ImageLoader
 
 ```kotlin
 val imageLoader = context.imageLoader
@@ -126,7 +126,7 @@ Coil.setImageLoader(
 ```
 ## 4、execute
 
-如果想直接拿到目标图片，可以调用 ImageLoader 的`execute`方法来实现
+如果想直接拿到目标图片，可以调用 ImageLoader 的 `execute` 方法来实现
 
 ```kotlin
 val request = ImageRequest.Builder(context)
@@ -161,7 +161,7 @@ Coil 在我看来是一个比较“**激进**”的开源库，热衷于使用�
 
 **如果你的项目中已经大面积使用到了 Jetpack、Kotlin Coroutines、OkHttp 的话，那么 Coil 会更加契合你的项目**
 
-当前在 Android 端最为流行的图片加载框架应该是 Glide 了，Coil 作为一个后起之秀相对 Glide 也有着一些独特的优势。例如，为了监听 UI 层的生命周期变化，Glide 是通过向 Activity 或者 Fragment 注入一个无 UI 界面的 Fragment 来实现间接监听的，而 Coil 则只需要直接监听 Lifecycle 即可，在实现方式上 Coil 会更加简单高效。此外，在联网请求图片的时候，Glide 需要通过线程池和多个回调来完成最终图片的显示，而 Coil 由于使用了 Kotlin 协程，可以很简洁地完成异步加载和线程切换，在流程上 Coil 会清晰很多。但实际上 Coil 也是借鉴了一些优秀开源库的实现思路，所以我看 Coil 的源码的时候就总会发现一些 Glide 和 OkHttp 的影子😅😅
+当前在 Android 端最为流行的图片加载框架应该是 Glide 了，Coil 作为一个后起之秀相对 Glide 也有着一些独特的优势。例如，为了监听 UI 层的生命周期变化，Glide 是通过向 Activity 或者 Fragment 注入一个无 UI 界面的 Fragment 来实现间接监听的，而 Coil 则只需要直接监听 Lifecycle 即可，在实现方式上 Coil 会更加简单高效。此外，在联网请求图片的时候，Glide 需要通过线程池和多个回调来完成最终图片的显示，而 Coil 由于使用了 Kotlin 协程，可以很简洁地完成异步加载和线程切换，在流程上 Coil 会清晰很多。但实际上 Coil 也是借鉴了一些优秀开源库的实现思路，所以我看 Coil 的源码的时候就总会发现一些 Glide 和 OkHttp 的影子
 
 这里就先来对 Coil 的各个特性和 Glide 做下简单的对比，先让读者有个大体的印象
 
@@ -194,7 +194,7 @@ Coil 在我看来是一个比较“**激进**”的开源库，热衷于使用�
 
 我看源码时习惯从最基础的使用方式来入手，分析其整个调用链关系和会涉及到的模块，这里也不例外，就从 Coil 加载一张网络图片来入手
 
-最简单的加载方式只需要调用一个`load`方法即可，比 Glide 还简洁，想要添加配置项的话就在 lambda 块中添加
+最简单的加载方式只需要调用一个 `load` 方法即可，比 Glide 还简洁，想要添加配置项的话就在 lambda 块中添加
 
 ```kotlin
 //直接加载图片，不添加任何配置项
@@ -246,7 +246,7 @@ inline fun ImageView.loadAny(
 
 下面就来分析下这一整个流程
 
-# 五、ImageRequest 
+# 五、ImageRequest
 
 ImageRequest 基于 Builder 模式来构建，包含了加载图片时的各个配置项，其配置项很多，重点看前九个
 
@@ -295,8 +295,8 @@ Target 即最终图片的接收载体，ImageRequest 提供了 `target` 方法�
 fun target(imageView: ImageView) = target(ImageViewTarget(imageView))
 
 fun target(target: Target?) = apply {
-	this.target = target
-	resetResolvedValues()
+    this.target = target
+    resetResolvedValues()
 }
 ```
 Target 接口提供了**图片开始加载、图片加载失败、图片加载成功**的事件回调，主要是为了显示**占位图、错误图、目标图**等几个
@@ -347,7 +347,7 @@ open class ImageViewTarget(
         updateAnimation()
     }
 
-	···
+    ···
 }
 ```
 ## 2、Lifecycle
@@ -358,10 +358,10 @@ open class ImageViewTarget(
 
 ```kotlin
 private fun resolveLifecycle(): Lifecycle {
-	val target = target
-	val context = if (target is ViewTarget<*>) target.view.context else context
+    val target = target
+    val context = if (target is ViewTarget<*>) target.view.context else context
     //context 属于 LifecycleOwner 类型则返回对应的 Lifecycle，否则返回 GlobalLifecycle
-	return context.getLifecycle() ?: GlobalLifecycle
+    return context.getLifecycle() ?: GlobalLifecycle
 }
 
 internal object GlobalLifecycle : Lifecycle() {
@@ -539,7 +539,7 @@ internal class ViewTargetDisposable(
 ```
 # 七、ImageLoader
 
-上面有说过，`loadAny`方法最终是会通过调用 `imageLoader.enqueue(request)`来发起一个图片加载请求的，那么重点就是要来看 ImageLoader 是如何实现的
+上面有说过，`loadAny` 方法最终是会通过调用 `imageLoader.enqueue(request)` 来发起一个图片加载请求的，那么重点就是要来看 ImageLoader 是如何实现的
 
 ```kotlin
 @JvmSynthetic
@@ -564,17 +564,17 @@ interface ImageLoader {
     val defaults: DefaultRequestOptions
     //内存缓存
     val memoryCache: MemoryCache
-	//Bitmap缓存池
+    //Bitmap缓存池
     val bitmapPool: BitmapPool
-	//异步加载图片
+    //异步加载图片
     fun enqueue(request: ImageRequest): Disposable
-	//同步加载图片
+    //同步加载图片
     suspend fun execute(request: ImageRequest): ImageResult
-	//停止全部任务
+    //停止全部任务
     fun shutdown()
 }
 ```
-ImageLoader 的唯一实现类是 RealImageLoader，其`enqueue`方法会启动一个协程，在 job 里执行 `executeMain` 方法得到 ImageResult，ImageResult 就包含了最终得到的图片。同时，job 会被包含在返回的 Disposable 对象里，这样外部才能**取消图片加载**或者**等待图片加载完成**
+ImageLoader 的唯一实现类是 RealImageLoader，其 `enqueue` 方法会启动一个协程，在 job 里执行 `executeMain` 方法得到 ImageResult，ImageResult 就包含了最终得到的图片。同时，job 会被包含在返回的 Disposable 对象里，这样外部才能**取消图片加载**或者**等待图片加载完成**
 
 ```kotlin
 override fun enqueue(request: ImageRequest): Disposable {
@@ -597,7 +597,7 @@ executeMain 方法的逻辑也比较简单，可以概括为：
 
 1. 为 target 和 request 创建一个代理类，用于支持 Bitmap 缓存和 Lifecycle 监听
 2. 如果外部发起的是异步请求的话（即 REQUEST_TYPE_ENQUEUE），那么就需要等到 Lifecycle 至少处于 Started 状态之后才能继续执行，这样当 Activity 还处于后台时就不会发起请求了
-3. 获取占位图并传给 target 
+3. 获取占位图并传给 target
 4. 获取 target 需要的图片尺寸大小，以便按需加载，对于 ImageViewTarget 来说，即获取 ImageView 的宽高属性
 5. 调用 executeChain 方法拿到 ImageResult，判断是否成功，调用 target 对应的成功或者失败的方法
 
@@ -663,7 +663,7 @@ private suspend fun executeMain(initialRequest: ImageRequest, type: Int): ImageR
     }
 }
 ```
-`executeChain`方法就比较有意思了，有看过 OkHttp 源码的同学应该会对 RealInterceptorChain 有点印象，OkHttp 的拦截器就是通过该同名类来实现的，很显然 Coil 借鉴了 OkHttp 的实现思路，极大方便了后续功能扩展，也给了外部控制整个图片加载流程的入口，可扩展性 +100
+`executeChain` 方法就比较有意思了，有看过 OkHttp 源码的同学应该会对 RealInterceptorChain 有点印象，OkHttp 的拦截器就是通过该同名类来实现的，很显然 Coil 借鉴了 OkHttp 的实现思路，极大方便了后续功能扩展，也给了外部控制整个图片加载流程的入口，可扩展性 +100
 
 > 不了解 OkHttp 的 RealInterceptorChain 实现思路的可以看我的这篇文章，这里不再赘述：[三方库源码笔记（11）-OkHttp 源码详解](https://juejin.cn/post/6895369745445748749)
 
@@ -1173,10 +1173,10 @@ internal class RequestService(private val logger: Logger?) {
         size: Size,
         isOnline: Boolean
     ): Options {
-       	···
+        ···
         // Disable fetching from the network if we know we're offline.
         val networkCachePolicy = if (isOnline) request.networkCachePolicy else CachePolicy.DISABLED
-     	···
+        ···
         return Options(
             context = request.context,
             config = config,
@@ -1202,7 +1202,7 @@ internal class RequestService(private val logger: Logger?) {
 
 和 Activity 或者 Fragment 关联的 Lifecycle 才**具备有生命周期感知能力**，这样 Coil 才可以在 Activity 处于后台或者已经销毁的时候暂停或者停止任务。而 GlobalLifecycle 会默认且一直会处于 RESUMED 状态，这样任务就会一直运行直到最终结束，这可能导致内存泄露
 
-那么，该  Lifecycle 对象具体是在什么地方起了作用呢？
+那么，该 Lifecycle 对象具体是在什么地方起了作用呢？
 
 这个主要看 RealImageLoader 的 `executeMain` 方法。在发起图片加载请求前，后先创建 request 的代理对象 requestDelegate，requestDelegate 中就包含了对 Lifecycle 的处理逻辑。此外，如果是异步请求的话，会等到 Lifecycle 至少处于 Started 状态之后才能发起请求，这样当 Activity 还处于后台时就不会发起请求了
 
@@ -1243,7 +1243,7 @@ private suspend fun executeMain(initialRequest: ImageRequest, type: Int): ImageR
    - 将请求请求参数包装为 ViewTargetRequestDelegate 类型，而 ViewTargetRequestDelegate 实现了 DefaultLifecycleObserver 接口，其会在收到 onDestroy 事件的时候主动取消 Job 并清理各类资源。所以向 Lifecycle 添加该 Observer 就可以保证在 Activity 销毁后也能同时取消图片加载请求，避免内存泄漏
    - 如果 target 属于 LifecycleObserver 类型的话，则也向 Lifecycle 添加该 Observer 。ImageViewTarget 就实现了 DefaultLifecycleObserver 接口，这主要是为了判断 ImageView 对应的 Activity 或者 Fragment 是否处于前台，如果处于前台且存在 Animatable 的话就会自动启动动画，否则就自动停止动画。之所以需要先 removeObserver 再 addObserver，是因为 target 可能需要先后请求多张图片，我们不能重复向 Lifecycle 添加同一个 Observer 对象
    - 同时，如果 View 已经 Detached 了的话，那么就需要主动取消请求
-2. 如果  target 对象不属于 ViewTarget 类型的话，创建的代理对象是 BaseRequestDelegate 类型，也会在收到 onDestroy 事件的时候主动取消 Job
+2. 如果 target 对象不属于 ViewTarget 类型的话，创建的代理对象是 BaseRequestDelegate 类型，也会在收到 onDestroy 事件的时候主动取消 Job
 
 ```kotlin
 /** Wrap [request] to automatically dispose (and for [ViewTarget]s restart) the [ImageRequest] based on its lifecycle. */
@@ -1289,7 +1289,7 @@ fun createRequestDelegate(
 
 图片变换是基本所有的图片加载库都会支持的功能，Coil 对这个概念的抽象即 Transformation 接口
 
-注意，`key()`方法的返回值是用于计算图片在内存缓存中的唯一 Key 时的辅助参数，所以需要实现该方法，为 Transformation 生成一个可以唯一标识自身的字符串 Key。`transform` 方法包含了一个 BitmapPool 参数，我们在实现图形变换的时候往往是需要一个全新的 Bitmap，此时就应该通过 BitmapPool 来获取，尽量复用已有的 Bitmap
+注意，`key()` 方法的返回值是用于计算图片在内存缓存中的唯一 Key 时的辅助参数，所以需要实现该方法，为 Transformation 生成一个可以唯一标识自身的字符串 Key。`transform` 方法包含了一个 BitmapPool 参数，我们在实现图形变换的时候往往是需要一个全新的 Bitmap，此时就应该通过 BitmapPool 来获取，尽量复用已有的 Bitmap
 
 ```kotlin
 interface Transformation {
@@ -1318,7 +1318,7 @@ Coil 默认提供了以下几个 Transformation 实现类
 - GrayscaleTransformation。用户实现将图片转换为灰色
 - RoundedCornersTransformation。用于为图片添加圆角
 
-我们可以学着官方给的例子，自己来实现两个 Transformation 
+我们可以学着官方给的例子，自己来实现两个 Transformation
 
 ## 1、为图片添加水印
 
@@ -1372,7 +1372,7 @@ imageView.load(imageUrl) {
 
 ## 2、为图片添加蒙层
 
-Android 的 Paint 原生就支持为 Bitmap 添加一个蒙层，只需要使用其 `colorFilter`方法即可
+Android 的 Paint 原生就支持为 Bitmap 添加一个蒙层，只需要使用其 `colorFilter` 方法即可
 
 ```kotlin
 class ColorFilterTransformation(
@@ -1525,7 +1525,7 @@ internal class RealImageLoader(
     val logger: Logger?
 ) : ImageLoader {
     
- 	private val registry = componentRegistry.newBuilder()
+    private val registry = componentRegistry.newBuilder()
         // Mappers
         .add(StringMapper())
         .add(FileUriMapper())
@@ -1561,7 +1561,7 @@ internal class StringMapper : Mapper<String, Uri> {
     override fun map(data: String) = data.toUri()
 }
 ```
-ResourceUriFetcher 会拿到 Uri，然后判断 Uri 的 `scheme` 是否是 `android.resource`，是的话就知道其指向的是本地的资源文件。HttpUriFetcher 则是判断 Uri 的 `scheme` 是否是`http`或者`https`，是的话就知道其指向的是远程网络图片
+ResourceUriFetcher 会拿到 Uri，然后判断 Uri 的 `scheme` 是否是 `android.resource`，是的话就知道其指向的是本地的资源文件。HttpUriFetcher 则是判断 Uri 的 `scheme` 是否是 `http` 或者 `https`，是的话就知道其指向的是远程网络图片
 
 ```kotlin
 internal class ResourceUriFetcher(

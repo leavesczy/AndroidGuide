@@ -6,7 +6,7 @@
 
 那么，对于一台 1440 x 2880 px，560 dpi 的真机，其宽高是 411 x 822 dp，此时我们在布局文件中就可以直接使用设计稿中给出来的宽度值 205.5 dp，使得 ImageView 在这台真机上就占据了屏幕的一半宽度。虽然设计稿和这台真机的屏幕像素尺寸并不相同，但由于屏幕像素密度的存在，使得两者的 dp 宽度是一样的，从而让开发者可以直接套用设计稿给出的 dp 值就能满足要求
 
-既然有了 dp，那我们为什么还需要进行屏幕适配呢？当然也是因为 dp 只能适用于大部分正常情况了。以上情况之所以能够实现完美适配，那也是因为举的例子刚好也是完美的：1440  / 1080 = 560 / 420 = 1.3333，两者的 px 宽度比例和像素密度比例刚好相等，所以此时使用 dp 才能刚好适用
+既然有了 dp，那我们为什么还需要进行屏幕适配呢？当然也是因为 dp 只能适用于大部分正常情况了。以上情况之所以能够实现完美适配，那也是因为举的例子刚好也是完美的：1440 / 1080 = 560 / 420 = 1.3333，两者的 px 宽度比例和像素密度比例刚好相等，所以此时使用 dp 才能刚好适用
 
 再来看一个不怎么完美的例子，以另外两台真机为例：
 
@@ -52,11 +52,11 @@ public static float applyDimension(int unit, float value, DisplayMetrics metrics
         case COMPLEX_UNIT_SP:
             return value * metrics.scaledDensity;
         case COMPLEX_UNIT_PT:
-            return value * metrics.xdpi * (1.0f/72);
+            return value * metrics.xdpi * (1.0f / 72);
         case COMPLEX_UNIT_IN:
             return value * metrics.xdpi;
         case COMPLEX_UNIT_MM:
-            return value * metrics.xdpi * (1.0f/25.4f);
+            return value * metrics.xdpi * (1.0f / 25.4f);
     }
     return 0;
 }

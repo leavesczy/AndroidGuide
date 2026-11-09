@@ -1,4 +1,4 @@
-> Google Jetpack 自从推出以后，极大地改变了 Android 开发者们的开发模式，并降低了开发难度。这也要求我们对当中一些子组件的实现原理具有一定的了解，所以我就打算来写一系列 Jetpack 源码解析的文章，希望对你有所帮助 🤣🤣🤣
+> Google Jetpack 自从推出以后，极大地改变了 Android 开发者们的开发模式，并降低了开发难度。这也要求我们对当中一些子组件的实现原理具有一定的了解，所以我就打算来写一系列 Jetpack 源码解析的文章，希望对你有所帮助
 
 ViewModel 是 Jetpack 整个家族体系内最为基础的组件之一，基本是按照如下方式来进行初始化和使用的：
 
@@ -54,9 +54,12 @@ private final Factory mFactory;
 private final ViewModelStore mViewModelStore;
 
 public ViewModelProvider(@NonNull ViewModelStoreOwner owner) {
-    this(owner.getViewModelStore(), owner instanceof HasDefaultViewModelProviderFactory
-            ? ((HasDefaultViewModelProviderFactory) owner).getDefaultViewModelProviderFactory()
-            : NewInstanceFactory.getInstance());
+    this(
+            owner.getViewModelStore(),
+            owner instanceof HasDefaultViewModelProviderFactory
+                    ? ((HasDefaultViewModelProviderFactory) owner)
+                            .getDefaultViewModelProviderFactory()
+                    : NewInstanceFactory.getInstance());
 }
 
 public ViewModelProvider(@NonNull ViewModelStoreOwner owner, @NonNull Factory factory) {
@@ -96,8 +99,8 @@ public static class NewInstanceFactory implements Factory {
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         //noinspection TryWithIdenticalCatches
         try {
-            //直接通过反射来完成 ViewModel 的初始化
-            //传入的 ViewModelClass 必须包含无参构造函数 
+            // 直接通过反射来完成 ViewModel 的初始化
+            // 传入的 ViewModelClass 必须包含无参构造函数
             return modelClass.newInstance();
         } catch (InstantiationException e) {
             throw new RuntimeException("Cannot create an instance of " + modelClass, e);
@@ -172,7 +175,7 @@ public <T extends ViewModel> T get(@NonNull String key, @NonNull Class<T> modelC
 ```
 # 二、如何保持不变
 
-Activity 每次获取 ViewModel 实例都会先尝试从 `mViewModelStore` 中取值，只有在取不到值的时候才会去重新构建一个新的 ViewModel 实例，且构建后的 ViewModel 实例也会被保存在`mViewModelStore` 中。那既然 Activity 可以在页面销毁重建的情况下获取到之前的 ViewModel 实例，那么不也就间接说明了在这种情况下 ViewModelStore 也是一直被保留着而没有被回收吗？
+Activity 每次获取 ViewModel 实例都会先尝试从 `mViewModelStore` 中取值，只有在取不到值的时候才会去重新构建一个新的 ViewModel 实例，且构建后的 ViewModel 实例也会被保存在 `mViewModelStore` 中。那既然 Activity 可以在页面销毁重建的情况下获取到之前的 ViewModel 实例，那么不也就间接说明了在这种情况下 ViewModelStore 也是一直被保留着而没有被回收吗？
 
 所以，想要知道 ViewModel 是如何保持不变的，那就看 ViewModelStore 实例是如何被保留不被回收就可以了
 
@@ -271,8 +274,8 @@ public final Object onRetainNonConfigurationInstance() {
     Object custom = onRetainCustomNonConfigurationInstance();
     ViewModelStore viewModelStore = mViewModelStore;
     if (viewModelStore == null) {
-        //如果 Activity 在第一次被重建后还未调用过 getViewModelStore() 方法，此时 mViewModelStore 就还是为 null
-        //之后又发生了第二次重建，那就主动调用 getLastNonConfigurationInstance() 来获取第一次重建时保存的 ViewModelStore 实例
+        // 如果 Activity 在第一次被重建后还未调用过 getViewModelStore() 方法，此时 mViewModelStore 就还是为 null
+        // 之后又发生了第二次重建，那就主动调用 getLastNonConfigurationInstance() 来获取第一次重建时保存的 ViewModelStore 实例
         NonConfigurationInstances nc =
                 (NonConfigurationInstances) getLastNonConfigurationInstance();
         if (nc != null) {
@@ -284,7 +287,7 @@ public final Object onRetainNonConfigurationInstance() {
     }
     NonConfigurationInstances nci = new NonConfigurationInstances();
     nci.custom = custom;
-    //将 viewModelStore 打包带走
+    // 将 viewModelStore 打包带走
     nci.viewModelStore = viewModelStore;
     return nci;
 }
@@ -293,7 +296,7 @@ public final Object onRetainNonConfigurationInstance() {
 
 ```java
 NonConfigurationInstances retainNonConfigurationInstances() {
-    //拿到子类需要保存的数据
+    // 拿到子类需要保存的数据
     Object activity = onRetainNonConfigurationInstance();
 
     HashMap<String, Object> children = onRetainNonConfigurationChildInstances();
@@ -307,13 +310,16 @@ NonConfigurationInstances retainNonConfigurationInstances() {
     mFragments.doLoaderStop(true);
     ArrayMap<String, LoaderManager> loaders = mFragments.retainLoaderNonConfig();
 
-    if (activity == null && children == null && fragments == null && loaders == null
+    if (activity == null
+            && children == null
+            && fragments == null
+            && loaders == null
             && mVoiceInteractor == null) {
         return null;
     }
 
     NonConfigurationInstances nci = new NonConfigurationInstances();
-    //保存起来
+    // 保存起来
     nci.activity = activity;
     nci.children = children;
     nci.fragments = fragments;
@@ -325,7 +331,7 @@ NonConfigurationInstances retainNonConfigurationInstances() {
     return nci;
 }
 ```
-> 从以上流程可以看出 Activity 的一些设计思路。由于  `android.app.Activity` 的逻辑是和特定的系统版本 SDK 关联的，我们无法决定用户手中的手机系统版本。而我们日常开发中都是选择直接继承于`androidx.appcompat.app.AppCompatActivity`，它又是作为一个依赖库来存在的，开发者可以自行决定要使用哪个版本号，Google 官方也可能随时推出新版本。所以，`android.app.Activity` 就将**非配置项实例数据**均当做一个 Object 实例来处理，由子类通过实现`onRetainNonConfigurationInstance()` 方法来返回，父类 Activity 不限制方法返回值需要特定类型，不同的子类可以返回不同的类型，父类只负责在需要的时候将实例保存起来，然后在重建时返回给子类即可，由子类自己来进行数据的拆解和重建。这样，不管用户使用的手机是哪个系统版本，都可以保证三方依赖库有最大的发挥余地
+> 从以上流程可以看出 Activity 的一些设计思路。由于 `android.app.Activity` 的逻辑是和特定的系统版本 SDK 关联的，我们无法决定用户手中的手机系统版本。而我们日常开发中都是选择直接继承于 `androidx.appcompat.app.AppCompatActivity`，它又是作为一个依赖库来存在的，开发者可以自行决定要使用哪个版本号，Google 官方也可能随时推出新版本。所以，`android.app.Activity` 就将**非配置项实例数据**均当做一个 Object 实例来处理，由子类通过实现 `onRetainNonConfigurationInstance()` 方法来返回，父类 Activity 不限制方法返回值需要特定类型，不同的子类可以返回不同的类型，父类只负责在需要的时候将实例保存起来，然后在重建时返回给子类即可，由子类自己来进行数据的拆解和重建。这样，不管用户使用的手机是哪个系统版本，都可以保证三方依赖库有最大的发挥余地
 
 再来看下 `retainNonConfigurationInstances()` 方法是在哪里调用的
 
@@ -333,43 +339,47 @@ NonConfigurationInstances retainNonConfigurationInstances() {
 
 ```java
 /** Core implementation of activity destroy call. */
-ActivityClientRecord performDestroyActivity(IBinder token, boolean finishing,
-        int configChanges, boolean getNonConfigInstance, String reason) {
+ActivityClientRecord performDestroyActivity(
+        IBinder token,
+        boolean finishing,
+        int configChanges,
+        boolean getNonConfigInstance,
+        String reason) {
     ActivityClientRecord r = mActivities.get(token);
     ···
-        if (getNonConfigInstance) {
-            try {
-                //保存 Activity 返回的 NonConfigurationInstances
-                r.lastNonConfigurationInstances
-                        = r.activity.retainNonConfigurationInstances();
-            } catch (Exception e) {
-                if (!mInstrumentation.onException(r.activity, e)) {
-                    throw new RuntimeException(
-                            "Unable to retain activity "
-                            + r.intent.getComponent().toShortString()
-                            + ": " + e.toString(), e);
-                }
+    if (getNonConfigInstance) {
+        try {
+            // 保存 Activity 返回的 NonConfigurationInstances
+            r.lastNonConfigurationInstances = r.activity.retainNonConfigurationInstances();
+        } catch (Exception e) {
+            if (!mInstrumentation.onException(r.activity, e)) {
+                throw new RuntimeException(
+                        "Unable to retain activity "
+                                + r.intent.getComponent().toShortString()
+                                + ": "
+                                + e.toString(),
+                        e);
             }
         }
+    }
 
     ···
-    //调用 Activity 的 onDestroy 方法
-    mInstrumentation.callActivityOnDestroy(r.activity);    
+    // 调用 Activity 的 onDestroy 方法
+    mInstrumentation.callActivityOnDestroy(r.activity);
     ···
     return r;
 }
 ```
-在重新启动 Activity 时，又会将数据  `attach` 到新的 Activity 实例上，将其作为 `getLastNonConfigurationInstance()` 方法的返回值。通过这种数据交接，重建前的 ViewModelStore 实例就会被重建后的 Activity 拿到，当中就保留了重建前 Activity 初始化的所有 ViewModel 实例，从而保障了 ViewModel 实例的不变性
+在重新启动 Activity 时，又会将数据 `attach` 到新的 Activity 实例上，将其作为 `getLastNonConfigurationInstance()` 方法的返回值。通过这种数据交接，重建前的 ViewModelStore 实例就会被重建后的 Activity 拿到，当中就保留了重建前 Activity 初始化的所有 ViewModel 实例，从而保障了 ViewModel 实例的不变性
 
 ```java
-/**  Core implementation of activity launch. */
+/** Core implementation of activity launch. */
 private Activity performLaunchActivity(ActivityClientRecord r, Intent customIntent) {
     ···
     Activity activity = null;
     try {
         java.lang.ClassLoader cl = appContext.getClassLoader();
-        activity = mInstrumentation.newActivity(
-                cl, component.getClassName(), r.intent);
+        activity = mInstrumentation.newActivity(cl, component.getClassName(), r.intent);
         StrictMode.incrementExpectedActivityCount(activity.getClass());
         r.intent.setExtrasClassLoader(cl);
         r.intent.prepareToEnterProcess();
@@ -379,19 +389,32 @@ private Activity performLaunchActivity(ActivityClientRecord r, Intent customInte
     } catch (Exception e) {
         if (!mInstrumentation.onException(activity, e)) {
             throw new RuntimeException(
-                "Unable to instantiate activity " + component
-                + ": " + e.toString(), e);
+                    "Unable to instantiate activity " + component + ": " + e.toString(), e);
         }
     }
 
     ···
 
-    //将 r.lastNonConfigurationInstances 传递进去
-    activity.attach(appContext, this, getInstrumentation(), r.token,
-                    r.ident, app, r.intent, r.activityInfo, title, r.parent,
-                    r.embeddedID, r.lastNonConfigurationInstances, config,
-                    r.referrer, r.voiceInteractor, window, r.configCallback,
-                    r.assistToken);
+    // 将 r.lastNonConfigurationInstances 传递进去
+    activity.attach(
+            appContext,
+            this,
+            getInstrumentation(),
+            r.token,
+            r.ident,
+            app,
+            r.intent,
+            r.activityInfo,
+            title,
+            r.parent,
+            r.embeddedID,
+            r.lastNonConfigurationInstances,
+            config,
+            r.referrer,
+            r.voiceInteractor,
+            window,
+            r.configCallback,
+            r.assistToken);
     ···
     return activity;
 }
@@ -479,7 +502,7 @@ public <T extends ViewModel> T get(@NonNull String key, @NonNull Class<T> modelC
         if (mFactory instanceof OnRequeryFactory) {
             ((OnRequeryFactory) mFactory).onRequery(viewModel);
         }
-        //如果 mViewModelStore 里已经缓存了同个 key，且 value 也对应相同的 Class 类型，那么就直接返回 value 
+        // 如果 mViewModelStore 里已经缓存了同个 key，且 value 也对应相同的 Class 类型，那么就直接返回 value
         return (T) viewModel;
     } else {
         //noinspection StatementWithEmptyBody
@@ -540,20 +563,23 @@ E/myViewModelB: github.leavesc.demo.MyViewModel@9abd6fe age: 20
 ```java
 public ComponentActivity() {
     ···
-    getLifecycle().addObserver(new LifecycleEventObserver() {
-        @Override
-        public void onStateChanged(@NonNull LifecycleOwner source,
-                @NonNull Lifecycle.Event event) {
-            if (event == Lifecycle.Event.ON_DESTROY) {
-                // Clear out the available context
-                mContextAwareHelper.clearAvailableContext();
-                // And clear the ViewModelStore
-                if (!isChangingConfigurations()) {
-                    getViewModelStore().clear();
-                }
-            }
-        }
-    });
+    getLifecycle()
+            .addObserver(
+                    new LifecycleEventObserver() {
+                        @Override
+                        public void onStateChanged(
+                                @NonNull LifecycleOwner source,
+                                @NonNull Lifecycle.Event event) {
+                            if (event == Lifecycle.Event.ON_DESTROY) {
+                                // Clear out the available context
+                                mContextAwareHelper.clearAvailableContext();
+                                // And clear the ViewModelStore
+                                if (!isChangingConfigurations()) {
+                                    getViewModelStore().clear();
+                                }
+                            }
+                        }
+                    });
     ···
 }
 ```
@@ -562,7 +588,7 @@ public class ViewModelStore {
 
     private final HashMap<String, ViewModel> mMap = new HashMap<>();
 
-	···
+    ···
         
     /**
      *  Clears internal storage and notifies ViewModels that they are no longer used.
@@ -630,7 +656,7 @@ E/AViewModel: onCleared
 E/bViewModel: github.leavesc.demo.BViewMode@e24ac80
 E/MainActivity: onCreate
 ```
-之所以造成这一结果，就是因为 `aViewModel` 和 `bViewModel` 都使用了同个 key，这就导致了在将 `bViewModel` 存到 HashMap 的时候就会覆盖并回收掉旧值 `aViewModel` 
+之所以造成这一结果，就是因为 `aViewModel` 和 `bViewModel` 都使用了同个 key，这就导致了在将 `bViewModel` 存到 HashMap 的时候就会覆盖并回收掉旧值 `aViewModel`
 
 ```kotlin
 public class ViewModelStore {

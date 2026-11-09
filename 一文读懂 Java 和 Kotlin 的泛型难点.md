@@ -1,8 +1,8 @@
-Java 和 Kotlin 的泛型算作是一块挺大的知识难点了，涉及到很多很难理解的概念：**泛型型参、泛型实参、类型参数、不变、型变、协变、逆变、内联**等等。本篇文章就将 Java 和 Kotlin 结合着一起讲，按照我的个人理解来阐述泛型的各个知识难点，希望对你有所帮助 🤣🤣
+Java 和 Kotlin 的泛型算作是一块挺大的知识难点了，涉及到很多很难理解的概念：**泛型型参、泛型实参、类型参数、不变、型变、协变、逆变、内联**等等。本篇文章就将 Java 和 Kotlin 结合着一起讲，按照我的个人理解来阐述泛型的各个知识难点，希望对你有所帮助
 
 # 一、泛型类型
 
-泛型允许你定义带**类型形参**的数据类型，当这种类型的实例被创建出来后，**类型形参**便被替换为称为**类型实参**的具体类型。例如，对于 `List<T>`，List 称为**基础类型**，T 便是**类型型参**，T 可以是任意类型，当没有指定 T 的具体类型时，我们只能知道`List<T>`是一个集合列表，但不知道承载的具体数据类型。而对于 `List<String>`，当中的 String 便是**类型实参**，我们可以明白地知道该列表承载的都是字符串，在这里 String 就相当于一个参数传递给了 List，在这语义下 String 也称为**类型参数**
+泛型允许你定义带**类型形参**的数据类型，当这种类型的实例被创建出来后，**类型形参**便被替换为称为**类型实参**的具体类型。例如，对于 `List<T>`，List 称为**基础类型**，T 便是**类型型参**，T 可以是任意类型，当没有指定 T 的具体类型时，我们只能知道 `List<T>` 是一个集合列表，但不知道承载的具体数据类型。而对于 `List<String>`，当中的 String 便是**类型实参**，我们可以明白地知道该列表承载的都是字符串，在这里 String 就相当于一个参数传递给了 List，在这语义下 String 也称为**类型参数**
 
 此外，在 Kotlin 中我们可以实现**实化类型参数**，在运行时的**内联函数**中拿到作为**类型实参**的具体类型，即可以实现 `T::class.java`，但在 Java 中却无法实现，因为**内联函数**是 Kotlin 中的概念，Java 中并不存在
 
@@ -10,7 +10,7 @@ Java 和 Kotlin 的泛型算作是一块挺大的知识难点了，涉及到很�
 
 泛型是在 Java 5 版本开始引入的，先通过几个小例子来明白泛型的重要性
 
-以下代码可以成功编译，但是在运行时却抛出了 ClassCastException。了解 ArrayList 源码的同学就知道其内部是用一个`Object[]`数组来存储数据的，这使得 ArrayList 能够存储任何类型的对象，所以在没有泛型的年代开发者一不小心就有可能向 ArrayList 存入了非期望值，编译期完全正常，等到在运行时就会抛出类型转换异常了
+以下代码可以成功编译，但是在运行时却抛出了 ClassCastException。了解 ArrayList 源码的同学就知道其内部是用一个 `Object[]` 数组来存储数据的，这使得 ArrayList 能够存储任何类型的对象，所以在没有泛型的年代开发者一不小心就有可能向 ArrayList 存入了非期望值，编译期完全正常，等到在运行时就会抛出类型转换异常了
 
 ```java
 public class GenericTest {
@@ -24,7 +24,6 @@ public class GenericTest {
     public static void addData(List dataList) {
         dataList.add(1);
     }
-
 }
 ```
 
@@ -38,7 +37,7 @@ java.lang.Integer cannot be cast to java.lang.String
 ```java
 public static void main(String[] args) {
     List<String> stringList = new ArrayList();
-    addData(stringList); //报错
+    addData(stringList); // 报错
     String str = stringList.get(0);
 }
 
@@ -78,7 +77,7 @@ public static <T extends Number> List<T> filter(List<T> data) {
 总的来说，泛型有以下几点优势：
 
 - 类型检查，在编译阶段就能发现错误
-- 更加语义化，看到 `List<String>`我们就知道存储的数据类型是 String
+- 更加语义化，看到 `List<String>` 我们就知道存储的数据类型是 String
 - 自动类型转换，在取值时无需进行手动类型转换
 - 能够将逻辑抽象出来，使得代码更加具有通用性
 
@@ -114,7 +113,6 @@ public class GenericTest {
         public NodeA(Object obj) {
             this.obj = obj;
         }
-
     }
 
     public static class NodeB<T> {
@@ -124,7 +122,6 @@ public class GenericTest {
         public NodeB(T obj) {
             this.obj = obj;
         }
-
     }
 
     public static void main(String[] args) {
@@ -132,7 +129,6 @@ public class GenericTest {
         NodeB<String> nodeB = new NodeB<>("业志陈");
         System.out.println(nodeB.obj);
     }
-
 }
 ```
 
@@ -179,7 +175,6 @@ public class GenericTest {
         public NodeA(String obj) {
             this.obj = obj;
         }
-
     }
 
     public static class NodeB<T extends String> {
@@ -189,7 +184,6 @@ public class GenericTest {
         public NodeB(T obj) {
             this.obj = obj;
         }
-
     }
 
     public static void main(String[] args) {
@@ -197,7 +191,6 @@ public class GenericTest {
         NodeB<String> nodeB = new NodeB<>("业志陈");
         System.out.println(nodeB.obj);
     }
-
 }
 ```
 
@@ -248,7 +241,6 @@ public class GenericTest {
         public NodeA(T obj) {
             this.obj = obj;
         }
-
     }
 
     public static class NodeB<T extends String> {
@@ -258,7 +250,6 @@ public class GenericTest {
         public NodeB(T obj) {
             this.obj = obj;
         }
-
     }
 
     public static void main(String[] args) {
@@ -274,7 +265,6 @@ public class GenericTest {
             System.out.println("fieldTypeName: " + field.getType().getName());
         }
     }
-
 }
 ```
 
@@ -299,16 +289,16 @@ fieldTypeName: java.lang.String
 
 ```java
 transient Object[] elementData;
-    
+
 public E get(int index) {
-	rangeCheck(index);
-	return elementData(index);
+    rangeCheck(index);
+    return elementData(index);
 }
-    
+
 @SuppressWarnings("unchecked")
 E elementData(int index) {
-	//强制类型转换
-	return (E) elementData[index];
+    // 强制类型转换
+    return (E) elementData[index];
 }
 ```
 
@@ -318,7 +308,7 @@ E elementData(int index) {
 
 Java 泛型对于类型的约束只在编译期存在，运行时仍然会按照 Java 5 之前的机制来运行，泛型的具体类型在运行时已经被删除了，所以 JVM 是识别不到我们在代码中指定的具体的泛型类型的
 
-例如，虽然`List<String>`只能用于添加字符串，但我们只能**泛化地**识别到它属于`List<?>`类型，而无法具体判断出该 List 内部包含的具体类型
+例如，虽然 `List<String>` 只能用于添加字符串，但我们只能**泛化地**识别到它属于 `List<?>` 类型，而无法具体判断出该 List 内部包含的具体类型
 
 ```java
 List<String> stringList = new ArrayList<>();
@@ -336,29 +326,23 @@ if (stringList instanceof ArrayList<String>) {
 
 ```java
 public <T> void filter(T data) {
-	//正常
-	if (data instanceof String) {
+    // 正常
+    if (data instanceof String) {}
 
-	}
-	//报错
-	if (T instanceof String) {
+    // 报错
+    if (T instanceof String) {}
 
-	}
-	//报错
-	Class<T> tClass = T::getClass;
+    // 报错
+    Class<T> tClass = T::getClass;
 }
 ```
 
 此外，类型擦除也会导致 Java 中出现多态问题。例如，以下两个方法的方法签名并不完全相同，但由于类型擦除的原因，入参参数的数据类型都会被看成 `List<Object>`，从而导致两者无法共存在同一个区域内
 
 ```java
-public void filter(List<String> stringList) {
+public void filter(List<String> stringList) {}
 
-}
-
-public void filter(List<Integer> stringList) {
-
-}
+public void filter(List<Integer> stringList) {}
 ```
 
 # 五、Kotlin 泛型
@@ -435,7 +419,7 @@ java.lang.String cannot be cast to java.lang.Number
 
 泛型本身已经带有类型约束的作用，我们也可以进一步细化其支持的具体类型
 
-例如，假设存在一个盘子 Plate，我们要求该 Plate 只能用于装水果 Fruit，那么就可以对其泛型声明做进一步约束，Java 中使用 extend 关键字来声明约束规则，而 Kotlin 使用的是 **:**  。这样 Plate 就只能用于 Fruit 和其子类，而无法用于 Noodles 等不相关的类型，这种类型约束就被称为**上界约束**
+例如，假设存在一个盘子 Plate，我们要求该 Plate 只能用于装水果 Fruit，那么就可以对其泛型声明做进一步约束，Java 中使用 extend 关键字来声明约束规则，而 Kotlin 使用的是 **:** 。这样 Plate 就只能用于 Fruit 和其子类，而无法用于 Noodles 等不相关的类型，这种类型约束就被称为**上界约束**
 
 ```kotlin
 open class Fruit
@@ -477,7 +461,7 @@ fun main() {
 
 假设现在有个需求，需要我们提供一个方法用于遍历所有类型的 List 集合并打印元素
 
-第一种做法就是直接将方法参数类型声明为 List，不包含任何泛型类型声明。这种做法可行，但编译器会警告无法确定 `list`元素的具体类型，所以这不是最优解法
+第一种做法就是直接将方法参数类型声明为 List，不包含任何泛型类型声明。这种做法可行，但编译器会警告无法确定 `list` 元素的具体类型，所以这不是最优解法
 
 ```java
 public static void printList1(List list) {
@@ -487,7 +471,7 @@ public static void printList1(List list) {
 }
 ```
 
-可能会想到的第二种做法是：将泛型类型直接声明为 Object，希望让其适用于任何类型的 List。这种做法完全不可行，因为即使 `String` 是 `Object` 的子类，但 `List<String>` 和 `List<Object>`并不具备从属关系，这导致 `printList2` 方法实际上只能用于`List<Object>`这一种具体类型
+可能会想到的第二种做法是：将泛型类型直接声明为 Object，希望让其适用于任何类型的 List。这种做法完全不可行，因为即使 `String` 是 `Object` 的子类，但 `List<String>` 和 `List<Object>` 并不具备从属关系，这导致 `printList2` 方法实际上只能用于 `List<Object>` 这一种具体类型
 
 ```java
 public static void printList2(List<Object> list) {
@@ -497,7 +481,7 @@ public static void printList2(List<Object> list) {
 }
 ```
 
-最优解法就是要用到 Java 的类型通配符 **?** 了，`printList3`方法完全可行且编译器也不会警告报错
+最优解法就是要用到 Java 的类型通配符 **?** 了，`printList3` 方法完全可行且编译器也不会警告报错
 
 ```java
 public static void printList3(List<?> list) {
@@ -507,7 +491,7 @@ public static void printList3(List<?> list) {
 }
 ```
 
-？ 表示我们并不关心具体的泛型类型，而只是想配合其它类型进行一些条件限制。例如，`printList3`方法希望传入的是一个 List，但不限制泛型的具体类型，此时`List<?>`就达到了这一层限制条件
+？ 表示我们并不关心具体的泛型类型，而只是想配合其它类型进行一些条件限制。例如，`printList3` 方法希望传入的是一个 List，但不限制泛型的具体类型，此时 `List<?>` 就达到了这一层限制条件
 
 类型通配符也存在着一些限制。因为 `printList3` 方法并不包含具体的泛型类型，所以我们从中取出的值只能是 Object 类型，且无法向其插入值，这都是为了避免发生 ClassCastException
 
@@ -534,32 +518,26 @@ val list2: MutableList<*> = ArrayList<*>() //报错
 看以下例子。Apple 和 Banana 都是 Fruit 的子类，可以发现 Apple[] 类型的对象是可以赋值给 Fruit[] 的，且 Fruit[] 可以容纳 Apple 对象和 Banana 对象，这种设计就被称为**协变**，即如果 A 是 B 的子类，那么 A[] 就是 B[] 的子类型。相对的，Object[] 就是所有数组对象的父类型
 
 ```java
-static class Fruit {
+static class Fruit {}
 
-}
+static class Apple extends Fruit {}
 
-static class Apple extends Fruit {
-
-}
-
-static class Banana extends Fruit {
-
-}
+static class Banana extends Fruit {}
 
 public static void main(String[] args) {
     Fruit[] fruitArray = new Apple[10];
-    //正常
+    // 正常
     fruitArray[0] = new Apple();
-    //编译时正常，运行时抛出 ArrayStoreException
+    // 编译时正常，运行时抛出 ArrayStoreException
     fruitArray[1] = new Banana();
 }
 ```
 
-而 Java 中的泛型是**不变**的，这意味着 String 虽然是 Object 的子类，但`List<String>`并不是`List<Object>`的子类型，两者并不具备继承关系
+而 Java 中的泛型是**不变**的，这意味着 String 虽然是 Object 的子类，但 `List<String>` 并不是 `List<Object>` 的子类型，两者并不具备继承关系
 
 ```java
 List<String> stringList = new ArrayList<>();
-List<Object> objectList = stringList; //报错
+List<Object> objectList = stringList; // 报错
 ```
 
 那为什么 Java 中的泛型是**不变**的呢？
@@ -575,31 +553,26 @@ String str = strList.get(0); //将抛出 ClassCastException，无法将整数转
 
 再来想个问题，既然**协变**本身并不安全，那么数组为何又要被设计为协变呢？
 
-Arrays 类包含一个 `equals`方法用于比较两个数组对象是否相等。如果数组是协变的，那么就需要为每一种数组对象都定义一个 `equals`方法，包括开发者自定义的数据类型。想要避免这种情况，就需要让 Object[] 可以接收任意数组类型，即**让 Object[] 成为所有数组对象的父类型**，这就使得数组必须支持协变，这样多态才能生效
+Arrays 类包含一个 `equals` 方法用于比较两个数组对象是否相等。如果数组是协变的，那么就需要为每一种数组对象都定义一个 `equals` 方法，包括开发者自定义的数据类型。想要避免这种情况，就需要让 Object[] 可以接收任意数组类型，即**让 Object[] 成为所有数组对象的父类型**，这就使得数组必须支持协变，这样多态才能生效
 
 ```java
 public class Arrays {
-    
-     public static boolean equals(Object[] a, Object[] a2) {
-        if (a==a2)
-            return true;
-        if (a==null || a2==null)
-            return false;
+
+    public static boolean equals(Object[] a, Object[] a2) {
+        if (a == a2) return true;
+        if (a == null || a2 == null) return false;
 
         int length = a.length;
-        if (a2.length != length)
-            return false;
+        if (a2.length != length) return false;
 
-        for (int i=0; i<length; i++) {
+        for (int i = 0; i < length; i++) {
             Object o1 = a[i];
             Object o2 = a2[i];
-            if (!(o1==null ? o2==null : o1.equals(o2)))
-                return false;
+            if (!(o1 == null ? o2 == null : o1.equals(o2))) return false;
         }
 
         return true;
     }
-    
 }
 ```
 
@@ -614,7 +587,7 @@ val anyArray: Array<Any?> = stringArray //报错
 
 # 九、泛型协变
 
-假设我们定义了一个`copyAll`希望用于 List 数据迁移。那以下操作在我们看来就是完全安全的，因为 Integer 是 Number 的子类，按道理来说是能够将 Integer 保存为 Number 的，但由于泛型不变性，`List<Integer>`并不是`List<Number>`的子类型，所以实际上该操作将报错
+假设我们定义了一个 `copyAll` 希望用于 List 数据迁移。那以下操作在我们看来就是完全安全的，因为 Integer 是 Number 的子类，按道理来说是能够将 Integer 保存为 Number 的，但由于泛型不变性，`List<Integer>` 并不是 `List<Number>` 的子类型，所以实际上该操作将报错
 
 ```java
 public static void main(String[] args) {
@@ -625,7 +598,7 @@ public static void main(String[] args) {
     integerList.add(2);
     integerList.add(3);
 
-    copyAll(numberList, integerList); //报错
+    copyAll(numberList, integerList); // 报错
 }
 
 private static <T> void copyAll(List<T> to, List<T> from) {
@@ -637,7 +610,7 @@ private static <T> void copyAll(List<T> to, List<T> from) {
 
 编译器的作用之一就是**进行安全检查并阻止可能发生不安全行为的操作**，`copyAll` 方法会报错，那么肯定就是编译器觉得该方法有可能会触发不安全的操作。开发者的本意是希望将 Integer 类型的数据转移到 NumberList 中，只有这种操作且这种操作在我们看来肯定是安全的，但是编译器不知道开发者最终所要做的具体操作啊
 
-假设 `copyAll`方法可以正常调用，那么`copyAll`方法自然只会把 `from` 当做 `List<Number>`来看待。因为 Integer 是 Number 的子类，从 `integerList` 获取到的数据对于 `numberList` 来说自然是安全的。而如果我们在`copyAll`方法中偷偷向 `integerList` 传入了一个 Number 类型的值的话，那么自然就将抛出异常，因为 from 实际上是 `List<Integer>`类型
+假设 `copyAll` 方法可以正常调用，那么 `copyAll` 方法自然只会把 `from` 当做 `List<Number>` 来看待。因为 Integer 是 Number 的子类，从 `integerList` 获取到的数据对于 `numberList` 来说自然是安全的。而如果我们在 `copyAll` 方法中偷偷向 `integerList` 传入了一个 Number 类型的值的话，那么自然就将抛出异常，因为 from 实际上是 `List<Integer>` 类型
 
 为了阻止这种不安全的行为，编译器选择通过直接报错来进行提示。为了解决报错，我们就需要向编译器做出安全保证：**从 from 取出来的值只会当做 Number 类型，且不会向 from 传入任何值**
 
@@ -649,13 +622,13 @@ private static <T> void copyAll(List<T> to, List<? extends T> from) {
 }
 ```
 
-`? extends T` 表示 `from` 接受 T 或者 T 的子类型，而不单单是 T 自身，这意味着我们可以安全地从 `from` 中取值并声明为 T 类型，但由于我们并不知道 T 代表的具体类型，写入操作并不安全，因此编译器会阻止我们向 `from` 执行传值操作。有了该限制后，从`integerList`中取出来的值只能是当做 Number 类型，且避免了向`integerList`插入非法值的可能，此时`List<Integer>`就相当于`List<? extends Number>`的子类型了，从而使得 `copyAll` 方法可以正常使用
+`? extends T` 表示 `from` 接受 T 或者 T 的子类型，而不单单是 T 自身，这意味着我们可以安全地从 `from` 中取值并声明为 T 类型，但由于我们并不知道 T 代表的具体类型，写入操作并不安全，因此编译器会阻止我们向 `from` 执行传值操作。有了该限制后，从 `integerList` 中取出来的值只能是当做 Number 类型，且避免了向 `integerList` 插入非法值的可能，此时 `List<Integer>` 就相当于 `List<? extends Number>` 的子类型了，从而使得 `copyAll` 方法可以正常使用
 
-简而言之，带 **extends** 限定了上界的通配符类型使得**泛型参数类型是协变的**，即如果 A 是 B 的子类，那么 `Generic<A>` 就是`Generic<? extends B>`的子类型
+简而言之，带 **extends** 限定了上界的通配符类型使得**泛型参数类型是协变的**，即如果 A 是 B 的子类，那么 `Generic<A>` 就是 `Generic<? extends B>` 的子类型
 
 # 十、泛型逆变
 
-**协变**所能做到的是：如果 A 是 B 的子类，那么 `Generic<A>` 就是`Generic<? extends B>`的子类型。**逆变**相反，其代表的是：如果 A 是 B 的子类，那么 `Generic<B>` 就是 `Generic<? super A>` 的子类型
+**协变**所能做到的是：如果 A 是 B 的子类，那么 `Generic<A>` 就是 `Generic<? extends B>` 的子类型。**逆变**相反，其代表的是：如果 A 是 B 的子类，那么 `Generic<B>` 就是 `Generic<? super A>` 的子类型
 
 协变还比较好理解，毕竟其继承关系是相同的，但逆变就比较反直觉了，整个继承关系都倒过来了
 
@@ -667,11 +640,11 @@ private static <T> void copyAll(List<? super T> to, List<T> from) {
 }
 ```
 
-`? super T`表示 `to` 接收 T 或者 T 的父类型，而不单单是 T 自身，这意味着我们可以安全地向 `to` 传类型为 T 的值，但由于我们并不知道 T 代表的具体类型，所以从 `to` 取出来的值只能是 Object 类型。有了该限制后，`integerList`只能向 `numberList`传递类型为 Integer 的值，且避免了从 `numberList` 中获取到非法类型值的可能，此时`List<Number>`就相当于`List<? super Integer>`的子类型了，从而使得 `copyAll` 方法可以正常使用
+`? super T` 表示 `to` 接收 T 或者 T 的父类型，而不单单是 T 自身，这意味着我们可以安全地向 `to` 传类型为 T 的值，但由于我们并不知道 T 代表的具体类型，所以从 `to` 取出来的值只能是 Object 类型。有了该限制后，`integerList` 只能向 `numberList` 传递类型为 Integer 的值，且避免了从 `numberList` 中获取到非法类型值的可能，此时 `List<Number>` 就相当于 `List<? super Integer>` 的子类型了，从而使得 `copyAll` 方法可以正常使用
 
 简而言之，带 **super** 限定了下界的通配符类型使得**泛型参数类型是逆变的**，即如果 A 是 B 的子类，那么 `Generic<B>` 就是 `Generic<? super A>` 的子类型
 
-# 十一、out  &  in
+# 十一、out & in
 
 Java 中关于泛型的困境在 Kotlin 中一样存在，out 和 in 都是 Kotlin 的关键字，其作用都是为了来应对泛型问题。`in` 和 `out` 是一个对立面，同时它们又与泛型**不变**相对立，统称为**型变**
 
@@ -712,17 +685,17 @@ fun <T> copyAll(to: MutableList<in T>, from: MutableList<T>) {
 }
 ```
 
-`out` 关键字就相当于 Java 中的`<?  extends T>`，其作用就是限制了 `from` 不能用于接收值而只能向其取值，这样就避免了从 `to` 取出值然后向 `from` 赋值这种不安全的行为了，即实现了泛型协变
+`out` 关键字就相当于 Java 中的 `<?  extends T>`，其作用就是限制了 `from` 不能用于接收值而只能向其取值，这样就避免了从 `to` 取出值然后向 `from` 赋值这种不安全的行为了，即实现了泛型协变
 
-`in` 关键字就相当于 Java 中的`<? super T>`，其作用就是限制了 `to` 只能用于接收值而不能向其取值，这样就避免了从 `to` 取出值然后向 `from` 赋值这种不安全的行为了，即实现了泛型逆变
+`in` 关键字就相当于 Java 中的 `<? super T>`，其作用就是限制了 `to` 只能用于接收值而不能向其取值，这样就避免了从 `to` 取出值然后向 `from` 赋值这种不安全的行为了，即实现了泛型逆变
 
-> 从这也可以联想到，`MutableList<*>` 就相当于 `MutableList<out Any?>`了，两者都带有相同的限制条件：不允许写值操作，允许读值操作，且读取出来的值只能当做 `Any?`进行处理
+> 从这也可以联想到，`MutableList<*>` 就相当于 `MutableList<out Any?>` 了，两者都带有相同的限制条件：不允许写值操作，允许读值操作，且读取出来的值只能当做 `Any?` 进行处理
 
 # 十二、支持协变的 List
 
 在上述例子中，想要实现协变还有另外一种方式，那就是使用 List
 
-将 from 的类型声明从 `MutableList<T>`修改为 `List<T>` 后，可以发现 `copyAll` 方法也可以正常调用了
+将 from 的类型声明从 `MutableList<T>` 修改为 `List<T>` 后，可以发现 `copyAll` 方法也可以正常调用了
 
 ```kotlin
 fun <T> copyAll(to: MutableList<T>, from: List<T>) {
@@ -732,7 +705,7 @@ fun <T> copyAll(to: MutableList<T>, from: List<T>) {
 
 对 Kotlin 有一定了解的同学应该知道，Kotlin 中的集合框架分为两种大类：**可读可写**和**只能读不能写**
 
-以 Java 中的 ArrayList 为例，Kotlin 将之分为了 MutableList 和 List 两种类型的接口。而 List 接口中的泛型已经使用 out 关键字进行修饰了，且不包含任何**传入值并保存**的方法，即 List 接口**只支持读值而不支持写值**，其本身就已经满足了协变所需要的条件，因此`copyAll` 方法可以正常使用
+以 Java 中的 ArrayList 为例，Kotlin 将之分为了 MutableList 和 List 两种类型的接口。而 List 接口中的泛型已经使用 out 关键字进行修饰了，且不包含任何**传入值并保存**的方法，即 List 接口**只支持读值而不支持写值**，其本身就已经满足了协变所需要的条件，因此 `copyAll` 方法可以正常使用
 
 ```kotlin
 public interface List<out E> : Collection<E> {
@@ -750,9 +723,9 @@ public interface List<out E> : Collection<E> {
 }
 ```
 
-> 虽然 List 接口中有几个方法也接收了 E 类型的入参参数，但该方法本身不会进行写值操作，所以实际上可以正常使用，Kotlin 也使用 `@UnsafeVariance`抑制了编译器警告
+> 虽然 List 接口中有几个方法也接收了 E 类型的入参参数，但该方法本身不会进行写值操作，所以实际上可以正常使用，Kotlin 也使用 `@UnsafeVariance` 抑制了编译器警告
 
-# 十三、reified  &  inline
+# 十三、reified & inline
 
 上文讲了，由于类型擦除，Java 和 Kotlin 的泛型类型实参都会在编译阶段被擦除，在 Kotlin 中存在一个额外手段可以来解决这个问题，即**内联函数**
 
@@ -771,35 +744,35 @@ inline fun <reified T> Any.isInstanceOf(): Boolean {
 }
 ```
 
-将以上的 Kotlin 代码反编译为 Java 代码，可以看出来 `main()`方法最终是没有调用 `isInstanceOf` 方法的，具体的判断逻辑都被插入到了`main()`方法内部，最终是执行了 `instanceof` 操作，且指定了具体的泛型类型参数 String 和 Integer
+将以上的 Kotlin 代码反编译为 Java 代码，可以看出来 `main()` 方法最终是没有调用 `isInstanceOf` 方法的，具体的判断逻辑都被插入到了 `main()` 方法内部，最终是执行了 `instanceof` 操作，且指定了具体的泛型类型参数 String 和 Integer
 
 ```java
 public final class GenericTest6Kt {
-   public static final void main() {
-      Object $this$isInstanceOf$iv = 1;
-      int $i$f$isInstanceOf = false;
-      boolean var2 = $this$isInstanceOf$iv instanceof String;
-      $i$f$isInstanceOf = false;
-      System.out.println(var2);
-      Object $this$isInstanceOf$iv = "string";
-      $i$f$isInstanceOf = false;
-      var2 = $this$isInstanceOf$iv instanceof Integer;
-      $i$f$isInstanceOf = false;
-      System.out.println(var2);
-   }
+    public static final void main() {
+        Object $this$isInstanceOf$iv = 1;
+        int $i$f$isInstanceOf = false;
+        boolean var2 = $this$isInstanceOf$iv instanceof String;
+        $i$f$isInstanceOf = false;
+        System.out.println(var2);
+        Object $this$isInstanceOf$iv = "string";
+        $i$f$isInstanceOf = false;
+        var2 = $this$isInstanceOf$iv instanceof Integer;
+        $i$f$isInstanceOf = false;
+        System.out.println(var2);
+    }
 
-   // $FF: synthetic method
-   public static void main(String[] var0) {
-      main();
-   }
+    // $FF: synthetic method
+    public static void main(String[] var0) {
+        main();
+    }
 
-   // $FF: synthetic method
-   public static final boolean isInstanceOf(Object $this$isInstanceOf) {
-      int $i$f$isInstanceOf = 0;
-      Intrinsics.checkNotNullParameter($this$isInstanceOf, "$this$isInstanceOf");
-      Intrinsics.reifiedOperationMarker(3, "T");
-      return $this$isInstanceOf instanceof Object;
-   }
+    // $FF: synthetic method
+    public static final boolean isInstanceOf(Object $this$isInstanceOf) {
+        int $i$f$isInstanceOf = 0;
+        Intrinsics.checkNotNullParameter($this$isInstanceOf, "$this$isInstanceOf");
+        Intrinsics.reifiedOperationMarker(3, "T");
+        return $this$isInstanceOf instanceof Object;
+    }
 }
 ```
 

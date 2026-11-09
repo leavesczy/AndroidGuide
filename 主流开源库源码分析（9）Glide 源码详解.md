@@ -1,6 +1,6 @@
-> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助 🤣🤣🤣
+> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助
 
-Glide 的源码有点复杂，如果要细细展开来讲解，那么写个十篇文章也囊括不完 😂😂 所以我就想着换个思路来看源码：**以小点来划分，每个小点只包含 Glide 实现某个功能或目的时所涉及的流程，以此来简化理解难度，通过整合多个小的功能点来把控住 Glide 大的实现方向**
+Glide 的源码有点复杂，如果要细细展开来讲解，那么写个十篇文章也囊括不完。所以我就想着换个思路来看源码：**以小点来划分，每个小点只包含 Glide 实现某个功能或目的时所涉及的流程，以此来简化理解难度，通过整合多个小的功能点来把控住 Glide 大的实现方向**
 
 本文基于 Glide 的以下版本来进行讲解
 
@@ -52,18 +52,21 @@ Glide 实现**生命周期监听**涉及到的类包含以下几个：
 4. ApplicationLifecycle
 5. SupportRequestManagerFragment
 
-首先，LifecycleListener 定义了三种事件通知回调，用于通知容器的活跃状态（是处于前台、后台、还是已经退出了）。Lifecycle 用于注册和移除 LifecycleListener 
+首先，LifecycleListener 定义了三种事件通知回调，用于通知容器的活跃状态（是处于前台、后台、还是已经退出了）。Lifecycle 用于注册和移除 LifecycleListener
 
 ```java
 public interface LifecycleListener {
-  void onStart();
-  void onStop();
-  void onDestroy();
+    void onStart();
+
+    void onStop();
+
+    void onDestroy();
 }
 
 public interface Lifecycle {
-  void addListener(@NonNull LifecycleListener listener);
-  void removeListener(@NonNull LifecycleListener listener);
+    void addListener(@NonNull LifecycleListener listener);
+
+    void removeListener(@NonNull LifecycleListener listener);
 }
 ```
 
@@ -73,49 +76,49 @@ ActivityFragmentLifecycle 用 **isStarted** 和 **isDestroyed** 两个布尔变�
 
 ```java
 class ActivityFragmentLifecycle implements Lifecycle {
-  private final Set<LifecycleListener> lifecycleListeners =
-      Collections.newSetFromMap(new WeakHashMap<LifecycleListener, Boolean>());
-  private boolean isStarted;
-  private boolean isDestroyed;
+    private final Set<LifecycleListener> lifecycleListeners =
+            Collections.newSetFromMap(new WeakHashMap<LifecycleListener, Boolean>());
+    private boolean isStarted;
+    private boolean isDestroyed;
 
-  @Override
-  public void addListener(@NonNull LifecycleListener listener) {
-    lifecycleListeners.add(listener);
+    @Override
+    public void addListener(@NonNull LifecycleListener listener) {
+        lifecycleListeners.add(listener);
 
-    if (isDestroyed) {
-      listener.onDestroy();
-    } else if (isStarted) {
-      listener.onStart();
-    } else {
-      listener.onStop();
+        if (isDestroyed) {
+            listener.onDestroy();
+        } else if (isStarted) {
+            listener.onStart();
+        } else {
+            listener.onStop();
+        }
     }
-  }
 
-  @Override
-  public void removeListener(@NonNull LifecycleListener listener) {
-    lifecycleListeners.remove(listener);
-  }
-
-  void onStart() {
-    isStarted = true;
-    for (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) {
-      lifecycleListener.onStart();
+    @Override
+    public void removeListener(@NonNull LifecycleListener listener) {
+        lifecycleListeners.remove(listener);
     }
-  }
 
-  void onStop() {
-    isStarted = false;
-    for (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) {
-      lifecycleListener.onStop();
+    void onStart() {
+        isStarted = true;
+        for (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) {
+            lifecycleListener.onStart();
+        }
     }
-  }
 
-  void onDestroy() {
-    isDestroyed = true;
-    for (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) {
-      lifecycleListener.onDestroy();
+    void onStop() {
+        isStarted = false;
+        for (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) {
+            lifecycleListener.onStop();
+        }
     }
-  }
+
+    void onDestroy() {
+        isDestroyed = true;
+        for (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) {
+            lifecycleListener.onDestroy();
+        }
+    }
 }
 ```
 
@@ -123,50 +126,49 @@ ActivityFragmentLifecycle 用于 SupportRequestManagerFragment 这个 Fragment �
 
 ```java
 public class SupportRequestManagerFragment extends Fragment {
-    
-  private static final String TAG = "SupportRMFragment";
-    
-  private final ActivityFragmentLifecycle lifecycle;
 
-  public SupportRequestManagerFragment() {
-    this(new ActivityFragmentLifecycle());
-  }
+    private static final String TAG = "SupportRMFragment";
 
-  @VisibleForTesting
-  @SuppressLint("ValidFragment")
-  public SupportRequestManagerFragment(@NonNull ActivityFragmentLifecycle lifecycle) {
-    this.lifecycle = lifecycle;
-  }
+    private final ActivityFragmentLifecycle lifecycle;
 
-  @NonNull
-  ActivityFragmentLifecycle getGlideLifecycle() {
-    return lifecycle;
-  }
+    public SupportRequestManagerFragment() {
+        this(new ActivityFragmentLifecycle());
+    }
 
-  @Override
-  public void onStart() {
-    super.onStart();
-    lifecycle.onStart();
-  }
+    @VisibleForTesting
+    @SuppressLint("ValidFragment")
+    public SupportRequestManagerFragment(@NonNull ActivityFragmentLifecycle lifecycle) {
+        this.lifecycle = lifecycle;
+    }
 
-  @Override
-  public void onStop() {
-    super.onStop();
-    lifecycle.onStop();
-  }
+    @NonNull
+    ActivityFragmentLifecycle getGlideLifecycle() {
+        return lifecycle;
+    }
 
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-    lifecycle.onDestroy();
-    unregisterFragmentWithRoot();
-  }
+    @Override
+    public void onStart() {
+        super.onStart();
+        lifecycle.onStart();
+    }
 
-  @Override
-  public String toString() {
-    return super.toString() + "{parent=" + getParentFragmentUsingHint() + "}";
-  }
-    
+    @Override
+    public void onStop() {
+        super.onStop();
+        lifecycle.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        lifecycle.onDestroy();
+        unregisterFragmentWithRoot();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "{parent=" + getParentFragmentUsingHint() + "}";
+    }
 }
 ```
 
@@ -177,15 +179,15 @@ public class SupportRequestManagerFragment extends Fragment {
 
 ```java
 class ApplicationLifecycle implements Lifecycle {
-  @Override
-  public void addListener(@NonNull LifecycleListener listener) {
-    listener.onStart();
-  }
+    @Override
+    public void addListener(@NonNull LifecycleListener listener) {
+        listener.onStart();
+    }
 
-  @Override
-  public void removeListener(@NonNull LifecycleListener listener) {
-    // Do nothing.
-  }
+    @Override
+    public void removeListener(@NonNull LifecycleListener listener) {
+        // Do nothing.
+    }
 }
 ```
 
@@ -197,31 +199,32 @@ class ApplicationLifecycle implements Lifecycle {
 
 ```java
 public class RequestManagerRetriever implements Handler.Callback {
-    
-  @NonNull
-  private SupportRequestManagerFragment getSupportRequestManagerFragment(
-      @NonNull final FragmentManager fm, @Nullable Fragment parentHint, boolean isParentVisible) {
-    //通过 TAG 判断 FragmentManager 中是否已经包含了 SupportRequestManagerFragment
-    SupportRequestManagerFragment current =
-        (SupportRequestManagerFragment) fm.findFragmentByTag(FRAGMENT_TAG);
-    if (current == null) {
-      //current 为 null 说明还未注入过 SupportRequestManagerFragment
-      //那么就构建一个 SupportRequestManagerFragment 实例并添加到 FragmentManager 中 
-      current = pendingSupportRequestManagerFragments.get(fm);
-      if (current == null) {
-        current = new SupportRequestManagerFragment();
-        current.setParentFragmentHint(parentHint);
-        if (isParentVisible) {
-          current.getGlideLifecycle().onStart();
-        }
-        pendingSupportRequestManagerFragments.put(fm, current);
-        fm.beginTransaction().add(current, FRAGMENT_TAG).commitAllowingStateLoss();
-        handler.obtainMessage(ID_REMOVE_SUPPORT_FRAGMENT_MANAGER, fm).sendToTarget();
-      }
-    }
-    return current;
-  }
 
+    @NonNull
+    private SupportRequestManagerFragment getSupportRequestManagerFragment(
+            @NonNull final FragmentManager fm,
+            @Nullable Fragment parentHint,
+            boolean isParentVisible) {
+        // 通过 TAG 判断 FragmentManager 中是否已经包含了 SupportRequestManagerFragment
+        SupportRequestManagerFragment current =
+                (SupportRequestManagerFragment) fm.findFragmentByTag(FRAGMENT_TAG);
+        if (current == null) {
+            // current 为 null 说明还未注入过 SupportRequestManagerFragment
+            // 那么就构建一个 SupportRequestManagerFragment 实例并添加到 FragmentManager 中
+            current = pendingSupportRequestManagerFragments.get(fm);
+            if (current == null) {
+                current = new SupportRequestManagerFragment();
+                current.setParentFragmentHint(parentHint);
+                if (isParentVisible) {
+                    current.getGlideLifecycle().onStart();
+                }
+                pendingSupportRequestManagerFragments.put(fm, current);
+                fm.beginTransaction().add(current, FRAGMENT_TAG).commitAllowingStateLoss();
+                handler.obtainMessage(ID_REMOVE_SUPPORT_FRAGMENT_MANAGER, fm).sendToTarget();
+            }
+        }
+        return current;
+    }
 }
 ```
 
@@ -233,44 +236,47 @@ public class RequestManagerRetriever implements Handler.Callback {
 Glide.with(FragmentActivity).load(url).into(ImageView)
 ```
 
-当调用 `Glide.with(FragmentActivity)` 时，最终是会中转调用到 RequestManagerRetriever 的 `get(FragmentActivity)` 方法，在内部调用 `supportFragmentGet` 方法完成 SupportRequestManagerFragment 的注入，并最终返回一个 RequestManager 对象，RequestManager 中就存储了通过该 FragmentActivity 启动的所有图片加载任务 
+当调用 `Glide.with(FragmentActivity)` 时，最终是会中转调用到 RequestManagerRetriever 的 `get(FragmentActivity)` 方法，在内部调用 `supportFragmentGet` 方法完成 SupportRequestManagerFragment 的注入，并最终返回一个 RequestManager 对象，RequestManager 中就存储了通过该 FragmentActivity 启动的所有图片加载任务
 
 ```java
 public class RequestManagerRetriever implements Handler.Callback {
-    
-  @NonNull
-  public RequestManager get(@NonNull FragmentActivity activity) {
-    if (Util.isOnBackgroundThread()) {
-      //如果是后台线程的话，那么就使用 ApplicationLifecycle
-      return get(activity.getApplicationContext());
-    } else {
-      assertNotDestroyed(activity);
-      FragmentManager fm = activity.getSupportFragmentManager();
-      return supportFragmentGet(activity, fm, /*parentHint=*/ null, isActivityVisible(activity));
+
+    @NonNull
+    public RequestManager get(@NonNull FragmentActivity activity) {
+        if (Util.isOnBackgroundThread()) {
+            // 如果是后台线程的话，那么就使用 ApplicationLifecycle
+            return get(activity.getApplicationContext());
+        } else {
+            assertNotDestroyed(activity);
+            FragmentManager fm = activity.getSupportFragmentManager();
+            return supportFragmentGet(
+                    activity, fm, /* parentHint= */ null, isActivityVisible(activity));
+        }
     }
-  }
-    
-  @NonNull
-  private RequestManager supportFragmentGet(
-      @NonNull Context context,
-      @NonNull FragmentManager fm,
-      @Nullable Fragment parentHint,
-      boolean isParentVisible) {
-    //在这里完成 SupportRequestManagerFragment 的注入操作
-    SupportRequestManagerFragment current =
-        getSupportRequestManagerFragment(fm, parentHint, isParentVisible);
-    RequestManager requestManager = current.getRequestManager();
-    if (requestManager == null) {
-      // TODO(b/27524013): Factor out this Glide.get() call.
-      Glide glide = Glide.get(context);
-      requestManager =
-          factory.build(
-              glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
-      current.setRequestManager(requestManager);
+
+    @NonNull
+    private RequestManager supportFragmentGet(
+            @NonNull Context context,
+            @NonNull FragmentManager fm,
+            @Nullable Fragment parentHint,
+            boolean isParentVisible) {
+        // 在这里完成 SupportRequestManagerFragment 的注入操作
+        SupportRequestManagerFragment current =
+                getSupportRequestManagerFragment(fm, parentHint, isParentVisible);
+        RequestManager requestManager = current.getRequestManager();
+        if (requestManager == null) {
+            // TODO(b/27524013): Factor out this Glide.get() call.
+            Glide glide = Glide.get(context);
+            requestManager =
+                    factory.build(
+                            glide,
+                            current.getGlideLifecycle(),
+                            current.getRequestManagerTreeNode(),
+                            context);
+            current.setRequestManager(requestManager);
+        }
+        return requestManager;
     }
-    return requestManager;
-  }
-    
 }
 ```
 
@@ -294,61 +300,61 @@ public class RequestManagerRetriever implements Handler.Callback {
 
 > RequestManagerFragment 的功能和 SupportRequestManagerFragment 相同，但目前已经是废弃状态，此处就不再赘述
 
-例如，`get(@NonNull Context context)` 就会根据调用者所在线程以及 Context 所属类型来判断如何注入 SupportRequestManagerFragment，从而得到不同的 RequestManager。如果最终没有注入 SupportRequestManagerFragment，那么使用的 RequestManager 对象就属于全局唯一的 Application 级别的 RequestManager 
+例如，`get(@NonNull Context context)` 就会根据调用者所在线程以及 Context 所属类型来判断如何注入 SupportRequestManagerFragment，从而得到不同的 RequestManager。如果最终没有注入 SupportRequestManagerFragment，那么使用的 RequestManager 对象就属于全局唯一的 Application 级别的 RequestManager
 
 ```java
-  /** The top application level RequestManager. */
-  private volatile RequestManager applicationManager;
+    /** The top application level RequestManager. */
+    private volatile RequestManager applicationManager;
 
-  @NonNull
-  public RequestManager get(@NonNull Context context) {
-    if (context == null) {
-      throw new IllegalArgumentException("You cannot start a load on a null Context");
-    } else if (Util.isOnMainThread() && !(context instanceof Application)) {
-      //在主线程调用，且 context 并非 Application
-        
-      if (context instanceof FragmentActivity) {
-        return get((FragmentActivity) context);
-      } else if (context instanceof Activity) {
-        return get((Activity) context);
-      } else if (context instanceof ContextWrapper
-          // Only unwrap a ContextWrapper if the baseContext has a non-null application context.
-          // Context#createPackageContext may return a Context without an Application instance,
-          // in which case a ContextWrapper may be used to attach one.
-          && ((ContextWrapper) context).getBaseContext().getApplicationContext() != null) {
-        return get(((ContextWrapper) context).getBaseContext());
-      }
-    }
+    @NonNull
+    public RequestManager get(@NonNull Context context) {
+        if (context == null) {
+            throw new IllegalArgumentException("You cannot start a load on a null Context");
+        } else if (Util.isOnMainThread() && !(context instanceof Application)) {
+            //在主线程调用，且 context 并非 Application
 
-    //在子线程调用或者 context 是 Application
-    return getApplicationManager(context);
-  }
-
-  @NonNull
-  private RequestManager getApplicationManager(@NonNull Context context) {
-    // Either an application context or we're on a background thread.
-    if (applicationManager == null) {
-      synchronized (this) {
-        if (applicationManager == null) {
-          // Normally pause/resume is taken care of by the fragment we add to the fragment or
-          // activity. However, in this case since the manager attached to the application will not
-          // receive lifecycle events, we must force the manager to start resumed using
-          // ApplicationLifecycle.
-
-          // TODO(b/27524013): Factor out this Glide.get() call.
-          Glide glide = Glide.get(context.getApplicationContext());
-          applicationManager =
-              factory.build(
-                  glide,
-                  new ApplicationLifecycle(),
-                  new EmptyRequestManagerTreeNode(),
-                  context.getApplicationContext());
+            if (context instanceof FragmentActivity) {
+                return get((FragmentActivity) context);
+            } else if (context instanceof Activity) {
+                return get((Activity) context);
+            } else if (context instanceof ContextWrapper
+                    // Only unwrap a ContextWrapper if the baseContext has a non-null application context.
+                    // Context#createPackageContext may return a Context without an Application instance,
+                    // in which case a ContextWrapper may be used to attach one.
+                    && ((ContextWrapper) context).getBaseContext().getApplicationContext() != null) {
+                return get(((ContextWrapper) context).getBaseContext());
+            }
         }
-      }
+
+        //在子线程调用或者 context 是 Application
+        return getApplicationManager(context);
     }
 
-    return applicationManager;
-  }
+    @NonNull
+    private RequestManager getApplicationManager(@NonNull Context context) {
+        // Either an application context or we're on a background thread.
+        if (applicationManager == null) {
+            synchronized (this) {
+                if (applicationManager == null) {
+                    // Normally pause/resume is taken care of by the fragment we add to the fragment or
+                    // activity. However, in this case since the manager attached to the application will not
+                    // receive lifecycle events, we must force the manager to start resumed using
+                    // ApplicationLifecycle.
+
+                    // TODO(b/27524013): Factor out this Glide.get() call.
+                    Glide glide = Glide.get(context.getApplicationContext());
+                    applicationManager =
+                            factory.build(
+                                    glide,
+                                    new ApplicationLifecycle(),
+                                    new EmptyRequestManagerTreeNode(),
+                                    context.getApplicationContext());
+                }
+            }
+        }
+
+        return applicationManager;
+    }
 ```
 
 # 四、如何启动加载图片的任务
@@ -359,83 +365,85 @@ public class RequestManagerRetriever implements Handler.Callback {
 
 ```java
 public class RequestManagerRetriever implements Handler.Callback {
-    
-  @NonNull
-private RequestManager supportFragmentGet(
-      @NonNull Context context,
-      @NonNull FragmentManager fm,
-      @Nullable Fragment parentHint,
-      boolean isParentVisible) {
-    //在这里完成 SupportRequestManagerFragment 的注入操作
-    SupportRequestManagerFragment current =
-        getSupportRequestManagerFragment(fm, parentHint, isParentVisible);
-    RequestManager requestManager = current.getRequestManager();
-    if (requestManager == null) {
-      //如果 requestManager 为 null 就进行生成并设置到 SupportRequestManagerFragment 中
-      // TODO(b/27524013): Factor out this Glide.get() call.
-      Glide glide = Glide.get(context);
-      requestManager =
-          factory.build(
-              glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
-      current.setRequestManager(requestManager);
+
+    @NonNull
+    private RequestManager supportFragmentGet(
+            @NonNull Context context,
+            @NonNull FragmentManager fm,
+            @Nullable Fragment parentHint,
+            boolean isParentVisible) {
+        // 在这里完成 SupportRequestManagerFragment 的注入操作
+        SupportRequestManagerFragment current =
+                getSupportRequestManagerFragment(fm, parentHint, isParentVisible);
+        RequestManager requestManager = current.getRequestManager();
+        if (requestManager == null) {
+            // 如果 requestManager 为 null 就进行生成并设置到 SupportRequestManagerFragment 中
+            // TODO(b/27524013): Factor out this Glide.get() call.
+            Glide glide = Glide.get(context);
+            requestManager =
+                    factory.build(
+                            glide,
+                            current.getGlideLifecycle(),
+                            current.getRequestManagerTreeNode(),
+                            context);
+            current.setRequestManager(requestManager);
+        }
+        return requestManager;
     }
-    return requestManager;
-  }
-    
 }
 ```
 
 RequestManager 类就是用于启动并管理某个 Activity 前后启动的所有加载图片的任务的地方，当我们完整调用 `Glide.with(FragmentActivity).load(url).into(ImageView)` 的 `into` 方法后，就会构建出一个代表当前加载任务的 Request 对象，并且将该任务传递给 RequestManager，以此开始跟踪该任务
 
 ```java
-  @NonNull
-  public ViewTarget<ImageView, TranscodeType> into(@NonNull ImageView view) {
+@NonNull
+public ViewTarget<ImageView, TranscodeType> into(@NonNull ImageView view) {
     ···
     return into(
-        glideContext.buildImageViewTarget(view, transcodeClass),
-        /*targetListener=*/ null,
-        requestOptions,
-        Executors.mainThreadExecutor());
-  }
+            glideContext.buildImageViewTarget(view, transcodeClass),
+            /* targetListener= */ null,
+            requestOptions,
+            Executors.mainThreadExecutor());
+}
 
-  private <Y extends Target<TranscodeType>> Y into(
-      @NonNull Y target,
-      @Nullable RequestListener<TranscodeType> targetListener,
-      BaseRequestOptions<?> options,
-      Executor callbackExecutor) {
+private <Y extends Target<TranscodeType>> Y into(
+        @NonNull Y target,
+        @Nullable RequestListener<TranscodeType> targetListener,
+        BaseRequestOptions<?> options,
+        Executor callbackExecutor) {
     Preconditions.checkNotNull(target);
     if (!isModelSet) {
-      throw new IllegalArgumentException("You must call #load() before calling #into()");
+        throw new IllegalArgumentException("You must call #load() before calling #into()");
     }
-    //构建一个代表加载任务的 Request 对象
+    // 构建一个代表加载任务的 Request 对象
     Request request = buildRequest(target, targetListener, options, callbackExecutor);
     ···
     requestManager.clear(target);
     target.setRequest(request);
-    //将 request 传递给 requestManager，以此开始跟踪该任务
+    // 将 request 传递给 requestManager，以此开始跟踪该任务
     requestManager.track(target, request);
     return target;
-  }
+}
 ```
 
-重点还是 `requestManager.track(target, request)`这一句代码，这就是任务的发起点
+重点还是 `requestManager.track(target, request)` 这一句代码，这就是任务的发起点
 
 ```java
-public class RequestManager implements ComponentCallbacks2, LifecycleListener, ModelTypes<RequestBuilder<Drawable>> {  
+public class RequestManager
+        implements ComponentCallbacks2, LifecycleListener, ModelTypes<RequestBuilder<Drawable>> {
 
-    //存储所有任务
-	@GuardedBy("this")
-  	private final RequestTracker requestTracker;
+    // 存储所有任务
+    @GuardedBy("this")
+    private final RequestTracker requestTracker;
 
-  	@GuardedBy("this")
-  	private final TargetTracker targetTracker = new TargetTracker();  
+    @GuardedBy("this")
+    private final TargetTracker targetTracker = new TargetTracker();
 
-  	synchronized void track(@NonNull Target<?> target, @NonNull Request request) {
-    	targetTracker.track(target);
-        //运行任务
-      	requestTracker.runRequest(request);
-  	}
-    
+    synchronized void track(@NonNull Target<?> target, @NonNull Request request) {
+        targetTracker.track(target);
+        // 运行任务
+        requestTracker.runRequest(request);
+    }
 }
 ```
 
@@ -443,74 +451,74 @@ public class RequestManager implements ComponentCallbacks2, LifecycleListener, M
 
 ```java
 public class RequestTracker {
-  private static final String TAG = "RequestTracker";
+    private static final String TAG = "RequestTracker";
 
-  private final Set<Request> requests =
-      Collections.newSetFromMap(new WeakHashMap<Request, Boolean>());
+    private final Set<Request> requests =
+            Collections.newSetFromMap(new WeakHashMap<Request, Boolean>());
 
-  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-  private final List<Request> pendingRequests = new ArrayList<>();
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private final List<Request> pendingRequests = new ArrayList<>();
 
-  private boolean isPaused;
+    private boolean isPaused;
 
-  /** Starts tracking the given request. */
-  public void runRequest(@NonNull Request request) {
-    //先将任务保存起来
-    requests.add(request);
-    //如果并非暂停状态，那么就开启任务，否则就将任务存入待处理列表
-    if (!isPaused) {
-      request.begin();
-    } else {
-      request.clear();
-      if (Log.isLoggable(TAG, Log.VERBOSE)) {
-        Log.v(TAG, "Paused, delaying request");
-      }
-      pendingRequests.add(request);
-    }
-  }
-
-  /** Stops any in progress requests. */
-  public void pauseRequests() {
-    isPaused = true;
-    for (Request request : Util.getSnapshot(requests)) {
-      if (request.isRunning()) {
-        // Avoid clearing parts of requests that may have completed (thumbnails) to avoid blinking
-        // in the UI, while still making sure that any in progress parts of requests are immediately
-        // stopped.
-        request.pause();
-        pendingRequests.add(request);
-      }
-    }
-  }
-
-  /** Restarts failed requests and cancels and restarts in progress requests. */
-  public void restartRequests() {
-    for (Request request : Util.getSnapshot(requests)) {
-      if (!request.isComplete() && !request.isCleared()) {
-        request.clear();
+    /** Starts tracking the given request. */
+    public void runRequest(@NonNull Request request) {
+        //先将任务保存起来
+        requests.add(request);
+        //如果并非暂停状态，那么就开启任务，否则就将任务存入待处理列表
         if (!isPaused) {
-          request.begin();
+            request.begin();
         } else {
-          // Ensure the request will be restarted in onResume.
-          pendingRequests.add(request);
+            request.clear();
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                Log.v(TAG, "Paused, delaying request");
+            }
+            pendingRequests.add(request);
         }
-      }
     }
-  }
 
-  ···
-    
+    /** Stops any in progress requests. */
+    public void pauseRequests() {
+        isPaused = true;
+        for (Request request : Util.getSnapshot(requests)) {
+            if (request.isRunning()) {
+                // Avoid clearing parts of requests that may have completed (thumbnails) to avoid blinking
+                // in the UI, while still making sure that any in progress parts of requests are immediately
+                // stopped.
+                request.pause();
+                pendingRequests.add(request);
+            }
+        }
+    }
+
+    /** Restarts failed requests and cancels and restarts in progress requests. */
+    public void restartRequests() {
+        for (Request request : Util.getSnapshot(requests)) {
+            if (!request.isComplete() && !request.isCleared()) {
+                request.clear();
+                if (!isPaused) {
+                    request.begin();
+                } else {
+                    // Ensure the request will be restarted in onResume.
+                    pendingRequests.add(request);
+                }
+            }
+        }
+    }
+
+    ···
+
 }
 ```
 
-当 SupportRequestManagerFragment  走到 `onStop()` 状态时，就会中转调用到 RequestTracker，将 isPaused 置为 true。此外，当 SupportRequestManagerFragment 执行到 `onDestroy()` 时，就意味着 Activity 已经被 finish 了，此时就会回调通知到 RequestManager 的 `onDestroy()` 方法，在这里完成任务的清理以及解除各种注册事件
+当 SupportRequestManagerFragment 走到 `onStop()` 状态时，就会中转调用到 RequestTracker，将 isPaused 置为 true。此外，当 SupportRequestManagerFragment 执行到 `onDestroy()` 时，就意味着 Activity 已经被 finish 了，此时就会回调通知到 RequestManager 的 `onDestroy()` 方法，在这里完成任务的清理以及解除各种注册事件
 
 ```java
 @Override
 public synchronized void onDestroy() {
     targetTracker.onDestroy();
     for (Target<?> target : targetTracker.getAll()) {
-      clear(target);
+        clear(target);
     }
     targetTracker.clear();
     requestTracker.clearRequests();
@@ -526,60 +534,60 @@ public synchronized void onDestroy() {
 Request 是一个接口，代表的是每个图片加载请求，其包含有几个实现类，这里以 SingleRequest 为例。SingleRequest 的 `begin()` 方法会先对当前的任务状态进行校验，防止重复加载，然后去获取 **目标宽高** 或者 **ImageView 的宽高**，之后还会判断是否需要先展示占位符
 
 ```java
-  public final class SingleRequest<R> implements Request, SizeReadyCallback, ResourceCallback {
+    public final class SingleRequest<R> implements Request, SizeReadyCallback, ResourceCallback {
 
-  @Override
-  public void begin() {
-    synchronized (requestLock) {
-      assertNotCallingCallbacks();
-      stateVerifier.throwIfRecycled();
-      startTime = LogTime.getLogTime();
-      if (model == null) {
-        if (Util.isValidDimensions(overrideWidth, overrideHeight)) {
-          width = overrideWidth;
-          height = overrideHeight;
+    @Override
+    public void begin() {
+        synchronized (requestLock) {
+            assertNotCallingCallbacks();
+            stateVerifier.throwIfRecycled();
+            startTime = LogTime.getLogTime();
+            if (model == null) {
+                if (Util.isValidDimensions(overrideWidth, overrideHeight)) {
+                    width = overrideWidth;
+                    height = overrideHeight;
+                }
+                // Only log at more verbose log levels if the user has set a fallback drawable, because
+                // fallback Drawables indicate the user expects null models occasionally.
+                int logLevel = getFallbackDrawable() == null ? Log.WARN : Log.DEBUG;
+                //model 为 null，说明外部没有传入图片来源地址，直接走失败流程
+                onLoadFailed(new GlideException("Received null model"), logLevel);
+                return;
+            }
+
+            //防止任务正在运行时重复启动
+            if (status == Status.RUNNING) {
+                throw new IllegalArgumentException("Cannot restart a running request");
+            }
+
+            if (status == Status.COMPLETE) {
+                //任务已经完成，直接返回已加载好的图片资源
+                onResourceReady(resource, DataSource.MEMORY_CACHE);
+                return;
+            }
+
+            // Restarts for requests that are neither complete nor running can be treated as new requests
+            // and can run again from the beginning.
+
+            //先获取目标宽高或者 ImageView 的宽高，按需加载
+            status = Status.WAITING_FOR_SIZE;
+            if (Util.isValidDimensions(overrideWidth, overrideHeight)) {
+                onSizeReady(overrideWidth, overrideHeight);
+            } else {
+                target.getSize(this);
+            }
+
+            if ((status == Status.RUNNING || status == Status.WAITING_FOR_SIZE)
+                    && canNotifyStatusChanged()) {
+                //先把占位符传出去
+                target.onLoadStarted(getPlaceholderDrawable());
+            }
+            if (IS_VERBOSE_LOGGABLE) {
+                logV("finished run method in " + LogTime.getElapsedMillis(startTime));
+            }
         }
-        // Only log at more verbose log levels if the user has set a fallback drawable, because
-        // fallback Drawables indicate the user expects null models occasionally.
-        int logLevel = getFallbackDrawable() == null ? Log.WARN : Log.DEBUG;
-        //model 为 null，说明外部没有传入图片来源地址，直接走失败流程
-        onLoadFailed(new GlideException("Received null model"), logLevel);
-        return;
-      }
-	
-      //防止任务正在运行时重复启动
-      if (status == Status.RUNNING) {
-        throw new IllegalArgumentException("Cannot restart a running request");
-      }
-
-      if (status == Status.COMPLETE) {
-        //任务已经完成，直接返回已加载好的图片资源
-        onResourceReady(resource, DataSource.MEMORY_CACHE);
-        return;
-      }
-
-      // Restarts for requests that are neither complete nor running can be treated as new requests
-      // and can run again from the beginning.
-	
-      //先获取目标宽高或者 ImageView 的宽高，按需加载
-      status = Status.WAITING_FOR_SIZE;
-      if (Util.isValidDimensions(overrideWidth, overrideHeight)) {
-        onSizeReady(overrideWidth, overrideHeight);
-      } else {
-        target.getSize(this);
-      }
-
-      if ((status == Status.RUNNING || status == Status.WAITING_FOR_SIZE)
-          && canNotifyStatusChanged()) {
-        //先把占位符传出去
-        target.onLoadStarted(getPlaceholderDrawable());
-      }
-      if (IS_VERBOSE_LOGGABLE) {
-        logV("finished run method in " + LogTime.getElapsedMillis(startTime));
-      }
     }
-  }
-    
+
 }
 ```
 
@@ -588,63 +596,63 @@ Request 是一个接口，代表的是每个图片加载请求，其包含有几
 所以，重点还是要看 `onSizeReady` 方法。其内部会将当前的所有配置信息（图片地址，宽高、优先级、是否允许使用缓存等等）都转交给 Engine 的 `load` 方法，由其来完成图片的加载
 
 ```java
-  private volatile Engine engine;  
+    private volatile Engine engine;  
 
-  /** A callback method that should never be invoked directly. */
-  @Override
-  public void onSizeReady(int width, int height) {
-    stateVerifier.throwIfRecycled();
-    synchronized (requestLock) {
-      if (IS_VERBOSE_LOGGABLE) {
-        logV("Got onSizeReady in " + LogTime.getElapsedMillis(startTime));
-      }
-      if (status != Status.WAITING_FOR_SIZE) {
-        return;
-      }
-      status = Status.RUNNING;
-	
-      //进行缩放处理
-      float sizeMultiplier = requestOptions.getSizeMultiplier();
-      this.width = maybeApplySizeMultiplier(width, sizeMultiplier);
-      this.height = maybeApplySizeMultiplier(height, sizeMultiplier);
+    /** A callback method that should never be invoked directly. */
+    @Override
+    public void onSizeReady(int width, int height) {
+        stateVerifier.throwIfRecycled();
+        synchronized (requestLock) {
+            if (IS_VERBOSE_LOGGABLE) {
+                logV("Got onSizeReady in " + LogTime.getElapsedMillis(startTime));
+            }
+            if (status != Status.WAITING_FOR_SIZE) {
+                return;
+            }
+            status = Status.RUNNING;
 
-      if (IS_VERBOSE_LOGGABLE) {
-        logV("finished setup for calling load in " + LogTime.getElapsedMillis(startTime));
-      }
-      //重点，正式开始加载图片
-      loadStatus =
-          engine.load(
-              glideContext,
-              model,
-              requestOptions.getSignature(),
-              this.width,
-              this.height,
-              requestOptions.getResourceClass(),
-              transcodeClass,
-              priority,
-              requestOptions.getDiskCacheStrategy(),
-              requestOptions.getTransformations(),
-              requestOptions.isTransformationRequired(),
-              requestOptions.isScaleOnlyOrNoTransform(),
-              requestOptions.getOptions(),
-              requestOptions.isMemoryCacheable(),
-              requestOptions.getUseUnlimitedSourceGeneratorsPool(),
-              requestOptions.getUseAnimationPool(),
-              requestOptions.getOnlyRetrieveFromCache(),
-              this,
-              callbackExecutor);
+            //进行缩放处理
+            float sizeMultiplier = requestOptions.getSizeMultiplier();
+            this.width = maybeApplySizeMultiplier(width, sizeMultiplier);
+            this.height = maybeApplySizeMultiplier(height, sizeMultiplier);
 
-      // This is a hack that's only useful for testing right now where loads complete synchronously
-      // even though under any executor running on any thread but the main thread, the load would
-      // have completed asynchronously.
-      if (status != Status.RUNNING) {
-        loadStatus = null;
-      }
-      if (IS_VERBOSE_LOGGABLE) {
-        logV("finished onSizeReady in " + LogTime.getElapsedMillis(startTime));
-      }
+            if (IS_VERBOSE_LOGGABLE) {
+                logV("finished setup for calling load in " + LogTime.getElapsedMillis(startTime));
+            }
+            //重点，正式开始加载图片
+            loadStatus =
+                    engine.load(
+                            glideContext,
+                            model,
+                            requestOptions.getSignature(),
+                            this.width,
+                            this.height,
+                            requestOptions.getResourceClass(),
+                            transcodeClass,
+                            priority,
+                            requestOptions.getDiskCacheStrategy(),
+                            requestOptions.getTransformations(),
+                            requestOptions.isTransformationRequired(),
+                            requestOptions.isScaleOnlyOrNoTransform(),
+                            requestOptions.getOptions(),
+                            requestOptions.isMemoryCacheable(),
+                            requestOptions.getUseUnlimitedSourceGeneratorsPool(),
+                            requestOptions.getUseAnimationPool(),
+                            requestOptions.getOnlyRetrieveFromCache(),
+                            this,
+                            callbackExecutor);
+
+            // This is a hack that's only useful for testing right now where loads complete synchronously
+            // even though under any executor running on any thread but the main thread, the load would
+            // have completed asynchronously.
+            if (status != Status.RUNNING) {
+                loadStatus = null;
+            }
+            if (IS_VERBOSE_LOGGABLE) {
+                logV("finished onSizeReady in " + LogTime.getElapsedMillis(startTime));
+            }
+        }
     }
-  }
 ```
 
 转交给 Engine 的配置信息同时还包含一个 ResourceCallback 对象，即 SingleRequest 本身，因为 SingleRequest 实现了 ResourceCallback 接口。从 ResourceCallback 包含的方法的名称来看，就可以知道当 Engine 在加载图片成功或者失败时，就会通过这两个方法将结果回调出来
@@ -652,11 +660,11 @@ Request 是一个接口，代表的是每个图片加载请求，其包含有几
 ```java
 public interface ResourceCallback {
 
-  void onResourceReady(Resource<?> resource, DataSource dataSource);
+    void onResourceReady(Resource<?> resource, DataSource dataSource);
 
-  void onLoadFailed(GlideException e);
+    void onLoadFailed(GlideException e);
 
-  Object getLock();
+    Object getLock();
 }
 ```
 
@@ -664,76 +672,76 @@ public interface ResourceCallback {
 
 ```java
 public <R> LoadStatus load(
-      GlideContext glideContext,
-      Object model,
-      Key signature,
-      int width,
-      int height,
-      Class<?> resourceClass,
-      Class<R> transcodeClass,
-      Priority priority,
-      DiskCacheStrategy diskCacheStrategy,
-      Map<Class<?>, Transformation<?>> transformations,
-      boolean isTransformationRequired,
-      boolean isScaleOnlyOrNoTransform,
-      Options options,
-      boolean isMemoryCacheable,
-      boolean useUnlimitedSourceExecutorPool,
-      boolean useAnimationPool,
-      boolean onlyRetrieveFromCache,
-      ResourceCallback cb,
-      Executor callbackExecutor) {
+        GlideContext glideContext,
+        Object model,
+        Key signature,
+        int width,
+        int height,
+        Class<?> resourceClass,
+        Class<R> transcodeClass,
+        Priority priority,
+        DiskCacheStrategy diskCacheStrategy,
+        Map<Class<?>, Transformation<?>> transformations,
+        boolean isTransformationRequired,
+        boolean isScaleOnlyOrNoTransform,
+        Options options,
+        boolean isMemoryCacheable,
+        boolean useUnlimitedSourceExecutorPool,
+        boolean useAnimationPool,
+        boolean onlyRetrieveFromCache,
+        ResourceCallback cb,
+        Executor callbackExecutor) {
     long startTime = VERBOSE_IS_LOGGABLE ? LogTime.getLogTime() : 0;
-	
-    //为本次请求生成一个唯一标识 key，这个 key 就是判定是否可以实现图片复用的依据
+
+    // 为本次请求生成一个唯一标识 key，这个 key 就是判定是否可以实现图片复用的依据
     EngineKey key =
-        keyFactory.buildKey(
-            model,
-            signature,
-            width,
-            height,
-            transformations,
-            resourceClass,
-            transcodeClass,
-            options);
+            keyFactory.buildKey(
+                    model,
+                    signature,
+                    width,
+                    height,
+                    transformations,
+                    resourceClass,
+                    transcodeClass,
+                    options);
 
     EngineResource<?> memoryResource;
     synchronized (this) {
-      //先从内存缓存中取值
-      memoryResource = loadFromMemory(key, isMemoryCacheable, startTime);
+        // 先从内存缓存中取值
+        memoryResource = loadFromMemory(key, isMemoryCacheable, startTime);
 
-      if (memoryResource == null) {
-        //当前内存中不存在目标资源，那么就启动一个新任务来加载，或者是为已存在的任务添加一个回调
-        return waitForExistingOrStartNewJob(
-            glideContext,
-            model,
-            signature,
-            width,
-            height,
-            resourceClass,
-            transcodeClass,
-            priority,
-            diskCacheStrategy,
-            transformations,
-            isTransformationRequired,
-            isScaleOnlyOrNoTransform,
-            options,
-            isMemoryCacheable,
-            useUnlimitedSourceExecutorPool,
-            useAnimationPool,
-            onlyRetrieveFromCache,
-            cb,
-            callbackExecutor,
-            key,
-            startTime);
-      }
+        if (memoryResource == null) {
+            // 当前内存中不存在目标资源，那么就启动一个新任务来加载，或者是为已存在的任务添加一个回调
+            return waitForExistingOrStartNewJob(
+                    glideContext,
+                    model,
+                    signature,
+                    width,
+                    height,
+                    resourceClass,
+                    transcodeClass,
+                    priority,
+                    diskCacheStrategy,
+                    transformations,
+                    isTransformationRequired,
+                    isScaleOnlyOrNoTransform,
+                    options,
+                    isMemoryCacheable,
+                    useUnlimitedSourceExecutorPool,
+                    useAnimationPool,
+                    onlyRetrieveFromCache,
+                    cb,
+                    callbackExecutor,
+                    key,
+                    startTime);
+        }
     }
 
     // Avoid calling back while holding the engine lock, doing so makes it easier for callers to
     // deadlock.
     cb.onResourceReady(memoryResource, DataSource.MEMORY_CACHE);
     return null;
-  }
+}
 ```
 
 对于一个加载网络图片的请求来说，`waitForExistingOrStartNewJob` 方法就对应着通过网络请求加载图片或者是加载本地磁盘文件的过程，如果目标图片还未下载过则去进行网络请求，如果之前已经缓存到了本地的话则去进行磁盘加载。`loadFromMemory` 方法则对应着尝试在内存中寻找目标图片的过程，因为目标图片可能之前已经加载到内存中了，此方法就用来尝试复用内存中的图片资源
@@ -742,7 +750,7 @@ public <R> LoadStatus load(
 
 ## 1、网络请求
 
-`Glide.with(Context).load(Any)`的 `load` 方法是一个多重载形式的方法，支持 Integer、String、Uri、File 等多种入参类型，而且最终我们获取到的可能是 Bitmap、Drawable、GifDrawable 等多种结果。那么，Glide 是如何分辨我们不同的入参请求的呢？以及如何对不同的请求类型进行处理呢？
+`Glide.with(Context).load(Any)` 的 `load` 方法是一个多重载形式的方法，支持 Integer、String、Uri、File 等多种入参类型，而且最终我们获取到的可能是 Bitmap、Drawable、GifDrawable 等多种结果。那么，Glide 是如何分辨我们不同的入参请求的呢？以及如何对不同的请求类型进行处理呢？
 
 Glide 类中包含一个 `registry` 变量，相当于一个注册器，存储了对于特定的入参类型，其对应的处理逻辑，以及该入参类型希望得到的结果值类型
 
@@ -787,24 +795,23 @@ HttpGlideUrlLoader 会将 ImageUrl 传给 HttpUrlFetcher，由其来进行具体
 
 ```java
 public class HttpGlideUrlLoader implements ModelLoader<GlideUrl, InputStream> {
- 
+
     @Override
-  	public LoadData<InputStream> buildLoadData(
-      	@NonNull GlideUrl model, int width, int height, @NonNull Options options) {
-    	// GlideUrls memoize parsed URLs so caching them saves a few object instantiations and time
-    	// spent parsing urls.
-    	GlideUrl url = model;
-    	if (modelCache != null) {
-      		url = modelCache.get(model, 0, 0);
-      			if (url == null) {
-        	modelCache.put(model, 0, 0, model);
-        	url = model;
-      	}
-    	}
-    	int timeout = options.get(TIMEOUT);
-    	return new LoadData<>(url, new HttpUrlFetcher(url, timeout));
-  	  }
-    
+    public LoadData<InputStream> buildLoadData(
+            @NonNull GlideUrl model, int width, int height, @NonNull Options options) {
+        // GlideUrls memoize parsed URLs so caching them saves a few object instantiations and time
+        // spent parsing urls.
+        GlideUrl url = model;
+        if (modelCache != null) {
+            url = modelCache.get(model, 0, 0);
+            if (url == null) {
+                modelCache.put(model, 0, 0, model);
+                url = model;
+            }
+        }
+        int timeout = options.get(TIMEOUT);
+        return new LoadData<>(url, new HttpUrlFetcher(url, timeout));
+    }
 }
 ```
 
@@ -887,76 +894,76 @@ public class HttpUrlFetcher implements DataFetcher<InputStream> {
 
 ```java
 private <R> LoadStatus waitForExistingOrStartNewJob(
-      GlideContext glideContext,
-      Object model,
-      Key signature,
-      int width,
-      int height,
-      Class<?> resourceClass,
-      Class<R> transcodeClass,
-      Priority priority,
-      DiskCacheStrategy diskCacheStrategy,
-      Map<Class<?>, Transformation<?>> transformations,
-      boolean isTransformationRequired,
-      boolean isScaleOnlyOrNoTransform,
-      Options options,
-      boolean isMemoryCacheable,
-      boolean useUnlimitedSourceExecutorPool,
-      boolean useAnimationPool,
-      boolean onlyRetrieveFromCache,
-      ResourceCallback cb,
-      Executor callbackExecutor,
-      EngineKey key,
-      long startTime) {
+        GlideContext glideContext,
+        Object model,
+        Key signature,
+        int width,
+        int height,
+        Class<?> resourceClass,
+        Class<R> transcodeClass,
+        Priority priority,
+        DiskCacheStrategy diskCacheStrategy,
+        Map<Class<?>, Transformation<?>> transformations,
+        boolean isTransformationRequired,
+        boolean isScaleOnlyOrNoTransform,
+        Options options,
+        boolean isMemoryCacheable,
+        boolean useUnlimitedSourceExecutorPool,
+        boolean useAnimationPool,
+        boolean onlyRetrieveFromCache,
+        ResourceCallback cb,
+        Executor callbackExecutor,
+        EngineKey key,
+        long startTime) {
 
     EngineJob<?> current = jobs.get(key, onlyRetrieveFromCache);
     if (current != null) {
-      //如果已经启动了同个请求任务，那么就向其添加一个回调即可
-      current.addCallback(cb, callbackExecutor);
-      if (VERBOSE_IS_LOGGABLE) {
-        logWithTimeAndKey("Added to existing load", startTime, key);
-      }
-      return new LoadStatus(cb, current);
+        // 如果已经启动了同个请求任务，那么就向其添加一个回调即可
+        current.addCallback(cb, callbackExecutor);
+        if (VERBOSE_IS_LOGGABLE) {
+            logWithTimeAndKey("Added to existing load", startTime, key);
+        }
+        return new LoadStatus(cb, current);
     }
 
     EngineJob<R> engineJob =
-        engineJobFactory.build(
-            key,
-            isMemoryCacheable,
-            useUnlimitedSourceExecutorPool,
-            useAnimationPool,
-            onlyRetrieveFromCache);
+            engineJobFactory.build(
+                    key,
+                    isMemoryCacheable,
+                    useUnlimitedSourceExecutorPool,
+                    useAnimationPool,
+                    onlyRetrieveFromCache);
 
     DecodeJob<R> decodeJob =
-        decodeJobFactory.build(
-            glideContext,
-            model,
-            key,
-            signature,
-            width,
-            height,
-            resourceClass,
-            transcodeClass,
-            priority,
-            diskCacheStrategy,
-            transformations,
-            isTransformationRequired,
-            isScaleOnlyOrNoTransform,
-            onlyRetrieveFromCache,
-            options,
-            engineJob);
+            decodeJobFactory.build(
+                    glideContext,
+                    model,
+                    key,
+                    signature,
+                    width,
+                    height,
+                    resourceClass,
+                    transcodeClass,
+                    priority,
+                    diskCacheStrategy,
+                    transformations,
+                    isTransformationRequired,
+                    isScaleOnlyOrNoTransform,
+                    onlyRetrieveFromCache,
+                    options,
+                    engineJob);
 
     jobs.put(key, engineJob);
 
     engineJob.addCallback(cb, callbackExecutor);
-    //启动 decodeJob
+    // 启动 decodeJob
     engineJob.start(decodeJob);
 
     if (VERBOSE_IS_LOGGABLE) {
-      logWithTimeAndKey("Started new load", startTime, key);
+        logWithTimeAndKey("Started new load", startTime, key);
     }
     return new LoadStatus(cb, engineJob);
-  }
+}
 ```
 
 这里主要看 DecodeJob 类。前文有讲到，Glide 最终缓存到磁盘中的图片类型可以分为两类，一类是原始图片，一类是将原始图片进行各种压缩裁剪变换等各种转换操作后得到的图片，该行为就通过 `diskCacheStrategy` 参数来决定
@@ -976,16 +983,16 @@ Glide.with(context).load(imageUrl)
 ```java
 private DataFetcherGenerator getNextGenerator() {
     switch (stage) {
-      case RESOURCE_CACHE:
-        return new ResourceCacheGenerator(decodeHelper, this);
-      case DATA_CACHE:
-        return new DataCacheGenerator(decodeHelper, this);
-      case SOURCE:
-        return new SourceGenerator(decodeHelper, this);
-      case FINISHED:
-        return null;
-      default:
-        throw new IllegalStateException("Unrecognized stage: " + stage);
+        case RESOURCE_CACHE:
+            return new ResourceCacheGenerator(decodeHelper, this);
+        case DATA_CACHE:
+            return new DataCacheGenerator(decodeHelper, this);
+        case SOURCE:
+            return new SourceGenerator(decodeHelper, this);
+        case FINISHED:
+            return null;
+        default:
+            throw new IllegalStateException("Unrecognized stage: " + stage);
     }
 }
 ```
@@ -996,40 +1003,40 @@ private DataFetcherGenerator getNextGenerator() {
 @Override
 public boolean startNext() {
     while (modelLoaders == null || !hasNextModelLoader()) {
-      sourceIdIndex++;
-      if (sourceIdIndex >= cacheKeys.size()) {
-        return false;
-      }
+        sourceIdIndex++;
+        if (sourceIdIndex >= cacheKeys.size()) {
+            return false;
+        }
 
-      Key sourceId = cacheKeys.get(sourceIdIndex);
-      // PMD.AvoidInstantiatingObjectsInLoops The loop iterates a limited number of times
-      // and the actions it performs are much more expensive than a single allocation.
-      @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-      Key originalKey = new DataCacheKey(sourceId, helper.getSignature());
-      //从磁盘缓存中取值
-      cacheFile = helper.getDiskCache().get(originalKey);
-      if (cacheFile != null) {
-        this.sourceKey = sourceId;
-        //拿到所有的数据类型转换器
-        modelLoaders = helper.getModelLoaders(cacheFile);
-        modelLoaderIndex = 0;
-      }
+        Key sourceId = cacheKeys.get(sourceIdIndex);
+        // PMD.AvoidInstantiatingObjectsInLoops The loop iterates a limited number of times
+        // and the actions it performs are much more expensive than a single allocation.
+        @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+        Key originalKey = new DataCacheKey(sourceId, helper.getSignature());
+        // 从磁盘缓存中取值
+        cacheFile = helper.getDiskCache().get(originalKey);
+        if (cacheFile != null) {
+            this.sourceKey = sourceId;
+            // 拿到所有的数据类型转换器
+            modelLoaders = helper.getModelLoaders(cacheFile);
+            modelLoaderIndex = 0;
+        }
     }
 
     loadData = null;
     boolean started = false;
     while (!started && hasNextModelLoader()) {
-      ModelLoader<File, ?> modelLoader = modelLoaders.get(modelLoaderIndex++);
-      loadData =
-          modelLoader.buildLoadData(
-              cacheFile, helper.getWidth(), helper.getHeight(), helper.getOptions());
-      if (loadData != null && helper.hasLoadPath(loadData.fetcher.getDataClass())) {
-        started = true;
-        loadData.fetcher.loadData(helper.getPriority(), this);
-      }
+        ModelLoader<File, ?> modelLoader = modelLoaders.get(modelLoaderIndex++);
+        loadData =
+                modelLoader.buildLoadData(
+                        cacheFile, helper.getWidth(), helper.getHeight(), helper.getOptions());
+        if (loadData != null && helper.hasLoadPath(loadData.fetcher.getDataClass())) {
+            started = true;
+            loadData.fetcher.loadData(helper.getPriority(), this);
+        }
     }
     return started;
-  }
+}
 ```
 
 DataCacheGenerator 代表的是从本地磁盘缓存中取到目标图片的情况，而请求网络图片并将该图片写入到本地磁盘的逻辑还要看 SourceGenerator
@@ -1037,69 +1044,69 @@ DataCacheGenerator 代表的是从本地磁盘缓存中取到目标图片的情�
 SourceGenerator 在通过 HttpUrlFetcher 成功加载到图片后就会调用到 `onDataReadyInternal` 方法。如果本次请求不允许进行磁盘缓存，就会直接回调 DecodeJob 的 `onDataFetcherReady` 方法完成整个流程，这个过程就和 DataCacheGenerator 一致。而如果允许进行磁盘缓存，那么就会调用到 `reschedule()` 方法重新触发 `startNext()` 方法，在 `cacheData` 方法中完成磁盘文件的写入，在写入成功后就会构造一个 DataCacheGenerator，由 DataCacheGenerator 再来从磁盘中取值
 
 ```java
-  void onDataReadyInternal(LoadData<?> loadData, Object data) {
-    DiskCacheStrategy diskCacheStrategy = helper.getDiskCacheStrategy();
-    if (data != null && diskCacheStrategy.isDataCacheable(loadData.fetcher.getDataSource())) {
-      //允许进行磁盘缓存，先将 data 缓存到 dataToCache 变量 
-      dataToCache = data;
-      // We might be being called back on someone else's thread. Before doing anything, we should
-      // reschedule to get back onto Glide's thread.
-      cb.reschedule();
-    } else {
-      cb.onDataFetcherReady(
-          loadData.sourceKey,
-          data,
-          loadData.fetcher,
-          loadData.fetcher.getDataSource(),
-          originalKey);
-    }
-  }
-
-  @Override
-  public boolean startNext() {
-    if (dataToCache != null) {
-      //dataToCache 不为 null，说明现在是要来将图片缓存到磁盘
-      Object data = dataToCache;
-      dataToCache = null;
-      cacheData(data);
+    void onDataReadyInternal(LoadData<?> loadData, Object data) {
+        DiskCacheStrategy diskCacheStrategy = helper.getDiskCacheStrategy();
+        if (data != null && diskCacheStrategy.isDataCacheable(loadData.fetcher.getDataSource())) {
+            //允许进行磁盘缓存，先将 data 缓存到 dataToCache 变量 
+            dataToCache = data;
+            // We might be being called back on someone else's thread. Before doing anything, we should
+            // reschedule to get back onto Glide's thread.
+            cb.reschedule();
+        } else {
+            cb.onDataFetcherReady(
+                    loadData.sourceKey,
+                    data,
+                    loadData.fetcher,
+                    loadData.fetcher.getDataSource(),
+                    originalKey);
+        }
     }
 
-    if (sourceCacheGenerator != null && sourceCacheGenerator.startNext()) {
-      return true;
-    }
-    ···
-    return started;
-  }
+    @Override
+    public boolean startNext() {
+        if (dataToCache != null) {
+            //dataToCache 不为 null，说明现在是要来将图片缓存到磁盘
+            Object data = dataToCache;
+            dataToCache = null;
+            cacheData(data);
+        }
 
-  private void cacheData(Object dataToCache) {
-    long startTime = LogTime.getLogTime();
-    try {
-      Encoder<Object> encoder = helper.getSourceEncoder(dataToCache);
-      DataCacheWriter<Object> writer =
-          new DataCacheWriter<>(encoder, dataToCache, helper.getOptions());
-      originalKey = new DataCacheKey(loadData.sourceKey, helper.getSignature());
-      //写入磁盘缓存
-      helper.getDiskCache().put(originalKey, writer);
-      if (Log.isLoggable(TAG, Log.VERBOSE)) {
-        Log.v(
-            TAG,
-            "Finished encoding source to cache"
-                + ", key: "
-                + originalKey
-                + ", data: "
-                + dataToCache
-                + ", encoder: "
-                + encoder
-                + ", duration: "
-                + LogTime.getElapsedMillis(startTime));
-      }
-    } finally {
-      loadData.fetcher.cleanup();
+        if (sourceCacheGenerator != null && sourceCacheGenerator.startNext()) {
+            return true;
+        }
+        ···
+        return started;
     }
 
-    sourceCacheGenerator =
-        new DataCacheGenerator(Collections.singletonList(loadData.sourceKey), helper, this);
-  }
+    private void cacheData(Object dataToCache) {
+        long startTime = LogTime.getLogTime();
+        try {
+            Encoder<Object> encoder = helper.getSourceEncoder(dataToCache);
+            DataCacheWriter<Object> writer =
+                    new DataCacheWriter<>(encoder, dataToCache, helper.getOptions());
+            originalKey = new DataCacheKey(loadData.sourceKey, helper.getSignature());
+            //写入磁盘缓存
+            helper.getDiskCache().put(originalKey, writer);
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                Log.v(
+                        TAG,
+                        "Finished encoding source to cache"
+                                + ", key: "
+                                + originalKey
+                                + ", data: "
+                                + dataToCache
+                                + ", encoder: "
+                                + encoder
+                                + ", duration: "
+                                + LogTime.getElapsedMillis(startTime));
+            }
+        } finally {
+            loadData.fetcher.cleanup();
+        }
+
+        sourceCacheGenerator =
+                new DataCacheGenerator(Collections.singletonList(loadData.sourceKey), helper, this);
+    }
 ```
 
 > Glide 的磁盘缓存算法具体对应的是 DiskLruCache 类，这是 Glide 根据 JakeWharton 的 [DiskLruCache](https://github.com/JakeWharton/DiskLruCache) 开源库修改而来的，这里不过多赘述
@@ -1107,15 +1114,15 @@ SourceGenerator 在通过 HttpUrlFetcher 成功加载到图片后就会调用到
 不管 DecodeJob 是通过什么方式拿到图片，最终都会调用到 Engine 类的 `onEngineJobComplete` 方法，该方法就会将加载的图片缓存到内存中，这也是实现内存缓存的数据来源
 
 ```java
-  @Override
-  public synchronized void onEngineJobComplete(
-      EngineJob<?> engineJob, Key key, EngineResource<?> resource) {
+@Override
+public synchronized void onEngineJobComplete(
+        EngineJob<?> engineJob, Key key, EngineResource<?> resource) {
     // A null resource indicates that the load failed, usually due to an exception.
     if (resource != null && resource.isMemoryCacheable()) {
-      activeResources.activate(key, resource);
+        activeResources.activate(key, resource);
     }
     jobs.removeIfCurrent(key, engineJob);
-  }
+}
 ```
 
 ## 3、内存缓存
@@ -1126,79 +1133,83 @@ SourceGenerator 在通过 HttpUrlFetcher 成功加载到图片后就会调用到
 - 根据 key 从 MemoryCache 取值，如果取得到的话则调用 `acquire()` 方法将该资源的引用数加一，并同时将该资源从 MemoryCache 中移除并存入 ActiveResources 中，取不到值的话则返回 null
 
 ```java
-  private final ActiveResources activeResources;
+private final ActiveResources activeResources;
 
-  private final MemoryCache cache;
+private final MemoryCache cache;
 
-  //尝试从内存中加载图片资源
-  @Nullable
-  private EngineResource<?> loadFromMemory(
-      EngineKey key, boolean isMemoryCacheable, long startTime) {
-    if (!isMemoryCacheable) { //如果配置了不允许使用内存缓存则直接返回
-      return null;
+// 尝试从内存中加载图片资源
+@Nullable
+private EngineResource<?> loadFromMemory(
+        EngineKey key, boolean isMemoryCacheable, long startTime) {
+    if (!isMemoryCacheable) { // 如果配置了不允许使用内存缓存则直接返回
+        return null;
     }
-	
-    //从 ActiveResources 加载
+
+    // 从 ActiveResources 加载
     EngineResource<?> active = loadFromActiveResources(key);
     if (active != null) {
-      if (VERBOSE_IS_LOGGABLE) {
-        logWithTimeAndKey("Loaded resource from active resources", startTime, key);
-      }
-      return active;
+        if (VERBOSE_IS_LOGGABLE) {
+            logWithTimeAndKey("Loaded resource from active resources", startTime, key);
+        }
+        return active;
     }
 
-    //从 MemoryCache 加载
+    // 从 MemoryCache 加载
     EngineResource<?> cached = loadFromCache(key);
     if (cached != null) {
-      if (VERBOSE_IS_LOGGABLE) {
-        logWithTimeAndKey("Loaded resource from cache", startTime, key);
-      }
-      return cached;
+        if (VERBOSE_IS_LOGGABLE) {
+            logWithTimeAndKey("Loaded resource from cache", startTime, key);
+        }
+        return cached;
     }
 
     return null;
-  }
+}
 
-  @Nullable
-  private EngineResource<?> loadFromActiveResources(Key key) {
+@Nullable
+private EngineResource<?> loadFromActiveResources(Key key) {
     EngineResource<?> active = activeResources.get(key);
     if (active != null) {
-      active.acquire();
+        active.acquire();
     }
 
     return active;
-  }
+}
 
-  private EngineResource<?> loadFromCache(Key key) {
+private EngineResource<?> loadFromCache(Key key) {
     EngineResource<?> cached = getEngineResourceFromCache(key);
     if (cached != null) {
-      cached.acquire();
-      activeResources.activate(key, cached);
+        cached.acquire();
+        activeResources.activate(key, cached);
     }
     return cached;
-  }
+}
 
-  private EngineResource<?> getEngineResourceFromCache(Key key) {
+private EngineResource<?> getEngineResourceFromCache(Key key) {
     Resource<?> cached = cache.remove(key);
 
     final EngineResource<?> result;
     if (cached == null) {
-      result = null;
+        result = null;
     } else if (cached instanceof EngineResource) {
-      // Save an object allocation if we've cached an EngineResource (the typical case).
-      result = (EngineResource<?>) cached;
+        // Save an object allocation if we've cached an EngineResource (the typical case).
+        result = (EngineResource<?>) cached;
     } else {
-      result =
-          new EngineResource<>(
-              cached, /*isMemoryCacheable=*/ true, /*isRecyclable=*/ true, key, /*listener=*/ this);
+        result =
+                new EngineResource<>(
+                        cached,
+                        /* isMemoryCacheable= */ true,
+                        /* isRecyclable= */ true,
+                        key,
+                        /* listener= */ this);
     }
     return result;
-  }
+}
 ```
 
 ActiveResources 是通过弱引用的方式来保存当前所有正在被使用的图片资源。我们知道，如果一个对象只具有弱引用而不再被强引用，那么当发生 GC 时，弱引用中持有的引用就会被直接置空，同时弱引用对象本身就会被存入关联的 ReferenceQueue 中
 
-当有一张新图片加载成功且被使用了，且当前允许内存缓存，那么该图片资源就会通过 `activate`方法保存到 `activeEngineResources` 中。当一张图片资源的引用计数 `acquired` 变为 0 时，说明该资源当前已经不再被外部使用了，此时就会通过 `deactivate` 方法将其从 `activeEngineResources` 中移除，消除对资源的引用，如果当前允许内存缓存的话则还会将该资源存入到 MemoryCache 中
+当有一张新图片加载成功且被使用了，且当前允许内存缓存，那么该图片资源就会通过 `activate` 方法保存到 `activeEngineResources` 中。当一张图片资源的引用计数 `acquired` 变为 0 时，说明该资源当前已经不再被外部使用了，此时就会通过 `deactivate` 方法将其从 `activeEngineResources` 中移除，消除对资源的引用，如果当前允许内存缓存的话则还会将该资源存入到 MemoryCache 中
 
 ```java
 final class ActiveResources {
@@ -1263,19 +1274,18 @@ LruResourceCache 主要是包含了一个 ResourceRemovedListener 对象，用�
 
 ```java
 public class LruResourceCache extends LruCache<Key, Resource<?>> implements MemoryCache {
-    
-  @Override
-  public void setResourceRemovedListener(@NonNull ResourceRemovedListener listener) {
-    this.listener = listener;
-  }
 
-  @Override
-  protected void onItemEvicted(@NonNull Key key, @Nullable Resource<?> item) {
-    if (listener != null && item != null) {
-      listener.onResourceRemoved(item);
+    @Override
+    public void setResourceRemovedListener(@NonNull ResourceRemovedListener listener) {
+        this.listener = listener;
     }
-  }
-    
+
+    @Override
+    protected void onItemEvicted(@NonNull Key key, @Nullable Resource<?> item) {
+        if (listener != null && item != null) {
+            listener.onResourceRemoved(item);
+        }
+    }
 }
 ```
 
@@ -1296,9 +1306,9 @@ Glide 的内存缓存机制是为了尽量复用图片资源，避免频繁地�
 @GuardedBy("Glide.class")
 @SuppressWarnings("deprecation")
 private static void initializeGlide(
-      @NonNull Context context,
-      @NonNull GlideBuilder builder,
-      @Nullable GeneratedAppGlideModule annotationGeneratedModule) {
+        @NonNull Context context,
+        @NonNull GlideBuilder builder,
+        @Nullable GeneratedAppGlideModule annotationGeneratedModule) {
     Context applicationContext = context.getApplicationContext();
     ···
     applicationContext.registerComponentCallbacks(glide);
@@ -1311,12 +1321,12 @@ private static void initializeGlide(
 ```java
 @Override
 public void onTrimMemory(int level) {
-	trimMemory(level);
+    trimMemory(level);
 }
 
 @Override
 public void onLowMemory() {
-	clearMemory();
+    clearMemory();
 }
 ```
 
@@ -1324,26 +1334,26 @@ public void onLowMemory() {
 
 ```java
 public void trimMemory(int level) {
-    // Engine asserts this anyway when removing resources, fail faster and consistently
-    Util.assertMainThread();
-    // Request managers need to be trimmed before the caches and pools, in order for the latter to
-    // have the most benefit.
-    for (RequestManager manager : managers) {
-      manager.onTrimMemory(level);
-    }
-    // memory cache needs to be trimmed before bitmap pool to trim re-pooled Bitmaps too. See #687.
-    memoryCache.trimMemory(level);
-    bitmapPool.trimMemory(level);
-    arrayPool.trimMemory(level);
+        // Engine asserts this anyway when removing resources, fail faster and consistently
+        Util.assertMainThread();
+        // Request managers need to be trimmed before the caches and pools, in order for the latter to
+        // have the most benefit.
+        for (RequestManager manager : managers) {
+            manager.onTrimMemory(level);
+        }
+        // memory cache needs to be trimmed before bitmap pool to trim re-pooled Bitmaps too. See #687.
+        memoryCache.trimMemory(level);
+        bitmapPool.trimMemory(level);
+        arrayPool.trimMemory(level);
 }
 
 public void clearMemory() {
-    // Engine asserts this anyway when removing resources, fail faster and consistently
-    Util.assertMainThread();
-    // memory cache needs to be cleared before bitmap pool to clear re-pooled Bitmaps too. See #687.
-    memoryCache.clearMemory();
-    bitmapPool.clearMemory();
-    arrayPool.clearMemory();
+        // Engine asserts this anyway when removing resources, fail faster and consistently
+        Util.assertMainThread();
+        // memory cache needs to be cleared before bitmap pool to clear re-pooled Bitmaps too. See #687.
+        memoryCache.clearMemory();
+        bitmapPool.clearMemory();
+        arrayPool.clearMemory();
 }
 ```
 
@@ -1355,26 +1365,25 @@ public void clearMemory() {
 
 ```java
 class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
-    
-  EngineJob(
-      GlideExecutor diskCacheExecutor,
-      GlideExecutor sourceExecutor,
-      GlideExecutor sourceUnlimitedExecutor,
-      GlideExecutor animationExecutor,
-      EngineJobListener engineJobListener,
-      ResourceListener resourceListener,
-      Pools.Pool<EngineJob<?>> pool) {
-    this(
-        diskCacheExecutor,
-        sourceExecutor,
-        sourceUnlimitedExecutor,
-        animationExecutor,
-        engineJobListener,
-        resourceListener,
-        pool,
-        DEFAULT_FACTORY);
-  }
-    
+
+    EngineJob(
+            GlideExecutor diskCacheExecutor,
+            GlideExecutor sourceExecutor,
+            GlideExecutor sourceUnlimitedExecutor,
+            GlideExecutor animationExecutor,
+            EngineJobListener engineJobListener,
+            ResourceListener resourceListener,
+            Pools.Pool<EngineJob<?>> pool) {
+        this(
+                diskCacheExecutor,
+                sourceExecutor,
+                sourceUnlimitedExecutor,
+                animationExecutor,
+                engineJobListener,
+                resourceListener,
+                pool,
+                DEFAULT_FACTORY);
+    }
 }
 ```
 
@@ -1383,7 +1392,7 @@ class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
 1. diskCacheExecutor。用于加载磁盘缓存
 2. sourceExecutor。用于执行非加载本地磁盘缓存的操作，例如，根据指定的 URI 或者 ImageUrl 去加载图片
 3. sourceUnlimitedExecutor。同 sourceExecutor
-4. animationExecutor。按官方的注释解释就是用于加载 Gif 
+4. animationExecutor。按官方的注释解释就是用于加载 Gif
 
 这四个线程池的创建逻辑可以看 GlideExecutor 类，这四个线程池的区别是：
 
@@ -1400,39 +1409,40 @@ class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
 public synchronized void start(DecodeJob<R> decodeJob) {
     this.decodeJob = decodeJob;
     GlideExecutor executor =
-        decodeJob.willDecodeFromCache() ? diskCacheExecutor : getActiveSourceExecutor();
+            decodeJob.willDecodeFromCache() ? diskCacheExecutor : getActiveSourceExecutor();
     executor.execute(decodeJob);
 }
 
 private GlideExecutor getActiveSourceExecutor() {
     return useUnlimitedSourceGeneratorPool
-        ? sourceUnlimitedExecutor
-        : (useAnimationPool ? animationExecutor : sourceExecutor);
+            ? sourceUnlimitedExecutor
+            : (useAnimationPool ? animationExecutor : sourceExecutor);
 }
 ```
 
 第五个线程池就位于 ActiveResources 类中。该线程池就用于不断从 ReferenceQueue 中取值判断，将当前已经不再被外部使用的图片资源缓存到 MemoryCache 中
 
 ```java
- ActiveResources(boolean isActiveResourceRetentionAllowed) {
+ActiveResources(boolean isActiveResourceRetentionAllowed) {
     this(
-        isActiveResourceRetentionAllowed,
-        java.util.concurrent.Executors.newSingleThreadExecutor(
-            new ThreadFactory() {
-              @Override
-              public Thread newThread(@NonNull final Runnable r) {
-                return new Thread(
-                    new Runnable() {
-                      @Override
-                      public void run() {
-                        Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                        r.run();
-                      }
-                    },
-                    "glide-active-resources");
-              }
-            }));
-  }
+            isActiveResourceRetentionAllowed,
+            java.util.concurrent.Executors.newSingleThreadExecutor(
+                    new ThreadFactory() {
+                        @Override
+                        public Thread newThread(@NonNull final Runnable r) {
+                            return new Thread(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Process.setThreadPriority(
+                                                    Process.THREAD_PRIORITY_BACKGROUND);
+                                            r.run();
+                                        }
+                                    },
+                                    "glide-active-resources");
+                        }
+                    }));
+}
 ```
 
 其余的两个线程池则在 Executors 类中
@@ -1443,54 +1453,54 @@ private GlideExecutor getActiveSourceExecutor() {
 
 ```java
 public final class Executors {
-  private Executors() {
-    // Utility class.
-  }
-
-  private static final Executor MAIN_THREAD_EXECUTOR =
-      new Executor() {
-        private final Handler handler = new Handler(Looper.getMainLooper());
-
-        @Override
-        public void execute(@NonNull Runnable command) {
-          handler.post(command);
-        }
-      };
-  private static final Executor DIRECT_EXECUTOR =
-      new Executor() {
-        @Override
-        public void execute(@NonNull Runnable command) {
-          command.run();
-        }
-      };
-
-  /** Posts executions to the main thread. */
-  public static Executor mainThreadExecutor() {
-    return MAIN_THREAD_EXECUTOR;
-  }
-
-  /** Immediately calls {@link Runnable#run()} on the current thread. */
-  public static Executor directExecutor() {
-    return DIRECT_EXECUTOR;
-  }
-
-  @VisibleForTesting
-  public static void shutdownAndAwaitTermination(ExecutorService pool) {
-    long shutdownSeconds = 5;
-    pool.shutdownNow();
-    try {
-      if (!pool.awaitTermination(shutdownSeconds, TimeUnit.SECONDS)) {
-        pool.shutdownNow();
-        if (!pool.awaitTermination(shutdownSeconds, TimeUnit.SECONDS)) {
-          throw new RuntimeException("Failed to shutdown");
-        }
-      }
-    } catch (InterruptedException ie) {
-      pool.shutdownNow();
-      Thread.currentThread().interrupt();
-      throw new RuntimeException(ie);
+    private Executors() {
+        // Utility class.
     }
-  }
+
+    private static final Executor MAIN_THREAD_EXECUTOR =
+            new Executor() {
+                private final Handler handler = new Handler(Looper.getMainLooper());
+
+                @Override
+                public void execute(@NonNull Runnable command) {
+                    handler.post(command);
+                }
+            };
+    private static final Executor DIRECT_EXECUTOR =
+            new Executor() {
+                @Override
+                public void execute(@NonNull Runnable command) {
+                    command.run();
+                }
+            };
+
+    /** Posts executions to the main thread. */
+    public static Executor mainThreadExecutor() {
+        return MAIN_THREAD_EXECUTOR;
+    }
+
+    /** Immediately calls {@link Runnable#run()} on the current thread. */
+    public static Executor directExecutor() {
+        return DIRECT_EXECUTOR;
+    }
+
+    @VisibleForTesting
+    public static void shutdownAndAwaitTermination(ExecutorService pool) {
+        long shutdownSeconds = 5;
+        pool.shutdownNow();
+        try {
+            if (!pool.awaitTermination(shutdownSeconds, TimeUnit.SECONDS)) {
+                pool.shutdownNow();
+                if (!pool.awaitTermination(shutdownSeconds, TimeUnit.SECONDS)) {
+                    throw new RuntimeException("Failed to shutdown");
+                }
+            }
+        } catch (InterruptedException ie) {
+            pool.shutdownNow();
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(ie);
+        }
+    }
 }
 ```
 
@@ -1511,11 +1521,11 @@ dependencies {
 ```java
 @GlideModule
 public final class OkHttpLibraryGlideModule extends LibraryGlideModule {
-  @Override
-  public void registerComponents(
-      @NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
-    registry.replace(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory());
-  }
+    @Override
+    public void registerComponents(
+            @NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
+        registry.replace(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory());
+    }
 }
 ```
 

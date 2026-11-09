@@ -1,5 +1,5 @@
 > 最近一直在了解关于 **Kotlin协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
-> 
+>
 > 协程官方文档：[coroutines-guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/coroutines-guide.md)
 
 本节讨论协程关于异常的处理和取消异常。我们已经知道，取消协程会使得在挂起点抛出 CancellationException，而协程机制会忽略这个异常。但是，如果在取消期间抛出异常，或者协程的多个子协程抛出异常，此时会发生什么情况呢?
@@ -49,7 +49,7 @@ Caught ArithmeticException
 
 在 JVM 上，可以通过 ServiceLoader 注册 CoroutineExceptionHandler 来重新定义所有协程的全局异常处理器。全局异常处理程序类似于 Thread.defaultUncaughtExceptionHandler ，后者在没有注册其它特定处理程序时使用。在 Android 上，uncaughtExceptionPreHandler 作为全局协程异常处理程序存在
 
-CoroutineExceptionHandler 只在预计不会由用户处理的异常上调用，因此在 async  这类协程构造器中注册它没有任何效果
+CoroutineExceptionHandler 只在预计不会由用户处理的异常上调用，因此在 async 这类协程构造器中注册它没有任何效果
 
 ```kotlin
 import kotlinx.coroutines.*

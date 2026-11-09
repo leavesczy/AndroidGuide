@@ -22,20 +22,19 @@ public class MyDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("title")
-			   .setMessage("message")
-               .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int id) {
-                       
-                   }
-               })
-               .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int id) {
-                       
-                   }
-               });
+                .setMessage("message")
+                .setPositiveButton(
+                        "确定",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {}
+                        })
+                .setNegativeButton(
+                        "取消",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {}
+                        });
         return builder.create();
     }
-	
 }
 ```
 之后，当创建此类的实例并调用该对象上的 show() 方法时，就可以显示出对话框了
@@ -79,25 +78,31 @@ public class ButtonDialogFragment extends DialogFragment {
     }
 
 }
-
 ```
 之后，提供调用方法
 
 ```java
 public void showButtonDialogFragment(View view) {
-        ButtonDialogFragment buttonDialogFragment = new ButtonDialogFragment();
-        buttonDialogFragment.show("Hi,你好", "leavesc", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(MainActivity.this, "点击了确定 " + which, Toast.LENGTH_SHORT).show();
-            }
-        }, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(MainActivity.this, "点击了取消 " + which, Toast.LENGTH_SHORT).show();
-            }
-        }, getFragmentManager());
-    }
+    ButtonDialogFragment buttonDialogFragment = new ButtonDialogFragment();
+    buttonDialogFragment.show(
+            "Hi,你好",
+            "leavesc",
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(MainActivity.this, "点击了确定 " + which, Toast.LENGTH_SHORT)
+                            .show();
+                }
+            },
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(MainActivity.this, "点击了取消 " + which, Toast.LENGTH_SHORT)
+                            .show();
+                }
+            },
+            getFragmentManager());
+}
 ```
 运行效果
 
@@ -144,16 +149,22 @@ public class NeutralDialogFragment extends DialogFragment {
 提供调用方法
 
 ```java
-    public void showNeutralDialogFragment(View view) {
-        NeutralDialogFragment neutralDialogFragment = new NeutralDialogFragment();
-        neutralDialogFragment.show("Hi,你好", "leavesc", "确定~", new DialogInterface.OnClickListener() {
+public void showNeutralDialogFragment(View view) {
+    NeutralDialogFragment neutralDialogFragment = new NeutralDialogFragment();
+    neutralDialogFragment.show(
+            "Hi,你好",
+            "leavesc",
+            "确定~",
+            new DialogInterface.OnClickListener() {
 
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(MainActivity.this, "点击了按钮 " + which, Toast.LENGTH_SHORT).show();
-            }
-        }, getFragmentManager());
-    }
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(MainActivity.this, "点击了按钮 " + which, Toast.LENGTH_SHORT)
+                            .show();
+                }
+            },
+            getFragmentManager());
+}
 ```
 运行效果
 
@@ -196,15 +207,23 @@ public class ItemsDialogFragment extends DialogFragment {
 
 ```java
 public void showItemsDialogFragment(View view) {
-        ItemsDialogFragment itemsDialogFragment = new ItemsDialogFragment();
-        String[] items = {"Hi", "Hello", "叶"};
-        itemsDialogFragment.show("Hi,你好", items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(MainActivity.this, "点击了第 " + (which + 1) + " 个选项", Toast.LENGTH_SHORT).show();
-            }
-        }, getFragmentManager());
-    }
+    ItemsDialogFragment itemsDialogFragment = new ItemsDialogFragment();
+    String[] items = {"Hi", "Hello", "叶"};
+    itemsDialogFragment.show(
+            "Hi,你好",
+            items,
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(
+                                    MainActivity.this,
+                                    "点击了第 " + (which + 1) + " 个选项",
+                                    Toast.LENGTH_SHORT)
+                            .show();
+                }
+            },
+            getFragmentManager());
+}
 ```
 运行效果
 
@@ -251,29 +270,34 @@ public class MultiChoiceDialogFragment extends DialogFragment {
 
 ```java
 public void showMultiChoiceDialogFragment(View view) {
-        MultiChoiceDialogFragment multiChoiceDialogFragment = new MultiChoiceDialogFragment();
-        final String[] items = {"Hi", "Hello", "叶"};
-        final List<Integer> integerList = new ArrayList<>();
-        multiChoiceDialogFragment.show("Hi,你好", items, new DialogInterface.OnMultiChoiceClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                if (isChecked) {
-                    integerList.add(which);
-                } else {
-                    integerList.remove(which);
+    MultiChoiceDialogFragment multiChoiceDialogFragment = new MultiChoiceDialogFragment();
+    final String[] items = {"Hi", "Hello", "叶"};
+    final List<Integer> integerList = new ArrayList<>();
+    multiChoiceDialogFragment.show(
+            "Hi,你好",
+            items,
+            new DialogInterface.OnMultiChoiceClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                    if (isChecked) {
+                        integerList.add(which);
+                    } else {
+                        integerList.remove(which);
+                    }
                 }
-            }
-        }, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String hint = "";
-                for (int i = 0; i < integerList.size(); i++) {
-                    hint = items[integerList.get(i)] + hint;
+            },
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String hint = "";
+                    for (int i = 0; i < integerList.size(); i++) {
+                        hint = items[integerList.get(i)] + hint;
+                    }
+                    Toast.makeText(MainActivity.this, hint, Toast.LENGTH_SHORT).show();
                 }
-                Toast.makeText(MainActivity.this, hint, Toast.LENGTH_SHORT).show();
-            }
-        }, getFragmentManager());
-    }
+            },
+            getFragmentManager());
+}
 ```
 运行效果
 
@@ -318,24 +342,33 @@ public class SingleChoiceDialogFragment extends DialogFragment {
 提供调用方法
 
 ```java
-  private int index;
+private int index;
 
-    public void showSingleChoiceDialogFragment(View view) {
-        SingleChoiceDialogFragment singleChoiceDialogFragment = new SingleChoiceDialogFragment();
-        String[] items = {"Hi", "Hello", "叶"};
+public void showSingleChoiceDialogFragment(View view) {
+    SingleChoiceDialogFragment singleChoiceDialogFragment = new SingleChoiceDialogFragment();
+    String[] items = {"Hi", "Hello", "叶"};
 
-        singleChoiceDialogFragment.show("Hi,你好", items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                index = which;
-            }
-        }, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(MainActivity.this, "选择了第" + (index + 1) + "项", Toast.LENGTH_SHORT).show();
-            }
-        }, getFragmentManager());
-    }
+    singleChoiceDialogFragment.show(
+            "Hi,你好",
+            items,
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    index = which;
+                }
+            },
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(
+                                    MainActivity.this,
+                                    "选择了第" + (index + 1) + "项",
+                                    Toast.LENGTH_SHORT)
+                            .show();
+                }
+            },
+            getFragmentManager());
+}
 ```
 运行效果
 
@@ -462,9 +495,12 @@ public class MainActivity extends AppCompatActivity implements ViewDialogFragmen
 
     @Override
     public void onClick(String userName, String password) {
-        Toast.makeText(MainActivity.this, "用户名: " + userName + " 密码: " + password, Toast.LENGTH_SHORT).show();
+        Toast.makeText(
+                        MainActivity.this,
+                        "用户名: " + userName + " 密码: " + password,
+                        Toast.LENGTH_SHORT)
+                .show();
     }
-
 }
 ```
 运行效果

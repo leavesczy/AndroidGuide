@@ -42,12 +42,12 @@ Compose Multiplatform 在移动端的跨平台框架子集叫做 Kotlin Multipla
 
 通过 IDEA 的 Kotlin Multiplatform Mobile 插件生成的模板项目，不同平台的代码已经分属于不同的模块了，同时包含一个 `common` 模块用于存放公用的业务逻辑，通过划分模块来实现代码隔离
 
-以 compose_tetris 为例，其目标平台是 Android 和 Desktop，所以包含三个主模块：`common、android、desktop`。`common`又划分为三个子模块：`commonMain、androidMain、desktopMain`。`commonMain` 包含的是同时适用于 Android 和 Desktop 的业务逻辑，由于其并不隶属于特定平台，因此也不具备直接调用平台 API 的能力，而是交由 `androidMain` 和 `desktopMain` 来实现特定的平台能力
+以 compose_tetris 为例，其目标平台是 Android 和 Desktop，所以包含三个主模块：`common、android、desktop`。`common` 又划分为三个子模块：`commonMain、androidMain、desktopMain`。`commonMain` 包含的是同时适用于 Android 和 Desktop 的业务逻辑，由于其并不隶属于特定平台，因此也不具备直接调用平台 API 的能力，而是交由 `androidMain` 和 `desktopMain` 来实现特定的平台能力
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c0403b4cbc8f4b798e3d756515a414bc~tplv-k3u1fbpfcp-zoom-1.image)
 
 - commonMain。用于存放适用于任何平台的业务逻辑、通用布局、expect 声明等
-- androidMain。专属于 Android 平台的模块，在 commonMain 的基础上根据 Android 平台的特性进行扩展，例如，将引用的业务逻辑注入到 ViewModel 中交由 android 模块进行引用、实现 expect 声明、引用原生的 `android.graphics.Canvas` 以便绘制  UI
+- androidMain。专属于 Android 平台的模块，在 commonMain 的基础上根据 Android 平台的特性进行扩展，例如，将引用的业务逻辑注入到 ViewModel 中交由 android 模块进行引用、实现 expect 声明、引用原生的 `android.graphics.Canvas` 以便绘制 UI
 - desktopMain。专属于 Desktop 平台的模块，在 commonMain 的基础上根据 Desktop 平台的特性进行扩展，例如，将引用的布局结构扩展为大屏模式、增加监听键盘点击事件的功能、实现 expect 声明、引用支持硬件加速的 `org.jetbrains.skia.Canvas` 以便绘制 UI
 - android。最终的平台模块
 - desktop。最终的平台模块
@@ -74,7 +74,7 @@ Compose Multiplatform 通过 `sourceSets` 来实现上述目的，`sourceSets` �
 
 compose_tetris 整个项目的依赖类型根据平台可以分为三种：common、android、desktop。顾名思义，common 也即适用于任意平台的通用依赖，当中不能调用任何平台 API，也不能引用任何只适用于单独平台的依赖库，所以在 Android 开发中比较流行的 OkHttp、Gson、RxJava 等库都不能在 `commonMain` 模块中使用
 
-而为了能够在`commonMain` 模块中构建适用于任意平台的 UI，`commonMain` 模块所引用的 common 依赖其实都是 `org.jetbrains.compose.xxx` 而非 `androidx.compose.xxx`，jetbrainsCompose 可以看做是对 androidxCompose 进行了一层包装，复刻了 androidxCompose 的大部分依赖库，保持 **包名、类签名、方法签名** 不变
+而为了能够在 `commonMain` 模块中构建适用于任意平台的 UI，`commonMain` 模块所引用的 common 依赖其实都是 `org.jetbrains.compose.xxx` 而非 `androidx.compose.xxx`，jetbrainsCompose 可以看做是对 androidxCompose 进行了一层包装，复刻了 androidxCompose 的大部分依赖库，保持 **包名、类签名、方法签名** 不变
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/2de06a23e3f14d9f8e0b4530718833dc~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -82,7 +82,7 @@ compose_tetris 整个项目的依赖类型根据平台可以分为三种：commo
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3f3a937aa7a242fba0d2b75edc006f9a~tplv-k3u1fbpfcp-zoom-1.image)
 
-`commonMain` 模块所引用的均是 **非 desktop 版本**，不会调用任何平台 API，也即不会和 Android 平台以及其它任意平台关联，使得`commonMain` 模块可以保证平台无关性。等到编译阶段，会自动为不同平台提供签名信息相同但具体实现不同的底层依赖，如果目标平台是 Android，最终引用的会是 androidxCompose；如果目标平台是 Desktop，则引用的是 jetbrainsCompose-desktop
+`commonMain` 模块所引用的均是 **非 desktop 版本**，不会调用任何平台 API，也即不会和 Android 平台以及其它任意平台关联，使得 `commonMain` 模块可以保证平台无关性。等到编译阶段，会自动为不同平台提供签名信息相同但具体实现不同的底层依赖，如果目标平台是 Android，最终引用的会是 androidxCompose；如果目标平台是 Desktop，则引用的是 jetbrainsCompose-desktop
 
 Kotlin 官方也提供了一些适用于多平台的基础库：
 
@@ -100,17 +100,17 @@ Compose Multiplatform 通过 `expect / actual` 机制来提供调用特定平台
 
 以 compose_tetris 为例，在游戏过程中需要播放音效，Android 和 Desktop 均需要提供 Play Sound 的能力。Android 平台上我使用的是系统提供的 `android.media.AudioManager`，这自然不能在 Desktop 平台上使用，此时就需要来差异化实现 Play Sound 的功能了
 
-在 `commonMain` 模块中，我将播放音效的能力抽象为 SoundPlayer 接口，再通过 `expect` 关键字修饰的 `getSoundPlayer()`方法来获取 SoundPlayer 对象，此方法相当于一个抽象方法，在 `commonMain` 模块中不需要具体实现，但可以正常调用。之后，`androidMain` 和 `desktopMain` 两个模块在相同包名下再各自实现`getSoundPlayer()`方法，通过 `actual` 关键字来修饰实现方法，当编译平台代码时，“方法声明”和“具体实现”就会被桥接在一起，从而达到平台差异化实现的目的
+在 `commonMain` 模块中，我将播放音效的能力抽象为 SoundPlayer 接口，再通过 `expect` 关键字修饰的 `getSoundPlayer()` 方法来获取 SoundPlayer 对象，此方法相当于一个抽象方法，在 `commonMain` 模块中不需要具体实现，但可以正常调用。之后，`androidMain` 和 `desktopMain` 两个模块在相同包名下再各自实现 `getSoundPlayer()` 方法，通过 `actual` 关键字来修饰实现方法，当编译平台代码时，“方法声明”和“具体实现”就会被桥接在一起，从而达到平台差异化实现的目的
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d5315c3cd4aa407480ede982b966d1d9~tplv-k3u1fbpfcp-zoom-1.image)
 
-类似地，Compose Multiplatform 也是通过`expect / actual` 机制来实现跨平台绘制 UI
+类似地，Compose Multiplatform 也是通过 `expect / actual` 机制来实现跨平台绘制 UI
 
-Jetpack Compose 除了在界面渲染时需要依赖于 Android 原生 API 外，其它大部分特性都可以做到平台无关。Jetpack Compose 在绘制文本的时候就需要通过调用 `android.graphics.Canvas` 的 `drawText`方法来实现，因此在 `androidx.compose.ui:ui-graphics:1.0.1` 中就包含一个 `nativeCanvas` 扩展属性用于获取原生平台的 Canvas 对象，也即 Android 平台的 `android.graphics.Canvas`。nativeCanvas 属性也是采用了`expect / actual` 机制，其 expect 声明就放在同个库的 Canvas 类内部
+Jetpack Compose 除了在界面渲染时需要依赖于 Android 原生 API 外，其它大部分特性都可以做到平台无关。Jetpack Compose 在绘制文本的时候就需要通过调用 `android.graphics.Canvas` 的 `drawText` 方法来实现，因此在 `androidx.compose.ui:ui-graphics:1.0.1` 中就包含一个 `nativeCanvas` 扩展属性用于获取原生平台的 Canvas 对象，也即 Android 平台的 `android.graphics.Canvas`。nativeCanvas 属性也是采用了 `expect / actual` 机制，其 expect 声明就放在同个库的 Canvas 类内部
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/69954c53bac74e40bd9c40adebbf9515~tplv-k3u1fbpfcp-zoom-1.image)
 
-而在 `org.jetbrains.compose.ui:ui-graphics-desktop:1.0.1`中，`nativeCanvas` 属性对应的是 Skiko 库中的 `org.jetbrains.skia.Canvas`
+而在 `org.jetbrains.compose.ui:ui-graphics-desktop:1.0.1` 中，`nativeCanvas` 属性对应的是 Skiko 库中的 `org.jetbrains.skia.Canvas`
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/100c6fa2fe9642a7bf0aecc93a7d5886~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -157,7 +157,7 @@ fun MainScreen(modifier: Modifier, tetrisLogic: ITetrisLogic) {
     }
 }
 ```
-`androidMain` 模块的 AndroidMainScreen 通过 accompanist 来控制状态栏，再通过 LifecycleObserver 来判断 Activity 是否处于前台 
+`androidMain` 模块的 AndroidMainScreen 通过 accompanist 来控制状态栏，再通过 LifecycleObserver 来判断 Activity 是否处于前台
 
 ```kotlin
 @Composable

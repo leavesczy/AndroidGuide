@@ -67,13 +67,13 @@ private object SystemMethodProxy {
 `telephonyManager.getDeviceId` 方法在字节码层面符合以下规则：
 
 - 调用的是实例方法，所以对应 INVOKEVIRTUAL
-- 调用的实例对象是 TelephonyManager 类型，所以对应 `android/telephony/TelephonyManager` 
-- 不包含入参参数，且返回值类型是 String，所以方法签名是 `()Ljava/lang/String;` 
+- 调用的实例对象是 TelephonyManager 类型，所以对应 `android/telephony/TelephonyManager`
+- 不包含入参参数，且返回值类型是 String，所以方法签名是 `()Ljava/lang/String;`
 
 `SystemMethodProxy.getDeviceId` 方法在字节码层面符合以下规则：
 
 - 调用的是静态方法，所以对应 INVOKESTATIC
-- 调用的实例对象是 SystemMethodProxy 类型，所以对应 `github/leavesczy/track/replace/instruction/SystemMethodProxy` 
+- 调用的实例对象是 SystemMethodProxy 类型，所以对应 `github/leavesczy/track/replace/instruction/SystemMethodProxy`
 - 多了一个入参参数 TelephonyManager，所以方法签名变成了 `(Landroid/telephony/TelephonyManager;)Ljava/lang/String;`
 
 `telephonyManager.getDeviceId()` 对应的是实例方法，再来举个调用静态方法的例子：`Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)`

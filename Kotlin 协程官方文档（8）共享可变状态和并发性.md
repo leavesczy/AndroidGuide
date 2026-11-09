@@ -1,5 +1,5 @@
 > 最近一直在了解关于 **Kotlin协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
-> 
+>
 > 协程官方文档：[coroutines-guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/coroutines-guide.md)
 
 可以使用多线程调度器（如 Dispatchers.Default）并发执行协程，它呈现了所有常见的并发问题。主要问题是对共享可变状态的同步访问。在协程作用域中解决这个问题的一些方法类似于多线程世界中的方法，但有一些其它方法是独有的
@@ -276,7 +276,7 @@ fun main() = runBlocking {
 
 actor 是一个实体，由一个协程、被限制并封装到这个协程中的状态以及一个与其它协程通信的通道组成。简单的 actor 可以写成函数，但具有复杂状态的 actor 更适合类
 
-有一个 actor 协程构造器，它可以方便地将 actor 的 mailbox  channel 合并到其接收的消息的作用域中，并将 send channel 合并到生成的 job  对象中，以便可以将对 actor 的单个引用作为其句柄引有
+有一个 actor 协程构造器，它可以方便地将 actor 的 mailbox channel 合并到其接收的消息的作用域中，并将 send channel 合并到生成的 job 对象中，以便可以将对 actor 的单个引用作为其句柄引有
 
 使用 actor 的第一步是定义一类 actor 将要处理的消息。kotlin 的密封类非常适合这个目的。在 CounterMsg 密封类中，我们用 IncCounter 消息来定义递增计数器，用 GetCounter 消息来获取其值，后者需要返回值。为此，这里使用 CompletableDeferred communication primitive，它表示将来已知（通信）的单个值
 
@@ -357,7 +357,7 @@ fun main() = runBlocking<Unit> {
 //sampleEnd    
 ```
 
-在什么上下文中执行 actor 本身并不重要（为了正确）。actor  是一个协程，并且协程是按顺序执行的，因此将状态限制到特定的协程可以解决共享可变状态的问题。实际上，actors 可以修改自己的私有状态，但只能通过消息相互影响（避免需要任何锁）
+在什么上下文中执行 actor 本身并不重要（为了正确）。actor 是一个协程，并且协程是按顺序执行的，因此将状态限制到特定的协程可以解决共享可变状态的问题。实际上，actors 可以修改自己的私有状态，但只能通过消息相互影响（避免需要任何锁）
 
 actor 比使用锁更为有效，因为在这种情况下，它总是有工作要做，根本不需要切换到不同的上下文
 

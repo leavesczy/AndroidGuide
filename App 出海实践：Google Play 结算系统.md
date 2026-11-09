@@ -228,13 +228,13 @@ ProductDetails 的数据结构如下所示，我们可以依靠这些信息来�
 
 ```json
 {
-	"productId": "",
-	"productType": "",
-	"title": "",
-	"name": "",
-	"description": "",
-	"oneTimePurchaseOfferDetails": {},
-	"subscriptionOfferDetails": []
+    "productId": "",
+    "productType": "",
+    "title": "",
+    "name": "",
+    "description": "",
+    "oneTimePurchaseOfferDetails": {},
+    "subscriptionOfferDetails": []
 }
 ```
 
@@ -244,9 +244,9 @@ oneTimePurchaseOfferDetails 对应的是一次性商品的详情，数据结构�
 
 ```json
 {
-	"priceAmountMicros": 548000000,
-	"priceCurrencyCode": "HKD",
-	"formattedPrice": "HK$548.00"
+    "priceAmountMicros": 548000000,
+    "priceCurrencyCode": "HKD",
+    "formattedPrice": "HK$548.00"
 }
 ```
 
@@ -311,7 +311,7 @@ subscriptionOfferDetails 对应的是订阅型商品的详情
 - offerToken 用于唯一标识每一个 Offer，具有唯一性
 - billingPeriod 用于表示计费周期，以 ISO 8601 格式来指定。例如，P1W 表示一周，P1Y 表示一年，P1M3D 表示一个月加三天
 - billingCycleCount 用于表示计费周期的周期数。例如，以上的第二个 Offer 的第一个 PricingPhases，就表示允许用户免费试用一周；假如 billingCycleCount 是 2，就表示允许用户免费试用两周
-- recurrenceMode 用于表示价格阶段的重复模式，当值为 1 或 3 时，billingCycleCount 值都会是 0 
+- recurrenceMode 用于表示价格阶段的重复模式，当值为 1 或 3 时，billingCycleCount 值都会是 0
    - 值为 1 就表示将在无限的计费周期内重复进行，除非用户主动取消
    - 值为 2 就表示将在 billingCycleCount 指定的周期内重复扣费
    - 值为 3 表示是一次性收费，不会重复

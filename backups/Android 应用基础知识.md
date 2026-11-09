@@ -44,7 +44,7 @@ Android 系统设计的独特之处在于，任何应用都可以启动其他应
 
 由于系统在单独的进程中运行每个应用，且其文件权限会限制对其他应用的访问，因此你的应用无法直接启动其他应用中的组件， 但 Android 系统却可以。因此，要想启动其他应用中的组件，你必须向系统传递一则消息，说明想启动特定组件的 Intent。 系统随后便会为你启动该组件
 
-## **二、Intent** 
+## **二、Intent**
 
 四种组件类型中的三种：Activity、服务和广播接收器 ，都通过名为 Intent 的异步消息进行启动。Intent 会在运行时将各个组件相互绑定（可以将 Intent 视为从其他组件请求操作的信使），无论组件属于你的应用还是其他应用。
 
@@ -82,12 +82,12 @@ Intent 不会启动另一个组件类型：内容提供程序，后者会在成�
 ```java
 <?xml version="1.0" encoding="utf-8"?>
 <manifest ... >
-    <application android:icon="@drawable/app_icon.png" ... >
-        <activity android:name="com.example.project.ExampleActivity"
-                  android:label="@string/example_label" ... >
-        </activity>
-        ...
-    </application>
+        <application android:icon="@drawable/app_icon.png" ... >
+                <activity android:name="com.example.project.ExampleActivity"
+                                    android:label="@string/example_label" ... >
+                </activity>
+                ...
+        </application>
 </manifest>
 ```
 
@@ -137,10 +137,10 @@ Intent 不会启动另一个组件类型：内容提供程序，后者会在成�
 
 ```java
 <manifest ... >
-    <uses-feature android:name="android.hardware.camera.any"
-                  android:required="true" />
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="19" />
-    ...
+        <uses-feature android:name="android.hardware.camera.any"
+                                    android:required="true" />
+        <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="19" />
+        ...
 </manifest>
 ```
 现在，没有相机且 Android 版本低于 2.1 的设备将无法从 Google Play 安装该应用。

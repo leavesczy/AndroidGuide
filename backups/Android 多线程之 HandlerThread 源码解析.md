@@ -20,24 +20,24 @@
 创建 HandlerThread 并调用 `start()` 方法，使其在子线程内创建 Looper 对象
 
 ```java
-	HandlerThread handlerThread = new HandlerThread("HandlerThread");
+    HandlerThread handlerThread = new HandlerThread("HandlerThread");
     handlerThread.start();
 ```
 
 然后以 HandlerThread 内部的 Looper 对象为参数创建一个 Handler，通过 Handler 向子线程发送 Message，以此下发耗时任务，消息的接收者与任务的处理者则由回调函数 ChildCallback 来完成
 
 ```java
-	Handler childThreadHandler = new Handler(handlerThread.getLooper(), new ChildCallback());
-	
-	//Callback 运行于子线程
-    private class ChildCallback implements Handler.Callback {
-        @Override
-        public boolean handleMessage(Message msg) {
-            //在此可以进行耗时操作
-            //如果需要更新UI，则需要通过主线程的Handler来完成
-            return false;
-        }
+Handler childThreadHandler = new Handler(handlerThread.getLooper(), new ChildCallback());
+
+// Callback 运行于子线程
+private class ChildCallback implements Handler.Callback {
+    @Override
+    public boolean handleMessage(Message msg) {
+        // 在此可以进行耗时操作
+        // 如果需要更新UI，则需要通过主线程的Handler来完成
+        return false;
     }
+}
 ```
 
 完整的示例代码如下所示
@@ -47,13 +47,19 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    //Callback 运行于子线程
+    // Callback 运行于子线程
     private class ChildCallback implements Handler.Callback {
         @Override
         public boolean handleMessage(Message msg) {
-            //在此可以进行耗时操作
-            //如果需要更新UI，则需要通过主线程的Handler来完成
-            Log.e(TAG, "ChildCallback 当前线程名：" + Thread.currentThread().getName() + "   " + "当前线程ID：" + Thread.currentThread().getId());
+            // 在此可以进行耗时操作
+            // 如果需要更新UI，则需要通过主线程的Handler来完成
+            Log.e(
+                    TAG,
+                    "ChildCallback 当前线程名："
+                            + Thread.currentThread().getName()
+                            + "   "
+                            + "当前线程ID："
+                            + Thread.currentThread().getId());
             Log.e(TAG, "耗时任务开始");
             try {
                 Thread.sleep(5000);
@@ -61,23 +67,30 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             Log.e(TAG, "耗时任务结束");
-            //通知界面更新UI
+            // 通知界面更新UI
             uiHandler.sendEmptyMessage(1);
             return false;
         }
     }
 
-    //运行于主线程的Handler，用于更新UI
+    // 运行于主线程的Handler，用于更新UI
     @SuppressLint("HandlerLeak")
-    private Handler uiHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            Log.e(TAG, "uiHandler 当前线程名：" + Thread.currentThread().getName() + "   " + "当前线程ID：" + Thread.currentThread().getId());
-            Toast.makeText(MainActivity.this, "耗时操作完成", Toast.LENGTH_LONG).show();
-        }
-    };
+    private Handler uiHandler =
+            new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    Log.e(
+                            TAG,
+                            "uiHandler 当前线程名："
+                                    + Thread.currentThread().getName()
+                                    + "   "
+                                    + "当前线程ID："
+                                    + Thread.currentThread().getId());
+                    Toast.makeText(MainActivity.this, "耗时操作完成", Toast.LENGTH_LONG).show();
+                }
+            };
 
-    //用于向子线程发布耗时任务的Handler
+    // 用于向子线程发布耗时任务的Handler
     private Handler childThreadHandler;
 
     private HandlerThread handlerThread;
@@ -89,7 +102,13 @@ public class MainActivity extends AppCompatActivity {
         handlerThread = new HandlerThread("HandlerThread");
         handlerThread.start();
         childThreadHandler = new Handler(handlerThread.getLooper(), new ChildCallback());
-        Log.e(TAG, "onCreate 当前线程名：" + Thread.currentThread().getName() + "   " + "当前线程ID：" + Thread.currentThread().getId());
+        Log.e(
+                TAG,
+                "onCreate 当前线程名："
+                        + Thread.currentThread().getName()
+                        + "   "
+                        + "当前线程ID："
+                        + Thread.currentThread().getId());
     }
 
     public void startTask(View view) {
@@ -102,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
         handlerThread.quit();
         childThreadHandler.removeCallbacksAndMessages(null);
     }
-
 }
 ```
 
@@ -121,74 +139,73 @@ public class MainActivity extends AppCompatActivity {
 先看下 HandlerThread 的类声明，是 Thread 的子类
 
 ```java
-	public class HandlerThread extends Thread
+    public class HandlerThread extends Thread
 ```
 
 两个构造函数，可以传入的参数分别是**线程名**和**线程优先级**
 
 ```java
-	public HandlerThread(String name) {
-        super(name);
-        //使用默认的线程优先级
-        mPriority = Process.THREAD_PRIORITY_DEFAULT;
-    }
+public HandlerThread(String name) {
+    super(name);
+    // 使用默认的线程优先级
+    mPriority = Process.THREAD_PRIORITY_DEFAULT;
+}
 
-    public HandlerThread(String name, int priority) {
-        super(name);
-        //使用自定义的线程优先级
-        mPriority = priority;
-    }
+public HandlerThread(String name, int priority) {
+    super(name);
+    // 使用自定义的线程优先级
+    mPriority = priority;
+}
 ```
 
 看下其 `run()` 方法
 
 ```java
-	@Override
-    public void run() {
-        mTid = Process.myTid();
-        //触发当前线程创建 Looper 对象
-        Looper.prepare();
-        synchronized (this) {
-            //获取 Looper 对象
-            mLooper = Looper.myLooper();
-            //唤醒在等待的线程
-            //唤醒 getLooer() 中可能还处于等待状态的线程
-            notifyAll();
-        }
-        //设置线程优先级
-        Process.setThreadPriority(mPriority);
-        onLooperPrepared();
-        //开启消息循环
-        Looper.loop();
-        mTid = -1;
+@Override
+public void run() {
+    mTid = Process.myTid();
+    // 触发当前线程创建 Looper 对象
+    Looper.prepare();
+    synchronized (this) {
+        // 获取 Looper 对象
+        mLooper = Looper.myLooper();
+        // 唤醒在等待的线程
+        // 唤醒 getLooer() 中可能还处于等待状态的线程
+        notifyAll();
     }
+    // 设置线程优先级
+    Process.setThreadPriority(mPriority);
+    onLooperPrepared();
+    // 开启消息循环
+    Looper.loop();
+    mTid = -1;
+}
 ```
 
 `Looper.prepare()` 方法用于为当前线程创建一个 Looper 对象，在主线程需要依赖此 Looper 对象来构建一个 Handler 对象，通过该 Handler 对象来向子线程下发耗时任务
 
-之后可以看到有一个同步代码块，在当中调用了 `notifyAll()`来唤醒等待线程，那该唤醒的又是哪个线程呢？这里需要明确各个方法是运行于哪个线程，`run()` 方法肯定是运行于子线程，但用于向 HandlerThread 下发任务的 Handler 是初始化于主线程，因此 `getLooper()`方法也是运行于主线程的。由于是两个不同的线程，`run()` 方法和 `getLooper()` 的运行先后顺序是不明确的，因此 `getLooper()` 方法需要确保 Looper 对象不为 **null** 时才返回，否则将一直阻塞等待 Looper 对象初始化完成
+之后可以看到有一个同步代码块，在当中调用了 `notifyAll()` 来唤醒等待线程，那该唤醒的又是哪个线程呢？这里需要明确各个方法是运行于哪个线程，`run()` 方法肯定是运行于子线程，但用于向 HandlerThread 下发任务的 Handler 是初始化于主线程，因此 `getLooper()` 方法也是运行于主线程的。由于是两个不同的线程，`run()` 方法和 `getLooper()` 的运行先后顺序是不明确的，因此 `getLooper()` 方法需要确保 Looper 对象不为 **null** 时才返回，否则将一直阻塞等待 Looper 对象初始化完成
 
 ```java
-	//获取与当前线程关联的 Looper 对象
-    //因为 getLooper() 方法可能先于 run() 被调用，此时就需要先等待 Looper 对象被创建
-    public Looper getLooper() {
-        //如果当前线程未在运行，则返回 null 
-        if (!isAlive()) {
-            return null;
-        }
-        synchronized (this) {
-            //如果当前线程已处理运行状态（已调用 start() 方法）且 Looper 对象还未创建
-            //则调用 wait() 方法释放锁，等待 Looper 对象创建
-            while (isAlive() && mLooper == null) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                }
+// 获取与当前线程关联的 Looper 对象
+// 因为 getLooper() 方法可能先于 run() 被调用，此时就需要先等待 Looper 对象被创建
+public Looper getLooper() {
+    // 如果当前线程未在运行，则返回 null
+    if (!isAlive()) {
+        return null;
+    }
+    synchronized (this) {
+        // 如果当前线程已处理运行状态（已调用 start() 方法）且 Looper 对象还未创建
+        // 则调用 wait() 方法释放锁，等待 Looper 对象创建
+        while (isAlive() && mLooper == null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
             }
         }
-        return mLooper;
     }
-
+    return mLooper;
+}
 ```
 
 Looper 对象初始化完成后，就需要调用 `Looper.loop()` 来开启消息循环，至此 HandlerThread 的初始化操作就完成了
@@ -317,5 +334,4 @@ public class HandlerThread extends Thread {
 
 }
 ```
-
 

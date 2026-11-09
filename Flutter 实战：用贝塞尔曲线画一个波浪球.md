@@ -23,60 +23,60 @@
 
 # 一、绘制 backgroundColor 文本
 
-flutter 通过 CustomPainter 为开发者提供了自绘 UI 的入口，其内部的 `void paint(Canvas canvas, Size size)`  方法提供了画布 canvas 对象以及包含 widget 宽高信息的 size 对象
+flutter 通过 CustomPainter 为开发者提供了自绘 UI 的入口，其内部的 `void paint(Canvas canvas, Size size)` 方法提供了画布 canvas 对象以及包含 widget 宽高信息的 size 对象
 
 这里就来继承 CustomPainter 类，在 `paint` 方法中先来绘制颜色为 backgroundColor 的文本。flutter 的 canvas 对象没有提供直接 `drawText` 的 API，所以其绘制文本的步骤相对原生的自定义 View 要稍微麻烦一点
 
 ```dart
 class _WaveLoadingPainter extends CustomPainter {
-  final String text;
+    final String text;
 
-  final double fontSize;
+    final double fontSize;
 
-  final double animatedValue;
+    final double animatedValue;
 
-  final Color backgroundColor;
+    final Color backgroundColor;
 
-  final Color foregroundColor;
+    final Color foregroundColor;
 
-  final Color waveColor;
+    final Color waveColor;
 
-  _WaveLoadingPainter({
-    required this.text,
-    required this.fontSize,
-    required this.animatedValue,
-    required this.backgroundColor,
-    required this.foregroundColor,
-    required this.waveColor,
-  });
+    _WaveLoadingPainter({
+        required this.text,
+        required this.fontSize,
+        required this.animatedValue,
+        required this.backgroundColor,
+        required this.foregroundColor,
+        required this.waveColor,
+    });
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final side = min(size.width, size.height);
-    _drawText(canvas: canvas, side: side, color: backgroundColor);
-  }
+    @override
+    void paint(Canvas canvas, Size size) {
+        final side = min(size.width, size.height);
+        _drawText(canvas: canvas, side: side, color: backgroundColor);
+    }
 
-  void _drawText(
-      {required Canvas canvas, required double side, required Color color}) {
-    ParagraphBuilder paragraphBuilder = ParagraphBuilder(ParagraphStyle(
-      textAlign: TextAlign.center,
-      fontStyle: FontStyle.normal,
-      fontSize: fontSize,
-    ));
-    paragraphBuilder.pushStyle(ui.TextStyle(color: color));
-    paragraphBuilder.addText(text);
-    ParagraphConstraints pc = ParagraphConstraints(width: fontSize);
-    Paragraph paragraph = paragraphBuilder.build()..layout(pc);
-    canvas.drawParagraph(
-      paragraph,
-      Offset((side - paragraph.width) / 2.0, (side - paragraph.height) / 2.0),
-    );
-  }
+    void _drawText(
+            {required Canvas canvas, required double side, required Color color}) {
+        ParagraphBuilder paragraphBuilder = ParagraphBuilder(ParagraphStyle(
+            textAlign: TextAlign.center,
+            fontStyle: FontStyle.normal,
+            fontSize: fontSize,
+        ));
+        paragraphBuilder.pushStyle(ui.TextStyle(color: color));
+        paragraphBuilder.addText(text);
+        ParagraphConstraints pc = ParagraphConstraints(width: fontSize);
+        Paragraph paragraph = paragraphBuilder.build()..layout(pc);
+        canvas.drawParagraph(
+            paragraph,
+            Offset((side - paragraph.width) / 2.0, (side - paragraph.height) / 2.0),
+        );
+    }
 
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return animatedValue != (oldDelegate as _WaveLoadingPainter).animatedValue;
-  }
+    @override
+    bool shouldRepaint(CustomPainter oldDelegate) {
+        return animatedValue != (oldDelegate as _WaveLoadingPainter).animatedValue;
+    }
 }
 ```
 
@@ -87,14 +87,14 @@ class _WaveLoadingPainter extends CustomPainter {
 取 widget 的宽度和高度的最小值作为圆的直径大小，以此构建出一个不超出 widget 范围的最大圆形路径 circlePath
 
 ```dart
-  @override
-  void paint(Canvas canvas, Size size) {
-    final side = min(size.width, size.height);
-    _drawText(canvas: canvas, side: side, color: backgroundColor);
+@override
+void paint(Canvas canvas, Size size) {
+  final side = min(size.width, size.height);
+  _drawText(canvas: canvas, side: side, color: backgroundColor);
 
-    final circlePath = Path();
-    circlePath.addArc(Rect.fromLTWH(0, 0, side, side), 0, 2 * pi);
-  }
+  final circlePath = Path();
+  circlePath.addArc(Rect.fromLTWH(0, 0, side, side), 0, 2 * pi);
+}
 ```
 
 # 三、绘制波浪线
@@ -102,33 +102,33 @@ class _WaveLoadingPainter extends CustomPainter {
 波浪的宽度和高度就根据一个固定的比例值来求值，以 circlePath 的中间分隔线作为水平线，在水平线的上下根据贝塞尔曲线绘制出连续的波浪线
 
 ```dart
-  @override
-  void paint(Canvas canvas, Size size) {
-    final side = min(size.width, size.height);
-    _drawText(canvas: canvas, side: side, color: backgroundColor);
+    @override
+    void paint(Canvas canvas, Size size) {
+        final side = min(size.width, size.height);
+        _drawText(canvas: canvas, side: side, color: backgroundColor);
 
-    final circlePath = Path();
-    circlePath.addArc(Rect.fromLTWH(0, 0, side, side), 0, 2 * pi);
+        final circlePath = Path();
+        circlePath.addArc(Rect.fromLTWH(0, 0, side, side), 0, 2 * pi);
 
-    final waveWidth = side * 0.8;
-    final waveHeight = side / 6;
-    final wavePath = Path();
-    final radius = side / 2.0;
-    wavePath.moveTo(-waveWidth, radius);
-    for (double i = -waveWidth; i < side; i += waveWidth) {
-      wavePath.relativeQuadraticBezierTo(
-          waveWidth / 4, -waveHeight, waveWidth / 2, 0);
-      wavePath.relativeQuadraticBezierTo(
-          waveWidth / 4, waveHeight, waveWidth / 2, 0);
+        final waveWidth = side * 0.8;
+        final waveHeight = side / 6;
+        final wavePath = Path();
+        final radius = side / 2.0;
+        wavePath.moveTo(-waveWidth, radius);
+        for (double i = -waveWidth; i < side; i += waveWidth) {
+            wavePath.relativeQuadraticBezierTo(
+                    waveWidth / 4, -waveHeight, waveWidth / 2, 0);
+            wavePath.relativeQuadraticBezierTo(
+                    waveWidth / 4, waveHeight, waveWidth / 2, 0);
+        }
+        //为了方便读者理解，这里把 wavePath 绘制出来，实际上不需要
+        final paint = Paint()
+            ..isAntiAlias = true
+            ..style = PaintingStyle.fill
+            ..strokeWidth = 3
+            ..color = waveColor;
+        canvas.drawPath(wavePath, paint);
     }
-    //为了方便读者理解，这里把 wavePath 绘制出来，实际上不需要
-    final paint = Paint()
-      ..isAntiAlias = true
-      ..style = PaintingStyle.fill
-      ..strokeWidth = 3
-      ..color = waveColor;
-    canvas.drawPath(wavePath, paint);
-  }
 ```
 
 ![](https://upload-images.jianshu.io/upload_images/2552605-89927e62ad3d25fe.png)
@@ -141,10 +141,10 @@ wavePath.lineTo(-waveWidth, side);
 wavePath.close();
 //为了方便读者理解，这里把 wavePath 绘制出来，实际上不需要
 final paint = Paint()
-  ..isAntiAlias = true
-  ..style = PaintingStyle.fill
-  ..strokeWidth = 3
-  ..color = waveColor;
+    ..isAntiAlias = true
+    ..style = PaintingStyle.fill
+    ..strokeWidth = 3
+    ..color = waveColor;
 canvas.drawPath(wavePath, paint);
 ```
 
@@ -154,14 +154,14 @@ wavePath 闭合后，此时半圆的颜色就会铺满了
 
 # 四、取交集
 
-取 circlePath 和  wavePath 的交集，就得到一个半圆形波浪球了
+取 circlePath 和 wavePath 的交集，就得到一个半圆形波浪球了
 
 ```dart
 final paint = Paint()
-  ..isAntiAlias = true
-  ..style = PaintingStyle.fill
-  ..strokeWidth = 3
-  ..color = waveColor;
+    ..isAntiAlias = true
+    ..style = PaintingStyle.fill
+    ..strokeWidth = 3
+    ..color = waveColor;
 final combinePath = Path.combine(PathOperation.intersect, circlePath, wavePath);
 canvas.drawPath(combinePath, paint);
 ```
@@ -187,59 +187,58 @@ _drawText(canvas: canvas, side: side, color: foregroundColor);
 
 ```dart
 class _WaveLoadingState extends State<WaveLoading>
-    with SingleTickerProviderStateMixin {
-  String get _text => widget.text;
+        with SingleTickerProviderStateMixin {
+    String get _text => widget.text;
 
-  double get _fontSize => widget.fontSize;
+    double get _fontSize => widget.fontSize;
 
-  Color get _backgroundColor => widget.backgroundColor;
+    Color get _backgroundColor => widget.backgroundColor;
 
-  Color get _foregroundColor => widget.foregroundColor;
+    Color get _foregroundColor => widget.foregroundColor;
 
-  Color get _waveColor => widget.waveColor;
+    Color get _waveColor => widget.waveColor;
 
-  late AnimationController _controller;
+    late AnimationController _controller;
 
-  late Animation<double> _animation;
+    late Animation<double> _animation;
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-        duration: const Duration(milliseconds: 700), vsync: this);
-    _animation = Tween(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(_controller)
-      ..addListener(() {
-        setState(() => {});
-      });
-    _controller.repeat();
-  }
+    @override
+    void initState() {
+        super.initState();
+        _controller = AnimationController(
+                duration: const Duration(milliseconds: 700), vsync: this);
+        _animation = Tween(
+            begin: 0.0,
+            end: 1.0,
+        ).animate(_controller)
+            ..addListener(() {
+                setState(() => {});
+            });
+        _controller.repeat();
+    }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+    @override
+    void dispose() {
+        _controller.dispose();
+        super.dispose();
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: CustomPaint(
-        painter: _WaveLoadingPainter(
-          text: _text,
-          fontSize: _fontSize,
-          animatedValue: _animation.value,
-          backgroundColor: _backgroundColor,
-          foregroundColor: _foregroundColor,
-          waveColor: _waveColor,
-        ),
-      ),
-    );
-  }
+    @override
+    Widget build(BuildContext context) {
+        return RepaintBoundary(
+            child: CustomPaint(
+                painter: _WaveLoadingPainter(
+                    text: _text,
+                    fontSize: _fontSize,
+                    animatedValue: _animation.value,
+                    backgroundColor: _backgroundColor,
+                    foregroundColor: _foregroundColor,
+                    waveColor: _waveColor,
+                ),
+            ),
+        );
+    }
 }
-
 ```
 
 _WaveLoadingPainter 根据 animatedValue 来设置 wavePath 的起始坐标点
@@ -254,31 +253,31 @@ wavePath.moveTo((animatedValue - 1) * waveWidth, radius);
 
 ```dart
 class WaveLoading extends StatefulWidget {
-  final String text;
+    final String text;
 
-  final double fontSize;
+    final double fontSize;
 
-  final Color backgroundColor;
+    final Color backgroundColor;
 
-  final Color foregroundColor;
+    final Color foregroundColor;
 
-  final Color waveColor;
+    final Color waveColor;
 
-  WaveLoading({
-    Key? key,
-    required this.text,
-    required this.fontSize,
-    required this.backgroundColor,
-    required this.foregroundColor,
-    required this.waveColor,
-  }) : super(key: key) {
-    assert(text.isNotEmpty && fontSize > 0);
-  }
+    WaveLoading({
+        Key? key,
+        required this.text,
+        required this.fontSize,
+        required this.backgroundColor,
+        required this.foregroundColor,
+        required this.waveColor,
+    }) : super(key: key) {
+        assert(text.isNotEmpty && fontSize > 0);
+    }
 
-  @override
-  State<StatefulWidget> createState() {
-    return _WaveLoadingState();
-  }
+    @override
+    State<StatefulWidget> createState() {
+        return _WaveLoadingState();
+    }
 }
 ```
 
@@ -286,14 +285,14 @@ class WaveLoading extends StatefulWidget {
 
 ```dart
 SizedBox(
-	width: 300,
-	height: 300,
-	child: WaveLoading(
-  		text: "開",
-  		fontSize: 210,
-  		backgroundColor: Colors.lightBlue,
-  		foregroundColor: Colors.white,
-  		waveColor: Colors.lightBlue,
+    width: 300,
+    height: 300,
+    child: WaveLoading(
+        text: "開",
+        fontSize: 210,
+        backgroundColor: Colors.lightBlue,
+        foregroundColor: Colors.white,
+        waveColor: Colors.lightBlue,
 )
 ```
 

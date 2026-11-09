@@ -7,7 +7,7 @@ Git 与CVS、Subversion 一类的集中式版本控制工具不同，它采用�
 Git官网下载地址：https://git-scm.com/download/
 Git完成默认配置安装后，在桌面点击鼠标右键，会有两个选项
 
-Git  GUI Here 代表图形界面模式
+Git GUI Here 代表图形界面模式
 Git Bash Here 代表命令行模式
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-f67487a7e0461799?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -25,7 +25,7 @@ config --global user.email "邮箱地址"
 
 --global 选项代表Git将使用该信息来处理你在系统中所做的一切操作，如果希望在一个特定的项目下使用不同的用户名或email地址，可以在该项目中运行该命令而不用--global选项
 
-![](http://upload-images.jianshu.io/upload_images/2552605-c7dbbac5cafce8f2?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240) 
+![](http://upload-images.jianshu.io/upload_images/2552605-c7dbbac5cafce8f2?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 配置完成后可以用以下命令查看个人信息
 
@@ -128,7 +128,6 @@ git log
 
 ```java
 $ git log --pretty=oneline
-
 ```
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-5b36dfc37b46505a?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)

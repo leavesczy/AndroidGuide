@@ -1,4 +1,4 @@
-> 本系列文章会陆续对 Java 和 Android 的集合框架（JDK 1.8，Android SDK 30）中的几个常见容器结合源码进行介绍，了解不同容器在**数据结构、适用场景、优势点**上的不同，希望对你有所帮助 🤣🤣🤣
+> 本系列文章会陆续对 Java 和 Android 的集合框架（JDK 1.8，Android SDK 30）中的几个常见容器结合源码进行介绍，了解不同容器在**数据结构、适用场景、优势点**上的不同，希望对你有所帮助
 
 # 一、HashMap
 
@@ -26,19 +26,19 @@ public class HashMap<K, V> extends AbstractMap<K, V>
 HashMap 中的全局常量主要看以下几个
 
 ```java
-//哈希桶数组的默认容量
+// 哈希桶数组的默认容量
 static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
 
-//哈希桶数组能够达到的最大容量
+// 哈希桶数组能够达到的最大容量
 static final int MAXIMUM_CAPACITY = 1 << 30;
 
-//装载因子
+// 装载因子
 static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
-//为了提高效率，当链表的长度超出这个值时，就将链表转换为红黑树
+// 为了提高效率，当链表的长度超出这个值时，就将链表转换为红黑树
 static final int TREEIFY_THRESHOLD = 8;
 
-//当红黑树的长度小于这个值时，就将红黑树转换为链表
+// 当红黑树的长度小于这个值时，就将红黑树转换为链表
 static final int UNTREEIFY_THRESHOLD = 6;
 ```
 
@@ -80,29 +80,28 @@ final float loadFactor;
 ## 5、构造函数
 
 ```java
-//设置Map的初始化大小和装载因子
+// 设置Map的初始化大小和装载因子
 public HashMap(int initialCapacity, float loadFactor) {
     if (initialCapacity < 0)
         throw new IllegalArgumentException("Illegal initial capacity: " + initialCapacity);
-    if (initialCapacity > MAXIMUM_CAPACITY)
-        initialCapacity = MAXIMUM_CAPACITY;
+    if (initialCapacity > MAXIMUM_CAPACITY) initialCapacity = MAXIMUM_CAPACITY;
     if (loadFactor <= 0 || Float.isNaN(loadFactor))
         throw new IllegalArgumentException("Illegal load factor: " + loadFactor);
     this.loadFactor = loadFactor;
     this.threshold = tableSizeFor(initialCapacity);
 }
 
-//设置初始化大小
+// 设置初始化大小
 public HashMap(int initialCapacity) {
     this(initialCapacity, DEFAULT_LOAD_FACTOR);
 }
 
-//使用默认值
+// 使用默认值
 public HashMap() {
     this.loadFactor = DEFAULT_LOAD_FACTOR;
 }
 
-//传入初始数据
+// 传入初始数据
 public HashMap(Map<? extends K, ? extends V> m) {
     this.loadFactor = DEFAULT_LOAD_FACTOR;
     putMapEntries(m, false);
@@ -120,25 +119,33 @@ public HashMap(Map<? extends K, ? extends V> m) {
 Node 类的声明如下所示
 
 ```java
-static class Node<K,V> implements Map.Entry<K,V> {
+static class Node<K, V> implements Map.Entry<K, V> {
 
-    //key 的哈希值
+    // key 的哈希值
     final int hash;
     final K key;
     V value;
-    //下一个结点
-    Node<K,V> next;
+    // 下一个结点
+    Node<K, V> next;
 
-    Node(int hash, K key, V value, Node<K,V> next) {
+    Node(int hash, K key, V value, Node<K, V> next) {
         this.hash = hash;
         this.key = key;
         this.value = value;
         this.next = next;
     }
 
-    public final K getKey()        { return key; }
-    public final V getValue()      { return value; }
-    public final String toString() { return key + "=" + value; }
+    public final K getKey() {
+        return key;
+    }
+
+    public final V getValue() {
+        return value;
+    }
+
+    public final String toString() {
+        return key + "=" + value;
+    }
 
     public final int hashCode() {
         return Objects.hashCode(key) ^ Objects.hashCode(value);
@@ -151,12 +158,10 @@ static class Node<K,V> implements Map.Entry<K,V> {
     }
 
     public final boolean equals(Object o) {
-        if (o == this)
-            return true;
+        if (o == this) return true;
         if (o instanceof Map.Entry) {
-            Map.Entry<?,?> e = (Map.Entry<?,?>)o;
-            if (Objects.equals(key, e.getKey()) &&
-                Objects.equals(value, e.getValue()))
+            Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+            if (Objects.equals(key, e.getKey()) && Objects.equals(value, e.getValue()))
                 return true;
         }
         return false;
@@ -164,14 +169,14 @@ static class Node<K,V> implements Map.Entry<K,V> {
 }
 ```
 
-插入键值对的方法是 `put(K key, V value)` 
+插入键值对的方法是 `put(K key, V value)`
 
 ```java
 public V put(K key, V value) {
     return putVal(hash(key), key, value, false, true);
 }
 
-//计算 key 的哈希值
+// 计算 key 的哈希值
 static final int hash(Object key) {
     int h;
     return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
@@ -190,72 +195,68 @@ static final int hash(Object key) {
 
 ```java
 /**
- * @param hash         hash for key
- * @param key          the key
- * @param value        the value to put
+ * @param hash hash for key
+ * @param key the key
+ * @param value the value to put
  * @param onlyIfAbsent 为 true 表示不会覆盖有相同 key 的非 null value，否则会覆盖原有值
- * @param evict        if false, the table is in creation mode.
+ * @param evict if false, the table is in creation mode.
  * @return previous value, or null if none
  */
 final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
     Node<K, V>[] tab;
     Node<K, V> p;
     int n, i;
-    //如果 table 还未初始化或者容量为0，则调用 resize 方法进行初始化
-    if ((tab = table) == null || (n = tab.length) == 0)
-        n = (tab = resize()).length;
+    // 如果 table 还未初始化或者容量为0，则调用 resize 方法进行初始化
+    if ((tab = table) == null || (n = tab.length) == 0) n = (tab = resize()).length;
 
-    //判断要存入的 key 是否存在哈希冲突
-    //p 指向了键值对希望存入的数组位置
-    //p 等于 null 说明不存在冲突
+    // 判断要存入的 key 是否存在哈希冲突
+    // p 指向了键值对希望存入的数组位置
+    // p 等于 null 说明不存在冲突
     if ((p = tab[i = (n - 1) & hash]) == null)
-        //直接在索引 i 处构建包含待存入元素的结点
+        // 直接在索引 i 处构建包含待存入元素的结点
         tab[i] = newNode(hash, key, value, null);
-
-    else { //走入本分支，说明待存入的 key 存在哈希冲突
+    else { // 走入本分支，说明待存入的 key 存在哈希冲突
 
         Node<K, V> e;
         K k;
-        //p 值已在上一个 if 语句中赋值了，此处就直接来判断 Node key 的相等性
+        // p 值已在上一个 if 语句中赋值了，此处就直接来判断 Node key 的相等性
         if (p.hash == hash && ((k = p.key) == key || (key != null && key.equals(k))))
-            //会走进这里，说明 p 结点 key 和待存入的键值对 key 相等
-            //此时该位置可能只有一个结点，也有可能是红黑树或者链表，
-            //那么 e 就指向该冲突结点
-            //此时就已经找到了键值对待存入的位置了
+            // 会走进这里，说明 p 结点 key 和待存入的键值对 key 相等
+            // 此时该位置可能只有一个结点，也有可能是红黑树或者链表，
+            // 那么 e 就指向该冲突结点
+            // 此时就已经找到了键值对待存入的位置了
             e = p;
 
-        //如果 Node key 不相等，且头结点是 TreeNode 类型，说明此时该位置当前是采用红黑树来处理哈希冲突
+        // 如果 Node key 不相等，且头结点是 TreeNode 类型，说明此时该位置当前是采用红黑树来处理哈希冲突
         else if (p instanceof TreeNode)
-            //如果红黑树中不存在相同 key 的话则插入保存键值对并返回 null，否则不保存并返回该该相同 key 的结点
+            // 如果红黑树中不存在相同 key 的话则插入保存键值对并返回 null，否则不保存并返回该该相同 key 的结点
             e = ((TreeNode<K, V>) p).putTreeVal(this, tab, hash, key, value);
-
-        else { //该位置当前是采用链表来处理哈希冲突
+        else { // 该位置当前是采用链表来处理哈希冲突
             for (int binCount = 0; ; ++binCount) {
                 if ((e = p.next) == null) {
-                    //会走进这里，说明遍历到了链表尾部，且链表中每个结点的 key 均不相等
-                    //那么就将其添加到链表尾部
+                    // 会走进这里，说明遍历到了链表尾部，且链表中每个结点的 key 均不相等
+                    // 那么就将其添加到链表尾部
                     p.next = newNode(hash, key, value, null);
-                    //如果链表的长度已达到允许的最大长度，那么就将链表转换为红黑树
+                    // 如果链表的长度已达到允许的最大长度，那么就将链表转换为红黑树
                     if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
-                        treeifyBin(tab, hash);
+                    treeifyBin(tab, hash);
                     break;
-                }   
+                }
                 if (e.hash == hash && ((k = e.key) == key || (key != null && key.equals(k))))
-                    //找到了相同 key 的结点，即 e
+                    // 找到了相同 key 的结点，即 e
                     break;
                 p = e;
             }
         }
 
-        //如果 e != null，说明原先存在相同 key 的键值对
-        //那么就再来判断下是否需要覆盖 value
-        if (e != null) {    
-            V oldValue = e.value;       
-            //如果 onlyIfAbsent 为 false 或者 oldValue 为 null 则覆盖原有值
-            if (!onlyIfAbsent || oldValue == null)
-                e.value = value;
+        // 如果 e != null，说明原先存在相同 key 的键值对
+        // 那么就再来判断下是否需要覆盖 value
+        if (e != null) {
+            V oldValue = e.value;
+            // 如果 onlyIfAbsent 为 false 或者 oldValue 为 null 则覆盖原有值
+            if (!onlyIfAbsent || oldValue == null) e.value = value;
 
-            //用于 LinkedHashMap ，在 HashMap 中是空实现
+            // 用于 LinkedHashMap ，在 HashMap 中是空实现
             afterNodeAccess(e);
             return oldValue;
         }
@@ -263,11 +264,10 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
 
     ++modCount;
 
-    //判断是否需要扩容
-    if (++size > threshold)
-        resize();
+    // 判断是否需要扩容
+    if (++size > threshold) resize();
 
-    //用于 LinkedHashMap ，在 HashMap 中是空实现
+    // 用于 LinkedHashMap ，在 HashMap 中是空实现
     afterNodeInsertion(evict);
     return null;
 }
@@ -275,7 +275,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
 
 ## 7、获取 value
 
-获取 value 对应的是 `get(Object key)`方法
+获取 value 对应的是 `get(Object key)` 方法
 
 ```java
 public V get(Object key) {
@@ -283,22 +283,24 @@ public V get(Object key) {
     return (e = getNode(hash(key), key)) == null ? null : e.value;
 }
 
-//根据 key 获取结点
+// 根据 key 获取结点
 final Node<K, V> getNode(int hash, Object key) {
     Node<K, V>[] tab;
     Node<K, V> first, e;
     int n;
     K k;
-    //只有当 table 不为空且 hash 对应的位置不为 null 时说明才有可能存在该 key
-    if ((tab = table) != null && (n = tab.length) > 0 && (first = tab[(n - 1) & hash]) != null) {
+    // 只有当 table 不为空且 hash 对应的位置不为 null 时说明才有可能存在该 key
+    if ((tab = table) != null
+            && (n = tab.length) > 0
+            && (first = tab[(n - 1) & hash]) != null) {
         if (first.hash == hash && ((k = first.key) == key || (key != null && key.equals(k))))
-            //如果与头结点相等的话说明找到了对应值
+            // 如果与头结点相等的话说明找到了对应值
             return first;
         // e != null 说明存在该位置存在链表或红黑树，那么就从这两者中获取
         if ((e = first.next) != null) {
-            if (first instanceof TreeNode) //红黑树
-                return ((TreeNode<K, V>) first).getTreeNode(hash, key);
-            do { //链表
+            if (first instanceof TreeNode) // 红黑树
+            return ((TreeNode<K, V>) first).getTreeNode(hash, key);
+            do { // 链表
                 if (e.hash == hash && ((k = e.key) == key || (key != null && key.equals(k))))
                     return e;
             } while ((e = e.next) != null);
@@ -313,38 +315,40 @@ final Node<K, V> getNode(int hash, Object key) {
 从 Map 中移除键值对的操作，对于其底层数据结构的体现就是要移除对某个 Node 对象的引用，这个数据结构可能是数组、红黑树、或者链表
 
 ```java
-//如果真的存在该 key，则返回对应的 value，否则返回 null
+// 如果真的存在该 key，则返回对应的 value，否则返回 null
 public V remove(Object key) {
     Node<K, V> e;
-    return (e = removeNode(hash(key), key, null, false, true)) == null ?
-            null : e.value;
+    return (e = removeNode(hash(key), key, null, false, true)) == null ? null : e.value;
 }
 
 /**
- * @param value       key对应的值，只有当matchValue为true时才需要使用到，否则忽略该值
- * @param matchValue  如果为 true ，则只有当找到key和value均匹配的结点时才会移除该结点，否则只要key相等就直接移除该元素
+ * @param value key对应的值，只有当matchValue为true时才需要使用到，否则忽略该值
+ * @param matchValue 如果为 true ，则只有当找到key和value均匹配的结点时才会移除该结点，否则只要key相等就直接移除该元素
  * @param movable if false do not move other nodes while removing
  * @return the node, or null if none
  */
-final Node<K, V> removeNode(int hash, Object key, Object value,
-                            boolean matchValue, boolean movable) {
+final Node<K, V> removeNode(
+        int hash, Object key, Object value, boolean matchValue, boolean movable) {
     Node<K, V>[] tab;
     Node<K, V> p;
     int n, index;
-    //只有当 table 不为空且 hash 对应的位置不为 null 时说明才有可能存在该 key
-    if ((tab = table) != null && (n = tab.length) > 0 && (p = tab[index = (n - 1) & hash]) != null) {
+    // 只有当 table 不为空且 hash 对应的位置不为 null 时说明才有可能存在该 key
+    if ((tab = table) != null
+            && (n = tab.length) > 0
+            && (p = tab[index = (n - 1) & hash]) != null) {
         Node<K, V> node = null, e;
         K k;
         V v;
         if (p.hash == hash && ((k = p.key) == key || (key != null && key.equals(k))))
-            //如果与头结点 p 的 key 相等，那么就已经找到了目标 node
+            // 如果与头结点 p 的 key 相等，那么就已经找到了目标 node
             node = p;
-        else if ((e = p.next) != null) { //存在红黑树或者链表
-            if (p instanceof TreeNode) //红黑树
-                node = ((TreeNode<K, V>) p).getTreeNode(hash, key);
-            else { //链表
+        else if ((e = p.next) != null) { // 存在红黑树或者链表
+            if (p instanceof TreeNode) // 红黑树
+            node = ((TreeNode<K, V>) p).getTreeNode(hash, key);
+            else { // 链表
                 do {
-                    if (e.hash == hash && ((k = e.key) == key || (key != null && key.equals(k)))) {
+                    if (e.hash == hash
+                            && ((k = e.key) == key || (key != null && key.equals(k)))) {
                         node = e;
                         break;
                     }
@@ -353,19 +357,22 @@ final Node<K, V> removeNode(int hash, Object key, Object value,
             }
         }
 
-        //node != null 说明存在 key 对应结点
-        //如果 matchValue 为 false ，则此处就可以直接移除结点 node
-        //如果 matchValue 为 true ，则当 value 相等时才需要移除该结点
-        if (node != null && (!matchValue || (v = node.value) == value || (value != null && value.equals(v)))) {
-            if (node instanceof TreeNode) //红黑树
-                ((TreeNode<K, V>) node).removeTreeNode(this, tab, movable);
-            else if (node == p) //对应 key 与头结点相等的情况，此时直接将指针移向下一位即可
-                tab[index] = node.next;
-            else //链表
-                p.next = node.next;
+        // node != null 说明存在 key 对应结点
+        // 如果 matchValue 为 false ，则此处就可以直接移除结点 node
+        // 如果 matchValue 为 true ，则当 value 相等时才需要移除该结点
+        if (node != null
+                && (!matchValue
+                        || (v = node.value) == value
+                        || (value != null && value.equals(v)))) {
+            if (node instanceof TreeNode) // 红黑树
+            ((TreeNode<K, V>) node).removeTreeNode(this, tab, movable);
+            else if (node == p) // 对应 key 与头结点相等的情况，此时直接将指针移向下一位即可
+            tab[index] = node.next;
+            else // 链表
+            p.next = node.next;
             ++modCount;
             --size;
-            //用于 LinkedHashMap ，在 HashMap 中是空实现
+            // 用于 LinkedHashMap ，在 HashMap 中是空实现
             afterNodeRemoval(node);
             return node;
         }
@@ -383,28 +390,30 @@ final Node<K, V> removeNode(int hash, Object key, Object value,
 ```java
 static final int hash(Object key) {
     int h;
-    //高位参与运算
+    // 高位参与运算
     return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
 }
 
-//根据 key 值获取 Value
+// 根据 key 值获取 Value
 public V get(Object key) {
     Node<K, V> e;
     return (e = getNode(hash(key), key)) == null ? null : e.value;
 }
 
-//查找指定结点
+// 查找指定结点
 final Node<K, V> getNode(int hash, Object key) {
     ···
-    //只有当 table 不为空且 hash 对应的位置不为 null 才有可获取的元素值
-    if ((tab = table) != null && (n = tab.length) > 0 && (first = tab[(n - 1) & hash]) != null) {
-       ···
+    // 只有当 table 不为空且 hash 对应的位置不为 null 才有可获取的元素值
+    if ((tab = table) != null
+            && (n = tab.length) > 0
+            && (first = tab[(n - 1) & hash]) != null) {
+        ···
     }
     return null;
 }
 ```
 
-可以看到，key 的哈希值是按照 `(h = key.hashCode()) ^ (h >>> 16)`的算法来得到的，该算法可以拆解为三步：
+可以看到，key 的哈希值是按照 `(h = key.hashCode()) ^ (h >>> 16)` 的算法来得到的，该算法可以拆解为三步：
 
 - 通过 key.hashCode() 拿到 key 的 hashCode，即 h
 - 通过 h >>> 16 将 h 的高 16 位迁移到低 16 位，高 16 位全变成 0
@@ -429,86 +438,86 @@ key 在哈希桶数组的位置索引则是通过 `(n - 1) & hash` 来计算得�
 
 默认情况下，哈希数组的容量是 16，loadFactor 是 0.75，这是**平衡空间利用率和时间效率两者**之后的结果
 
-初始化数组和扩容数组这两个操作对应的是 `resize()`方法
+初始化数组和扩容数组这两个操作对应的是 `resize()` 方法
 
 ```java
 final Node<K, V>[] resize() {
-    //扩容前的数组
+    // 扩容前的数组
     Node<K, V>[] oldTab = table;
-    //扩容前数组的容量
+    // 扩容前数组的容量
     int oldCap = (oldTab == null) ? 0 : oldTab.length;
-    //当前的扩容临界值
+    // 当前的扩容临界值
     int oldThr = threshold;
-    //扩容后的数组容量和扩容临界值
+    // 扩容后的数组容量和扩容临界值
     int newCap, newThr = 0;
-    if (oldCap > 0) { 
-        //oldCap > 0 对应的是 table 已被初始化的情况，此时是来判断是否需要进行扩容
+    if (oldCap > 0) {
+        // oldCap > 0 对应的是 table 已被初始化的情况，此时是来判断是否需要进行扩容
 
-        //如果数组已达到最大容量，则不再进行扩容，并将扩容临界点 threshold 提升到 Integer.MAX_VALUE，结束
+        // 如果数组已达到最大容量，则不再进行扩容，并将扩容临界点 threshold 提升到 Integer.MAX_VALUE，结束
         if (oldCap >= MAXIMUM_CAPACITY) {
             threshold = Integer.MAX_VALUE;
             return oldTab;
-        } else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY && oldCap >= DEFAULT_INITIAL_CAPACITY) {
-            //如果将数组的现有容量提升到两倍依然小于 MAXIMUM_CAPACITY，且现有容量大于等于 DEFAULT_INITIAL_CAPACITY
-            //则将数组的容量和扩容临界值均提升为原先的两倍
+        } else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY
+                && oldCap >= DEFAULT_INITIAL_CAPACITY) {
+            // 如果将数组的现有容量提升到两倍依然小于 MAXIMUM_CAPACITY，且现有容量大于等于 DEFAULT_INITIAL_CAPACITY
+            // 则将数组的容量和扩容临界值均提升为原先的两倍
             newThr = oldThr << 1;
-        } 
+        }
 
-        //此处应该还有一种情况
-        //即将数组的现有容量提升到现在的两倍后大于等于 MAXIMUM_CAPACITY 的情况
-        //此时 newThr 等于 0，newCap 等于 oldCap 的两倍值
-        //此处并没有对 newCap 的数值进行还原，说明 HashMap 是允许扩容后容量超出 MAXIMUM_CAPACITY 的
-        //只是在现有容量超出 MAXIMUM_CAPACITY 后，不允许再次进行扩容
-    } else if (oldThr > 0) { 
-        //oldCap <= 0 && oldThr > 0
-        //对应的是 table 还未被初始化，且在调用构造函数时有传入 initialCapacity 或者 Map 的情况
-        //此时就直接将容量提升为 threshold，在后边重新计算新的扩容临界值
+        // 此处应该还有一种情况
+        // 即将数组的现有容量提升到现在的两倍后大于等于 MAXIMUM_CAPACITY 的情况
+        // 此时 newThr 等于 0，newCap 等于 oldCap 的两倍值
+        // 此处并没有对 newCap 的数值进行还原，说明 HashMap 是允许扩容后容量超出 MAXIMUM_CAPACITY 的
+        // 只是在现有容量超出 MAXIMUM_CAPACITY 后，不允许再次进行扩容
+    } else if (oldThr > 0) {
+        // oldCap <= 0 && oldThr > 0
+        // 对应的是 table 还未被初始化，且在调用构造函数时有传入 initialCapacity 或者 Map 的情况
+        // 此时就直接将容量提升为 threshold，在后边重新计算新的扩容临界值
         newCap = oldThr;
-    } else { 
-        //oldCap <= 0 && oldThr <= 0
-        //对应的是 table 还未被初始化，且调用的是无参构造函数
-        //将 table 的容量扩充到默认大小，并使用默认的装载因子来计算扩容临界值
+    } else {
+        // oldCap <= 0 && oldThr <= 0
+        // 对应的是 table 还未被初始化，且调用的是无参构造函数
+        // 将 table 的容量扩充到默认大小，并使用默认的装载因子来计算扩容临界值
         newCap = DEFAULT_INITIAL_CAPACITY;
         newThr = (int) (DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
     }
     if (newThr == 0) {
         float ft = (float) newCap * loadFactor;
-        //计算扩容后新的扩容临界值
-        newThr = (newCap < MAXIMUM_CAPACITY && ft < (float) MAXIMUM_CAPACITY ? (int) ft : Integer.MAX_VALUE);
+        // 计算扩容后新的扩容临界值
+        newThr =
+                (newCap < MAXIMUM_CAPACITY && ft < (float) MAXIMUM_CAPACITY
+                        ? (int) ft
+                        : Integer.MAX_VALUE);
     }
     threshold = newThr;
     @SuppressWarnings({"rawtypes", "unchecked"})
     Node<K, V>[] newTab = (Node<K, V>[]) new Node[newCap];
     table = newTab;
-    //如果旧数组中存在值，则需要将其中的数据复制到新数组中
+    // 如果旧数组中存在值，则需要将其中的数据复制到新数组中
     if (oldTab != null) {
         for (int j = 0; j < oldCap; ++j) {
             Node<K, V> e;
             if ((e = oldTab[j]) != null) {
                 oldTab[j] = null;
-                //e.next == null 说明元素 e 没有产生 hash 冲突，因此可以直接转移该元素
+                // e.next == null 说明元素 e 没有产生 hash 冲突，因此可以直接转移该元素
                 if (e.next == null)
-                    //计算元素 e 在新数组中的位置
+                    // 计算元素 e 在新数组中的位置
                     newTab[e.hash & (newCap - 1)] = e;
-                else if (e instanceof TreeNode) //存在哈希冲突且是用了红黑树
-                    ((TreeNode<K, V>) e).split(this, newTab, j, oldCap);
-                else { //存在哈希冲突且是用了链表
+                else if (e instanceof TreeNode) // 存在哈希冲突且是用了红黑树
+                ((TreeNode<K, V>) e).split(this, newTab, j, oldCap);
+                else { // 存在哈希冲突且是用了链表
                     Node<K, V> loHead = null, loTail = null;
                     Node<K, V> hiHead = null, hiTail = null;
                     Node<K, V> next;
                     do {
                         next = e.next;
                         if ((e.hash & oldCap) == 0) {
-                            if (loTail == null)
-                                loHead = e;
-                            else
-                                loTail.next = e;
+                            if (loTail == null) loHead = e;
+                            else loTail.next = e;
                             loTail = e;
                         } else {
-                            if (hiTail == null)
-                                hiHead = e;
-                            else
-                                hiTail.next = e;
+                            if (hiTail == null) hiHead = e;
+                            else hiTail.next = e;
                             hiTail = e;
                         }
                     } while ((e = next) != null);
@@ -555,7 +564,6 @@ public class Key {
     public int hashCode() {
         return value;
     }
-
 }
 ```
 
@@ -589,7 +597,6 @@ public class Test {
             test(i);
         }
     }
-
 }
 ```
 
@@ -682,14 +689,14 @@ private void linkNodeLast(LinkedHashMap.Entry<K,V> p) {
 变量 accessOrder 用于决定 LinkedHashMap 中元素的排序方式，如果为 true 就按照元素访问顺序来排序，为 false 就按照元素插入顺序来排序
 
 ```java
-//序列化ID
+// 序列化ID
 private static final long serialVersionUID = 3801124242820219131L;
 
-//指向双向链表的头结点
-transient LinkedHashMap.Entry<K,V> head;
+// 指向双向链表的头结点
+transient LinkedHashMap.Entry<K, V> head;
 
-//指向最新访问的结点
-transient LinkedHashMap.Entry<K,V> tail;
+// 指向最新访问的结点
+transient LinkedHashMap.Entry<K, V> tail;
 
 final boolean accessOrder;
 ```
@@ -732,75 +739,70 @@ public LinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder)
 
 ```java
 // Callbacks to allow LinkedHashMap post-actions
-void afterNodeAccess(Node<K,V> p) { }
-void afterNodeInsertion(boolean evict) { }
-void afterNodeRemoval(Node<K,V> p) { }
+void afterNodeAccess(Node<K, V> p) {}
+
+void afterNodeInsertion(boolean evict) {}
+
+void afterNodeRemoval(Node<K, V> p) {}
 ```
 
-当 HashMap 中的某个结点被访问了（例如调用了 get 方法）且 accessOrder 为 true，那么`afterNodeAccess` 方法就会被调用，该方法用于将最新访问的键值对移至链表的尾部，由于链表内结点位置的改变仅仅是修改几个引用即可，所以这个操作还是非常轻量级的 
+当 HashMap 中的某个结点被访问了（例如调用了 get 方法）且 accessOrder 为 true，那么 `afterNodeAccess` 方法就会被调用，该方法用于将最新访问的键值对移至链表的尾部，由于链表内结点位置的改变仅仅是修改几个引用即可，所以这个操作还是非常轻量级的
 
 ```java
 public V get(Object key) {
-    Node<K,V> e;
-    if ((e = getNode(hash(key), key)) == null)
-        return null;
-    if (accessOrder)
-        afterNodeAccess(e);
+    Node<K, V> e;
+    if ((e = getNode(hash(key), key)) == null) return null;
+    if (accessOrder) afterNodeAccess(e);
     return e.value;
 }
 
-//当访问了结点 e 时调用
-//结点 e 是最新访问的一个结点，此时就将结点 e 置为链表的尾结点
-void afterNodeAccess(Node<K,V> e) {
-    //last 用来指向链表的尾结点
-    LinkedHashMap.Entry<K,V> last;
-    //只有当 last 和 e 不相等时才需要进行下一步，如果相等说明 e 已经在链表尾部了
+// 当访问了结点 e 时调用
+// 结点 e 是最新访问的一个结点，此时就将结点 e 置为链表的尾结点
+void afterNodeAccess(Node<K, V> e) {
+    // last 用来指向链表的尾结点
+    LinkedHashMap.Entry<K, V> last;
+    // 只有当 last 和 e 不相等时才需要进行下一步，如果相等说明 e 已经在链表尾部了
     if (accessOrder && (last = tail) != e) {
-        LinkedHashMap.Entry<K,V> p = (LinkedHashMap.Entry<K,V>)e, b = p.before, a = p.after;
-        //因为结点 p 将成为尾结点，所以 after 置为null
+        LinkedHashMap.Entry<K, V> p = (LinkedHashMap.Entry<K, V>) e, b = p.before, a = p.after;
+        // 因为结点 p 将成为尾结点，所以 after 置为null
         p.after = null;
-        //如果 b == null ，说明结点 p 此时是链表的头结点，那 a 就会成为新的头结点
-        //如果 b != null ，则移除结点 b 对结点 p 的引用并和 a 串联起来
-        if (b == null)
-            head = a;
-        else
-            b.after = a;
-        //如果 a != null，说明结点 p 此时不是链表的尾结点，则移除结点 a 对结点 p 的引用并和 b 串联起来
-        //如果 a == null，则说明结点 p 此时是链表的尾结点，那 a 就会成为新的尾结点
-        if (a != null)
-            a.before = b;
-        else
-            last = b;
-        //如果 last == null，说明原链表为空，则此时头结点就是结点 p
-        //如果 last != null，则 p 就会成为新的尾结点
-        if (last == null)
-            head = p;
+        // 如果 b == null ，说明结点 p 此时是链表的头结点，那 a 就会成为新的头结点
+        // 如果 b != null ，则移除结点 b 对结点 p 的引用并和 a 串联起来
+        if (b == null) head = a;
+        else b.after = a;
+        // 如果 a != null，说明结点 p 此时不是链表的尾结点，则移除结点 a 对结点 p 的引用并和 b 串联起来
+        // 如果 a == null，则说明结点 p 此时是链表的尾结点，那 a 就会成为新的尾结点
+        if (a != null) a.before = b;
+        else last = b;
+        // 如果 last == null，说明原链表为空，则此时头结点就是结点 p
+        // 如果 last != null，则 p 就会成为新的尾结点
+        if (last == null) head = p;
         else {
             p.before = last;
             last.after = p;
         }
-        //最新一个引用到的结点就是 tail
+        // 最新一个引用到的结点就是 tail
         tail = p;
         ++modCount;
     }
 }
 ```
 
-当 `put` 方法被调用时`afterNodeInsertion` 方法也会被调用，该方法用于判断是否移除最近最少使用的元素，依此可以来构建 LRUcache 缓存
+当 `put` 方法被调用时 `afterNodeInsertion` 方法也会被调用，该方法用于判断是否移除最近最少使用的元素，依此可以来构建 LRUcache 缓存
 
 ```java
-//在插入元素后调用，此方法可用于 LRUcache 算法中移除最近最少使用的元素
+// 在插入元素后调用，此方法可用于 LRUcache 算法中移除最近最少使用的元素
 void afterNodeInsertion(boolean evict) {
-    LinkedHashMap.Entry<K,V> first;
+    LinkedHashMap.Entry<K, V> first;
     if (evict && (first = head) != null && removeEldestEntry(first)) {
         K key = first.key;
         removeNode(hash(key), key, null, false, true);
     }
 }
 
-//此方法就用于决定是否移除最旧的缓存，默认返回 false
-//可以通过重写该方法来实现按照特定规则移除旧数据
-protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
+// 此方法就用于决定是否移除最旧的缓存，默认返回 false
+// 可以通过重写该方法来实现按照特定规则移除旧数据
+protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
     return false;
 }
 ```
@@ -808,23 +810,19 @@ protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
 当 HashMap 内部移除了某个结点时，LinkedHashMap 也要通过 `afterNodeRemoval` 方法将对该结点的引用从维护的链表中移除
 
 ```java
-//在移除结点 e 后调用
-void afterNodeRemoval(Node<K,V> e) {
-    LinkedHashMap.Entry<K,V> p = (LinkedHashMap.Entry<K,V>)e, b = p.before, a = p.after;
-    //移除结点 p 对相邻结点的引用
+// 在移除结点 e 后调用
+void afterNodeRemoval(Node<K, V> e) {
+    LinkedHashMap.Entry<K, V> p = (LinkedHashMap.Entry<K, V>) e, b = p.before, a = p.after;
+    // 移除结点 p 对相邻结点的引用
     p.before = p.after = null;
-    //如果 b == null，说明结点 p 是链表的头结点，则 a 将成为新的头结点
-    //如果 b != null，则更新结点间的引用
-    if (b == null)
-        head = a;
-    else
-        b.after = a;
-    //如果 a == null，说明结点 a 是尾结点，则移除结点 p 后最新一个访问的结点就是原倒数第二的结点
-    //如果 a != null，则更新结点间的引用
-    if (a == null)
-        tail = b;
-    else
-        a.before = b;
+    // 如果 b == null，说明结点 p 是链表的头结点，则 a 将成为新的头结点
+    // 如果 b != null，则更新结点间的引用
+    if (b == null) head = a;
+    else b.after = a;
+    // 如果 a == null，说明结点 a 是尾结点，则移除结点 p 后最新一个访问的结点就是原倒数第二的结点
+    // 如果 a != null，则更新结点间的引用
+    if (a == null) tail = b;
+    else a.before = b;
 }
 ```
 
@@ -837,52 +835,50 @@ void afterNodeRemoval(Node<K,V> e) {
 ```java
 public class LRUCache {
 
-	private static class LRUCacheMap<K, V> extends LinkedHashMap<K, V> {
+    private static class LRUCacheMap<K, V> extends LinkedHashMap<K, V> {
 
-    //最大的缓存数量
-    private final int maxCacheSize;
+        // 最大的缓存数量
+        private final int maxCacheSize;
 
-    public LRUCacheMap(int maxCacheSize) {
-        super(16, 0.75F, true);
-        this.maxCacheSize = maxCacheSize;
+        public LRUCacheMap(int maxCacheSize) {
+            super(16, 0.75F, true);
+            this.maxCacheSize = maxCacheSize;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+            return size() > maxCacheSize;
+        }
     }
 
-    @Override
-    protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-        return size() > maxCacheSize;
+    public static void main(String[] args) {
+        // 最大缓存数量是 5
+        LRUCacheMap<String, Integer> map = new LRUCacheMap<>(5);
+        map.put("Java", 1);
+        map.put("Jetpack", 2);
+        map.put("Kotlin", 3);
+        map.put("业志陈", 4);
+        map.put("字节数组", 5);
+        map.put("leavesczy", 6);
+
+        System.out.println();
+        Set<String> keySet = map.keySet();
+        // 输出结果是：Jetpack Kotlin 业志陈 字节数组 leavesczy
+        keySet.forEach(key -> System.out.print(key + " "));
+
+        // 获取链表的头结点的值，使之移动到链表尾部
+        map.get("Jetpack");
+        System.out.println();
+        keySet = map.keySet();
+        // 输出结果是：Kotlin 业志陈 字节数组 leavesczy Jetpack
+        keySet.forEach(key -> System.out.print(key + " "));
+
+        // 向链表添加元素
+        map.put("Dart", 5);
+        System.out.println();
+        // 输出结果是：业志陈 字节数组 leavesczy Jetpack Dart
+        keySet.forEach(key -> System.out.print(key + " "));
     }
-
-}
-
-public static void main(String[] args) {
-    //最大缓存数量是 5
-    LRUCacheMap<String, Integer> map = new LRUCacheMap<>(5);
-    map.put("Java", 1);
-    map.put("Jetpack", 2);
-    map.put("Kotlin", 3);
-    map.put("业志陈", 4);
-    map.put("字节数组", 5);
-    map.put("leavesczy", 6);
-
-    System.out.println();
-    Set<String> keySet = map.keySet();
-    //输出结果是：Jetpack Kotlin 业志陈 字节数组 leavesczy
-    keySet.forEach(key -> System.out.print(key + " "));
-
-    //获取链表的头结点的值，使之移动到链表尾部
-    map.get("Jetpack");
-    System.out.println();
-    keySet = map.keySet();
-    //输出结果是：Kotlin 业志陈 字节数组 leavesczy Jetpack
-    keySet.forEach(key -> System.out.print(key + " "));
-
-    //向链表添加元素
-    map.put("Dart", 5);
-    System.out.println();
-    //输出结果是：业志陈 字节数组 leavesczy Jetpack Dart
-    keySet.forEach(key -> System.out.print(key + " "));
-}
-
 }
 ```
 
@@ -895,26 +891,26 @@ HashSet 实现了 Set 接口，不允许插入重复的元素，允许包含 nul
 在此就直接贴出源代码了
 
 ```java
-public class HashSet<E> extends AbstractSet<E> implements Set<E>, Cloneable, java.io.Serializable{
+public class HashSet<E> extends AbstractSet<E> implements Set<E>, Cloneable, java.io.Serializable {
 
     static final long serialVersionUID = -5024744406713321676L;
 
-    //HashSet 底层用 HashMap 来存放数据
-    //Key 值由外部传入，Value 则由 HashSet 内部来维护
-    private transient HashMap<E,Object> map;
+    // HashSet 底层用 HashMap 来存放数据
+    // Key 值由外部传入，Value 则由 HashSet 内部来维护
+    private transient HashMap<E, Object> map;
 
-    //HashMap 中所有键值对都共享同一个值
-    //即所有存入 HashMap 的键值对都是使用这个对象作为值
+    // HashMap 中所有键值对都共享同一个值
+    // 即所有存入 HashMap 的键值对都是使用这个对象作为值
     private static final Object PRESENT = new Object();
 
     public HashSet() {
         map = new HashMap<>();
     }
 
-    //使用默认的装载因子，并以此来计算 HashMap 的初始化大小
-    //+1 是为了弥补精度损失
+    // 使用默认的装载因子，并以此来计算 HashMap 的初始化大小
+    // +1 是为了弥补精度损失
     public HashSet(Collection<? extends E> c) {
-        map = new HashMap<>(Math.max((int) (c.size()/.75f) + 1, 16));
+        map = new HashMap<>(Math.max((int) (c.size() / .75f) + 1, 16));
         addAll(c);
     }
 
@@ -926,12 +922,12 @@ public class HashSet<E> extends AbstractSet<E> implements Set<E>, Cloneable, jav
         map = new HashMap<>(initialCapacity);
     }
 
-    //此构造函数为包访问权限，只用于支持 LinkedHashSet
+    // 此构造函数为包访问权限，只用于支持 LinkedHashSet
     HashSet(int initialCapacity, float loadFactor, boolean dummy) {
         map = new LinkedHashMap<>(initialCapacity, loadFactor);
     }
 
-    //将对 HashSet 的迭代转换为对 HashMap 的 Key 值的迭代
+    // 将对 HashSet 的迭代转换为对 HashMap 的 Key 值的迭代
     public Iterator<E> iterator() {
         return map.keySet().iterator();
     }
@@ -948,21 +944,20 @@ public class HashSet<E> extends AbstractSet<E> implements Set<E>, Cloneable, jav
         return map.containsKey(o);
     }
 
-    //如果 HashMap 中不包含 key 是 e 的键值对，则添加该元素并返回 true
-    //如果包含则只会覆盖 value 而不会影响 key，同时返回 false
-    //从而实现 HashSet key 不重复的特性
+    // 如果 HashMap 中不包含 key 是 e 的键值对，则添加该元素并返回 true
+    // 如果包含则只会覆盖 value 而不会影响 key，同时返回 false
+    // 从而实现 HashSet key 不重复的特性
     public boolean add(E e) {
-        return map.put(e, PRESENT)==null;
+        return map.put(e, PRESENT) == null;
     }
 
     public boolean remove(Object o) {
-        return map.remove(o)==PRESENT;
+        return map.remove(o) == PRESENT;
     }
 
     public void clear() {
         map.clear();
     }
-    
 }
 ```
 
@@ -975,16 +970,15 @@ HashSet 为 LinkedHashSet 预留了一个构造函数，其 dummy 参数并没�
 ```java
 public class HashSet<E> extends AbstractSet<E> implements Set<E>, Cloneable, java.io.Serializable {
 
-    private transient HashMap<E,Object> map;
-    
+    private transient HashMap<E, Object> map;
+
     HashSet(int initialCapacity, float loadFactor, boolean dummy) {
         map = new LinkedHashMap<>(initialCapacity, loadFactor);
     }
-    
 }
 
-
-public class LinkedHashSet<E> extends HashSet<E> implements Set<E>, Cloneable, java.io.Serializable {
+public class LinkedHashSet<E> extends HashSet<E>
+        implements Set<E>, Cloneable, java.io.Serializable {
 
     private static final long serialVersionUID = -2851667679971038690L;
 
@@ -996,20 +990,19 @@ public class LinkedHashSet<E> extends HashSet<E> implements Set<E>, Cloneable, j
         super(initialCapacity, .75f, true);
     }
 
-    //使用默认的初始容量以及装载因子
+    // 使用默认的初始容量以及装载因子
     public LinkedHashSet() {
         super(16, .75f, true);
     }
 
     public LinkedHashSet(Collection<? extends E> c) {
-        super(Math.max(2*c.size(), 11), .75f, true);
+        super(Math.max(2 * c.size(), 11), .75f, true);
         addAll(c);
     }
-    
+
     @Override
     public Spliterator<E> spliterator() {
         return Spliterators.spliterator(this, Spliterator.DISTINCT | Spliterator.ORDERED);
     }
-
 }
 ```

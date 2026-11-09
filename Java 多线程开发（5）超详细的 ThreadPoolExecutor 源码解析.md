@@ -1,4 +1,4 @@
-> 目前，多线程编程可以说是在大部分平台和应用上都需要实现的一个基本需求。本系列文章就来对 **Java 平台下的多线程编程知识** 进行讲解，从 **概念入门**、**底层实现** 到 **上层应用** 都会涉及到，预计一共会有五篇文章，希望对你有所帮助 😎😎😎
+> 目前，多线程编程可以说是在大部分平台和应用上都需要实现的一个基本需求。本系列文章就来对 **Java 平台下的多线程编程知识** 进行讲解，从 **概念入门**、**底层实现** 到 **上层应用** 都会涉及到，预计一共会有五篇文章，希望对你有所帮助
 >
 > 本篇文章是第五篇，应该也是最后一篇了，从现实需求出发到源码介绍，一步步理清楚线程池的作用和优势
 
@@ -87,23 +87,21 @@ or
 ThreadPoolExecutor 中参数最多的一个构造函数的声明如下所示：
 
 ```java
-public ThreadPoolExecutor(int corePoolSize,
-                          int maximumPoolSize,
-                          long keepAliveTime,
-                          TimeUnit unit,
-                          BlockingQueue<Runnable> workQueue,
-                          ThreadFactory threadFactory,
-                          RejectedExecutionHandler handler) {
-    if (corePoolSize < 0 ||
-        maximumPoolSize <= 0 ||
-        maximumPoolSize < corePoolSize ||
-        keepAliveTime < 0)
-        throw new IllegalArgumentException();
+public ThreadPoolExecutor(
+        int corePoolSize,
+        int maximumPoolSize,
+        long keepAliveTime,
+        TimeUnit unit,
+        BlockingQueue<Runnable> workQueue,
+        ThreadFactory threadFactory,
+        RejectedExecutionHandler handler) {
+    if (corePoolSize < 0
+            || maximumPoolSize <= 0
+            || maximumPoolSize < corePoolSize
+            || keepAliveTime < 0) throw new IllegalArgumentException();
     if (workQueue == null || threadFactory == null || handler == null)
         throw new NullPointerException();
-    this.acc = System.getSecurityManager() == null ?
-            null :
-            AccessController.getContext();
+    this.acc = System.getSecurityManager() == null ? null : AccessController.getContext();
     this.corePoolSize = corePoolSize;
     this.maximumPoolSize = maximumPoolSize;
     this.workQueue = workQueue;
@@ -115,7 +113,7 @@ public ThreadPoolExecutor(int corePoolSize,
 
 - corePoolSize ：用于指定线程池的核心线程数大小
 - maximumPoolSize：用于指定最大线程池大小
-- keepAliveTime、unit   ：一起用于指定线程池中空闲线程的最大存活时间
+- keepAliveTime、unit ：一起用于指定线程池中空闲线程的最大存活时间
 - workQueue ：任务队列，相当于生产者-消费者模式中的传输管道，用于存放待处理的任务
 - threadFactory：用于指定创建线程的线程工厂
 - handler：用于指定当任务队列已满且线程数量达到 maximumPoolSize 时任务的处理策略
@@ -129,17 +127,17 @@ public ThreadPoolExecutor(int corePoolSize,
 线程池一共包含以下五种生命周期状态，涵盖了线程池从启动到终止的这整个范围。线程池的生命周期状态可以按顺序跃迁，但无法反向回转，每个状态的数值大小也是逐步递增的
 
 ```java
-//运行状态，线程池正处于运行中
-private static final int RUNNING    = -1 << COUNT_BITS;
-//关闭状态，当调用 shutdown() 方法后处于这个状态，任务队列中的任务会继续处理，但不再接受新任务，
-private static final int SHUTDOWN   =  0 << COUNT_BITS;
-//停止状态，当调用 shutdownNow() 方法后处于这个状态
-//任务队列中的任务也不再处理且作为方法返回值返回，此后不再接受新任务
-private static final int STOP       =  1 << COUNT_BITS;
-//TERMINATED 之前的临时状态，当线程都被回收且任务队列已清空后就会处于这个状态
-private static final int TIDYING    =  2 << COUNT_BITS;
-//终止状态，在处于 TIDYING 状态后会立即调用 terminated() 方法，调用完成就会马上转到此状态
-private static final int TERMINATED =  3 << COUNT_BITS;
+// 运行状态，线程池正处于运行中
+private static final int RUNNING = -1 << COUNT_BITS;
+// 关闭状态，当调用 shutdown() 方法后处于这个状态，任务队列中的任务会继续处理，但不再接受新任务，
+private static final int SHUTDOWN = 0 << COUNT_BITS;
+// 停止状态，当调用 shutdownNow() 方法后处于这个状态
+// 任务队列中的任务也不再处理且作为方法返回值返回，此后不再接受新任务
+private static final int STOP = 1 << COUNT_BITS;
+// TERMINATED 之前的临时状态，当线程都被回收且任务队列已清空后就会处于这个状态
+private static final int TIDYING = 2 << COUNT_BITS;
+// 终止状态，在处于 TIDYING 状态后会立即调用 terminated() 方法，调用完成就会马上转到此状态
+private static final int TERMINATED = 3 << COUNT_BITS;
 ```
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/42fd1e9319824fdca526dbcdaeb4fe90~tplv-k3u1fbpfcp-zoom-1.image)
@@ -155,10 +153,10 @@ private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
 ThreadPoolExecutor 还声明了以下两个常量用来参与位运算
 
 ```java
-//用来表示线程数量的位数，即 29
+// 用来表示线程数量的位数，即 29
 private static final int COUNT_BITS = Integer.SIZE - 3;
-//线程池所能表达的最大线程数，即一个“高3位全是0，低29位全是1”的数值
-private static final int CAPACITY   = (1 << COUNT_BITS) - 1;
+// 线程池所能表达的最大线程数，即一个“高3位全是0，低29位全是1”的数值
+private static final int CAPACITY = (1 << COUNT_BITS) - 1;
 ```
 
 相应的，那么就需要有几个方法可以来分别取“生命周期状态”和“线程数”这两个值，以及将这两个值合并保存的方法，这几个方法都使用到了位运算
@@ -166,16 +164,22 @@ private static final int CAPACITY   = (1 << COUNT_BITS) - 1;
 ```java
 // Packing and unpacking ctl
 
-//通过按位取反 + 按位与运算，将 c 的高3位保留，舍弃低29位，从而得到线程池状态
-private static int runStateOf(int c)     { return c & ~CAPACITY; }
+// 通过按位取反 + 按位与运算，将 c 的高3位保留，舍弃低29位，从而得到线程池状态
+private static int runStateOf(int c) {
+    return c & ~CAPACITY;
+}
 
-//通过按位与运算，将 c 的高3位舍弃，保留低29位，从而得到工作线程数
-private static int workerCountOf(int c)  { return c & CAPACITY; }
+// 通过按位与运算，将 c 的高3位舍弃，保留低29位，从而得到工作线程数
+private static int workerCountOf(int c) {
+    return c & CAPACITY;
+}
 
-//rs，即 runState，线程池的生命周期状态
-//wc，即 workerCount，工作线程数量
-//通过按位或运算来合并值
-private static int ctlOf(int rs, int wc) { return rs | wc; }
+// rs，即 runState，线程池的生命周期状态
+// wc，即 workerCount，工作线程数量
+// 通过按位或运算来合并值
+private static int ctlOf(int rs, int wc) {
+    return rs | wc;
+}
 
 private static boolean runStateLessThan(int c, int s) {
     return c < s;
@@ -185,8 +189,8 @@ private static boolean runStateAtLeast(int c, int s) {
     return c >= s;
 }
 
-//用于判断线程池是否处于 RUNNING 状态
-//由于五个状态值的大小是依次递增的，所以只需要和 SHUTDOWN 比较即可
+// 用于判断线程池是否处于 RUNNING 状态
+// 由于五个状态值的大小是依次递增的，所以只需要和 SHUTDOWN 比较即可
 private static boolean isRunning(int c) {
     return c < SHUTDOWN;
 }
@@ -195,13 +199,13 @@ public boolean isShutdown() {
     return !isRunning(ctl.get());
 }
 
-//用于判断当前状态是否处于 SHUTDOWN、STOP、TIDYING 三者中的一个
+// 用于判断当前状态是否处于 SHUTDOWN、STOP、TIDYING 三者中的一个
 public boolean isTerminating() {
     int c = ctl.get();
     return !isRunning(c) && runStateLessThan(c, TERMINATED);
 }
 
-//用于判断当前状态是否处于 TERMINATED
+// 用于判断当前状态是否处于 TERMINATED
 public boolean isTerminated() {
     return runStateAtLeast(ctl.get(), TERMINATED);
 }
@@ -219,39 +223,34 @@ public boolean isTerminated() {
 
 ```java
 public void execute(Runnable command) {
-    if (command == null)
-        throw new NullPointerException();
+    if (command == null) throw new NullPointerException();
     int c = ctl.get();
     if (workerCountOf(c) < corePoolSize) {
-        //如果当前线程数还未达到 corePoolSize，则尝试创建一个核心线程来处理任务
-        //addWorker 可能会因为线程池被关闭了、线程数量超出限制等原因返回 false
-        if (addWorker(command, true))
-            return;
+        // 如果当前线程数还未达到 corePoolSize，则尝试创建一个核心线程来处理任务
+        // addWorker 可能会因为线程池被关闭了、线程数量超出限制等原因返回 false
+        if (addWorker(command, true)) return;
         c = ctl.get();
     }
 
-    if (isRunning(c) && workQueue.offer(command)) { //线程池还处于运行状态且成功添加任务到任务队列
-        //需要重新检查下运行状态
-        //因为等执行到这里时，线程池可能被其它线程关闭了
+    if (isRunning(c) && workQueue.offer(command)) { // 线程池还处于运行状态且成功添加任务到任务队列
+        // 需要重新检查下运行状态
+        // 因为等执行到这里时，线程池可能被其它线程关闭了
         int recheck = ctl.get();
 
-        //1、如果线程池已经处于非运行状态了
-        //1.1、如果移除 command 成功，则走拒绝策略
-        //1.2、如果移除 command 失败（因为 command 可能已经被其它线程拿去执行了），则走第 3 步
-        //2、如果线程池还处于运行状态，则走第 3 步
-        //3、如果当前线程数量为 0，则创建线程进行处理
-        //第 3 步的意义在于：corePoolSize 可以被设为 0，所以这里需要检查下，在需要的时候创建一个非核心线程
-        if (! isRunning(recheck) && remove(command))
-            reject(command);
-        else if (workerCountOf(recheck) == 0)
-            addWorker(null, false);
+        // 1、如果线程池已经处于非运行状态了
+        // 1.1、如果移除 command 成功，则走拒绝策略
+        // 1.2、如果移除 command 失败（因为 command 可能已经被其它线程拿去执行了），则走第 3 步
+        // 2、如果线程池还处于运行状态，则走第 3 步
+        // 3、如果当前线程数量为 0，则创建线程进行处理
+        // 第 3 步的意义在于：corePoolSize 可以被设为 0，所以这里需要检查下，在需要的时候创建一个非核心线程
+        if (!isRunning(recheck) && remove(command)) reject(command);
+        else if (workerCountOf(recheck) == 0) addWorker(null, false);
     }
-    //如果线程池处于非运行状态了，或者是处于运行状态但队列已满了，此时就会走到这里
-    //在这里尝试创建一个非核心线程
-    //如果线程创建失败，说明要么是线程池当前状态大于等于 STOP，或者是任务队列已满且线程总数达到 maximumPoolSize 了
-    //此时就走拒绝策略
-    else if (!addWorker(command, false))
-        reject(command);
+    // 如果线程池处于非运行状态了，或者是处于运行状态但队列已满了，此时就会走到这里
+    // 在这里尝试创建一个非核心线程
+    // 如果线程创建失败，说明要么是线程池当前状态大于等于 STOP，或者是任务队列已满且线程总数达到 maximumPoolSize 了
+    // 此时就走拒绝策略
+    else if (!addWorker(command, false)) reject(command);
 }
 ```
 
@@ -270,37 +269,33 @@ public void execute(Runnable command) {
 
 ```java
 private boolean addWorker(Runnable firstTask, boolean core) {
-    //下面的 for 主要逻辑：
-    //在创建线程前通过 CAS 原子性地将“工作者线程数量递增加一”
-    //由于 CAS 可能会失败，所以将之放到 for 循环中进行循环重试
-    //每次循环前后都需要检查下当前状态是否允许创建线程
+    // 下面的 for 主要逻辑：
+    // 在创建线程前通过 CAS 原子性地将“工作者线程数量递增加一”
+    // 由于 CAS 可能会失败，所以将之放到 for 循环中进行循环重试
+    // 每次循环前后都需要检查下当前状态是否允许创建线程
     retry:
-    for (;;) {
+    for (; ; ) {
         int c = ctl.get();
         int rs = runStateOf(c);
 
         // Check if queue empty only if necessary.
-        if (rs >= SHUTDOWN &&
-            ! (rs == SHUTDOWN &&
-               firstTask == null &&
-               ! workQueue.isEmpty()))   
-            //当外部调用 shutdown() 方法后，线程池状态会变迁为 SHUTDOWN
-            //此时依然允许创建线程来对队列中的任务进行处理，但是不会再接受新任务
-            //除这种情况之外不允许在非 RUNNING 的时候还创建线程
+        if (rs >= SHUTDOWN && !(rs == SHUTDOWN && firstTask == null && !workQueue.isEmpty()))
+            // 当外部调用 shutdown() 方法后，线程池状态会变迁为 SHUTDOWN
+            // 此时依然允许创建线程来对队列中的任务进行处理，但是不会再接受新任务
+            // 除这种情况之外不允许在非 RUNNING 的时候还创建线程
             return false;
 
-        for (;;) {  
+        for (; ; ) {
             int wc = workerCountOf(c);
-            if (wc >= CAPACITY ||
-                wc >= (core ? corePoolSize : maximumPoolSize))
-                //当前线程数已经超出最大限制
+            if (wc >= CAPACITY || wc >= (core ? corePoolSize : maximumPoolSize))
+                // 当前线程数已经超出最大限制
                 return false;
             if (compareAndIncrementWorkerCount(c))
-                //通过 CAS 更新工作者线程数成功后就跳出循环，去实际创建线程
+                // 通过 CAS 更新工作者线程数成功后就跳出循环，去实际创建线程
                 break retry;
-            c = ctl.get();  // Re-read ctl
+            c = ctl.get(); // Re-read ctl
             if (runStateOf(c) != rs)
-                //循环过程中线程池状态被改变了，重新循环
+                // 循环过程中线程池状态被改变了，重新循环
                 continue retry;
             // else CAS failed due to workerCount change; retry inner loop
         }
@@ -321,15 +316,13 @@ private boolean addWorker(Runnable firstTask, boolean core) {
                 // shut down before lock acquired.
                 int rs = runStateOf(ctl.get());
 
-                if (rs < SHUTDOWN ||
-                    (rs == SHUTDOWN && firstTask == null)) {
+                if (rs < SHUTDOWN || (rs == SHUTDOWN && firstTask == null)) {
                     if (t.isAlive()) // precheck that t is startable
-                        throw new IllegalThreadStateException();
+                    throw new IllegalThreadStateException();
                     workers.add(w);
-                    //更新线程池曾经达到的最大线程数
+                    // 更新线程池曾经达到的最大线程数
                     int s = workers.size();
-                    if (s > largestPoolSize)
-                        largestPoolSize = s;
+                    if (s > largestPoolSize) largestPoolSize = s;
                     workerAdded = true;
                 }
             } finally {
@@ -341,9 +334,8 @@ private boolean addWorker(Runnable firstTask, boolean core) {
             }
         }
     } finally {
-        //如果线程没有被成功启动，则需要将该任务从队列中移除并重新更新工作者线程数
-        if (! workerStarted)
-            addWorkerFailed(w);
+        // 如果线程没有被成功启动，则需要将该任务从队列中移除并重新更新工作者线程数
+        if (!workerStarted) addWorkerFailed(w);
     }
     return workerStarted;
 }
@@ -358,7 +350,7 @@ Worker 继承于 AbstractQueuedSynchronizer，意味着 Worker 就相当于一�
 1. Worker 在开始执行任务前会执行 `Worker.lock()` ，表明线程正在执行任务
 2. 如果 Worker 处于锁定状态，则不应该对其进行中断，避免任务执行一半就被打断
 3. 如果 Worker 处于非锁定状态，说明其当前是处于阻塞获取任务的状态，此时才允许对其进行中断
-4. 线程池在执行 `shutdown()` 方法或 `shutdownNow()` 方法时会调用 `interruptIdleWorkers()` 方法来回收空闲的线程，`interruptIdleWorkers()` 方法会使用`Worker.tryLock()` 方法来尝试获取锁，由于 Worker 是不可重入锁，所以如果锁获取成功就说明线程处于空闲状态，此时才可以进行回收
+4. 线程池在执行 `shutdown()` 方法或 `shutdownNow()` 方法时会调用 `interruptIdleWorkers()` 方法来回收空闲的线程，`interruptIdleWorkers()` 方法会使用 `Worker.tryLock()` 方法来尝试获取锁，由于 Worker 是不可重入锁，所以如果锁获取成功就说明线程处于空闲状态，此时才可以进行回收
 
 Worker 同时也是 Runnable 类型，`thread` 是通过 `getThreadFactory().newThread(this)` 来创建的，即将 Worker 本身作为构造参数传给 Thread 进行初始化，所以在 `thread` 启动的时候 Worker 的 `run()` 方法就会被执行
 
@@ -438,7 +430,7 @@ private final class Worker extends AbstractQueuedSynchronizer implements Runnabl
 }
 ```
 
-`runWorker(Worker)` 方法就是线程正式进行任务执行的地方。该方法通过 while 循环不断从任务队列中取出任务来进行执行，如果 `getTask()`方法返回了 null，那此时就需要将此线程进行回收。如果在任务执行过程中抛出了异常，那也需要回收此线程
+`runWorker(Worker)` 方法就是线程正式进行任务执行的地方。该方法通过 while 循环不断从任务队列中取出任务来进行执行，如果 `getTask()` 方法返回了 null，那此时就需要将此线程进行回收。如果在任务执行过程中抛出了异常，那也需要回收此线程
 
 ```java
 final void runWorker(Worker w) {
@@ -781,32 +773,30 @@ private Runnable getTask() {
         int wc = workerCountOf(c);
 
         // Are workers subject to culling?
-        //timed 用于标记从任务队列中取任务时是否需要进行超时控制
-        //如果允许回收空闲核心线程或者是当前的线程总数已经超出 corePoolSize 了，那么就需要进行超时控制
+        // timed 用于标记从任务队列中取任务时是否需要进行超时控制
+        // 如果允许回收空闲核心线程或者是当前的线程总数已经超出 corePoolSize 了，那么就需要进行超时控制
         boolean timed = allowCoreThreadTimeOut || wc > corePoolSize;
 
-        //1. 线程总数超出 maximumPoolSize
-        //2. 允许回收核心线程，且核心线程的空闲时间已达到限制了
-        //如果以上两种情况之一有一个满足，且当前线程数大于 1 或者任务队列为空时就返回 null（如果 CAS 更新 WorkerCount 成功的话）
-        //避免在任务队列不为空且只有一个线程时还回收线程导致任务没人处理
-        if ((wc > maximumPoolSize || (timed && timedOut))
-                && (wc > 1 || workQueue.isEmpty())) {
-            if (compareAndDecrementWorkerCount(c))
-                return null;
+        // 1. 线程总数超出 maximumPoolSize
+        // 2. 允许回收核心线程，且核心线程的空闲时间已达到限制了
+        // 如果以上两种情况之一有一个满足，且当前线程数大于 1 或者任务队列为空时就返回 null（如果 CAS 更新 WorkerCount 成功的话）
+        // 避免在任务队列不为空且只有一个线程时还回收线程导致任务没人处理
+        if ((wc > maximumPoolSize || (timed && timedOut)) && (wc > 1 || workQueue.isEmpty())) {
+            if (compareAndDecrementWorkerCount(c)) return null;
             continue;
         }
 
         try {
-            Runnable r = timed ?
-                    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
-                    workQueue.take();
-            if (r != null)
-                return r;
+            Runnable r =
+                    timed
+                            ? workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS)
+                            : workQueue.take();
+            if (r != null) return r;
             timedOut = true;
-            //如果能执行到 timedOut = true 说明是由于超时导致 poll 返回了 null
-            //之所以不在判断到 r 不为 null 的时候就直接 return 出去
-            //是因为可能在获取任务的过程中外部又重新修改了 allowCoreThreadTimeOut 和 corePoolSize 等配置
-            //导致此时又不需要回收此线程了，所以就在下一次循环时再判断是否回收此线程
+            // 如果能执行到 timedOut = true 说明是由于超时导致 poll 返回了 null
+            // 之所以不在判断到 r 不为 null 的时候就直接 return 出去
+            // 是因为可能在获取任务的过程中外部又重新修改了 allowCoreThreadTimeOut 和 corePoolSize 等配置
+            // 导致此时又不需要回收此线程了，所以就在下一次循环时再判断是否回收此线程
         } catch (InterruptedException retry) {
             timedOut = false;
         }
@@ -827,17 +817,16 @@ private Runnable getTask() {
 
 ```java
 final void tryTerminate() {
-    for (;;) {
+    for (; ; ) {
         int c = ctl.get();
-        //在以下几种情况不需要终止线程池：
-        //1.还处于运行状态
-        //2.已经处于 TIDYING 或 TERMINATED 状态
-        //3.处于 SHUTDOWN 状态且还有待处理的任务
-        if (isRunning(c) ||
-                runStateAtLeast(c, TIDYING) ||
-                (runStateOf(c) == SHUTDOWN && ! workQueue.isEmpty()))
-            return;
-        //在达到 TIDYING 状态前需要确保所有线程都被关闭了
+        // 在以下几种情况不需要终止线程池：
+        // 1.还处于运行状态
+        // 2.已经处于 TIDYING 或 TERMINATED 状态
+        // 3.处于 SHUTDOWN 状态且还有待处理的任务
+        if (isRunning(c)
+                || runStateAtLeast(c, TIDYING)
+                || (runStateOf(c) == SHUTDOWN && !workQueue.isEmpty())) return;
+        // 在达到 TIDYING 状态前需要确保所有线程都被关闭了
         if (workerCountOf(c) != 0) { // Eligible to terminate
             interruptIdleWorkers(ONLY_ONE);
             return;
@@ -848,11 +837,11 @@ final void tryTerminate() {
         try {
             if (ctl.compareAndSet(c, ctlOf(TIDYING, 0))) {
                 try {
-                    //terminated() 方法执行完毕后，线程池状态就从 TIDYING 转为 TERMINATED 了，此时线程池就走向终止了
+                    // terminated() 方法执行完毕后，线程池状态就从 TIDYING 转为 TERMINATED 了，此时线程池就走向终止了
                     terminated();
                 } finally {
                     ctl.set(ctlOf(TERMINATED, 0));
-                    //唤醒所有在等待线程池 TERMINATED 的线程
+                    // 唤醒所有在等待线程池 TERMINATED 的线程
                     termination.signalAll();
                 }
                 return;
@@ -883,7 +872,6 @@ final void tryTerminate() {
 public interface RejectedExecutionHandler {
 
     void rejectedExecution(Runnable r, ThreadPoolExecutor executor);
-    
 }
 ```
 
@@ -902,37 +890,32 @@ ThreadPoolExecutor 提供了以下几种拒绝策略，默认使用的是 AbortP
 
 ```java
 public void execute(Runnable command) {
-    if (command == null)
-        throw new NullPointerException();
+    if (command == null) throw new NullPointerException();
     int c = ctl.get();
     if (workerCountOf(c) < corePoolSize) {
-        if (addWorker(command, true))
-            return;
+        if (addWorker(command, true)) return;
         c = ctl.get();
     }
 
-    if (isRunning(c) && workQueue.offer(command)) { //线程池还处于运行状态且成功添加任务到任务队列
-        //需要重新检查下运行状态
-        //因为等执行到这里时，线程池可能被其它线程关闭了
+    if (isRunning(c) && workQueue.offer(command)) { // 线程池还处于运行状态且成功添加任务到任务队列
+        // 需要重新检查下运行状态
+        // 因为等执行到这里时，线程池可能被其它线程关闭了
         int recheck = ctl.get();
 
-        //1、如果线程池已经处于非运行状态了
-        //1.1、如果移除 command 成功，则走拒绝策略
-        //1.2、如果移除 command 失败（因为 command 可能已经被其它线程拿去执行了），则走第 3 步
-        //2、如果线程池还处于运行状态，则走第 3 步
-        //3、如果当前线程数量为 0，则创建线程进行处理
-        //第 3 步的意义在于：corePoolSize 可以被设为 0，所以这里需要检查下，在需要的时候创建一个非核心线程
-        if (! isRunning(recheck) && remove(command))
-            reject(command);
-        else if (workerCountOf(recheck) == 0)
-            addWorker(null, false);
+        // 1、如果线程池已经处于非运行状态了
+        // 1.1、如果移除 command 成功，则走拒绝策略
+        // 1.2、如果移除 command 失败（因为 command 可能已经被其它线程拿去执行了），则走第 3 步
+        // 2、如果线程池还处于运行状态，则走第 3 步
+        // 3、如果当前线程数量为 0，则创建线程进行处理
+        // 第 3 步的意义在于：corePoolSize 可以被设为 0，所以这里需要检查下，在需要的时候创建一个非核心线程
+        if (!isRunning(recheck) && remove(command)) reject(command);
+        else if (workerCountOf(recheck) == 0) addWorker(null, false);
     }
-    //如果线程池处于非运行状态了，或者是处于运行状态但队列已满了，此时就会走到这里
-    //在这里尝试创建一个非核心线程
-    //如果线程创建失败，说明要么是线程池当前状态大于等于 STOP，或者是任务队列已满且线程总数达到 maximumPoolSize 了
-    //此时就走拒绝策略
-    else if (!addWorker(command, false))
-        reject(command);
+    // 如果线程池处于非运行状态了，或者是处于运行状态但队列已满了，此时就会走到这里
+    // 在这里尝试创建一个非核心线程
+    // 如果线程创建失败，说明要么是线程池当前状态大于等于 STOP，或者是任务队列已满且线程总数达到 maximumPoolSize 了
+    // 此时就走拒绝策略
+    else if (!addWorker(command, false)) reject(command);
 }
 
 final void reject(Runnable command) {
@@ -955,11 +938,11 @@ ThreadPoolExecutor 提供了多个配置参数以便满足多种不同的需求�
 此外，ThreadPoolExecutor 也预留了几个钩子方法可以由子类去实现。通过以下几个方法，就可以实现每个任务开始执行前和执行后，以及线程池走向终止时插入一些自定义的监控代码，以此来实现：**计算任务的平均执行时间、最小执行时间和最大执行时间**等功能
 
 ```java
-protected void beforeExecute(Thread t, Runnable r) { }
+protected void beforeExecute(Thread t, Runnable r) {}
 
-protected void afterExecute(Runnable r, Throwable t) { }
+protected void afterExecute(Runnable r, Throwable t) {}
 
-protected void terminated() { }
+protected void terminated() {}
 ```
 
 # 四、Executors
@@ -968,66 +951,72 @@ Executors 是 JDK 提供的一个线程池创建工具类，封装了很多个�
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b34aa0ed8322449d821b8f07666a66e2~tplv-k3u1fbpfcp-zoom-1.image)
 
-`newFixedThreadPool`方法创建的线程池，核心线程数和最大线程数都是 nThreads，所以线程池在任何时候最多也只会有 nThreads 个线程在同时运行，且在停止线程池前所有线程都不会被回收。LinkedBlockingQueue 的默认容量是 Integer.MAX_VALUE，近乎无限，在线程繁忙的情况下有可能导致等待处理的任务持续堆积，使得系统频繁 GC，最终导致 OOM
+`newFixedThreadPool` 方法创建的线程池，核心线程数和最大线程数都是 nThreads，所以线程池在任何时候最多也只会有 nThreads 个线程在同时运行，且在停止线程池前所有线程都不会被回收。LinkedBlockingQueue 的默认容量是 Integer.MAX_VALUE，近乎无限，在线程繁忙的情况下有可能导致等待处理的任务持续堆积，使得系统频繁 GC，最终导致 OOM
 
 此类线程池适合用于希望所有任务都能够被执行的情况
 
 ```java
 public static ExecutorService newFixedThreadPool(int nThreads) {
-    return new ThreadPoolExecutor(nThreads, nThreads,
-                                  0L, TimeUnit.MILLISECONDS,
-                                  new LinkedBlockingQueue<Runnable>());
+    return new ThreadPoolExecutor(
+            nThreads, nThreads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 }
 
 public static ExecutorService newFixedThreadPool(int nThreads, ThreadFactory threadFactory) {
-    return new ThreadPoolExecutor(nThreads, nThreads,
-                                  0L, TimeUnit.MILLISECONDS,
-                                  new LinkedBlockingQueue<Runnable>(),
-                                  threadFactory);
+    return new ThreadPoolExecutor(
+            nThreads,
+            nThreads,
+            0L,
+            TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(),
+            threadFactory);
 }
 ```
 
-`newSingleThreadExecutor`方法创建的线程池，核心线程数和最大线程数都是 1，所以线程池在任何时候最多也只会有 1 个线程在同时运行，且在停止线程池前所有线程都不会被回收。由于使用了 LinkedBlockingQueue，所以在极端情况下也是有发生 OOM 的可能
+`newSingleThreadExecutor` 方法创建的线程池，核心线程数和最大线程数都是 1，所以线程池在任何时候最多也只会有 1 个线程在同时运行，且在停止线程池前所有线程都不会被回收。由于使用了 LinkedBlockingQueue，所以在极端情况下也是有发生 OOM 的可能
 
 此类线程池适合用于执行需要串行处理的任务，或者是任务的提交间隔比任务的执行时间长的情况
 
 ```java
 public static ExecutorService newSingleThreadExecutor() {
-    return new FinalizableDelegatedExecutorService
-        (new ThreadPoolExecutor(1, 1,
-                                0L, TimeUnit.MILLISECONDS,
-                                new LinkedBlockingQueue<Runnable>()));
+    return new FinalizableDelegatedExecutorService(
+            new ThreadPoolExecutor(
+                    1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>()));
 }
 
 public static ExecutorService newSingleThreadExecutor(ThreadFactory threadFactory) {
-    return new FinalizableDelegatedExecutorService
-        (new ThreadPoolExecutor(1, 1,
-                                0L, TimeUnit.MILLISECONDS,
-                                new LinkedBlockingQueue<Runnable>(),
-                                threadFactory));
+    return new FinalizableDelegatedExecutorService(
+            new ThreadPoolExecutor(
+                    1,
+                    1,
+                    0L,
+                    TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<Runnable>(),
+                    threadFactory));
 }
 ```
 
-`newCachedThreadPool`方法创建的线程池，核心线程数是 0，最大线程数是 Integer.MAX_VALUE，所以允许同时运行的线程数量近乎无限。再加上 SynchronousQueue 是一个不储存元素的阻塞队列，每当有新任务到来时，如果当前没有空闲线程的话就会马上启动一个新线程来执行任务，这使得任务总是能够很快被执行，提升了响应速度，但同时也存在由于要执行的任务过多导致一直创建线程的可能性，这在任务耗时过长且任务量过多的情况下也可能导致 OOM
+`newCachedThreadPool` 方法创建的线程池，核心线程数是 0，最大线程数是 Integer.MAX_VALUE，所以允许同时运行的线程数量近乎无限。再加上 SynchronousQueue 是一个不储存元素的阻塞队列，每当有新任务到来时，如果当前没有空闲线程的话就会马上启动一个新线程来执行任务，这使得任务总是能够很快被执行，提升了响应速度，但同时也存在由于要执行的任务过多导致一直创建线程的可能性，这在任务耗时过长且任务量过多的情况下也可能导致 OOM
 
 此类线程池适合用于对任务的处理速度要求比较高的情况
 
 ```java
 public static ExecutorService newCachedThreadPool() {
-    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
-                                  60L, TimeUnit.SECONDS,
-                                  new SynchronousQueue<Runnable>());
+    return new ThreadPoolExecutor(
+            0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
 }
 
 public static ExecutorService newCachedThreadPool(ThreadFactory threadFactory) {
-    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
-                                  60L, TimeUnit.SECONDS,
-                                  new SynchronousQueue<Runnable>(),
-                                  threadFactory);
+    return new ThreadPoolExecutor(
+            0,
+            Integer.MAX_VALUE,
+            60L,
+            TimeUnit.SECONDS,
+            new SynchronousQueue<Runnable>(),
+            threadFactory);
 }
 ```
 
-`newScheduledThreadPool`方法创建的线程池对应的是 ScheduledThreadPoolExecutor，其继承于 ThreadPoolExecutor 并实现了 ScheduledExecutorService 接口，在线程池的基础上扩展实现了执行定时任务的能力。ScheduledThreadPoolExecutor 的核心线程数由入参 corePoolSize 决定，最大线程数是 Integer.MAX_VALUE，keepAliveTime 是 0 秒，所以该线程池可能同时运行近乎无限的线程，但一旦当前没有待执行的任务的话，线程就会马上被回收
+`newScheduledThreadPool` 方法创建的线程池对应的是 ScheduledThreadPoolExecutor，其继承于 ThreadPoolExecutor 并实现了 ScheduledExecutorService 接口，在线程池的基础上扩展实现了执行定时任务的能力。ScheduledThreadPoolExecutor 的核心线程数由入参 corePoolSize 决定，最大线程数是 Integer.MAX_VALUE，keepAliveTime 是 0 秒，所以该线程池可能同时运行近乎无限的线程，但一旦当前没有待执行的任务的话，线程就会马上被回收
 
 此类线程池适合用于需要定时多次执行特定任务的情况
 
@@ -1042,17 +1031,17 @@ public static ScheduledExecutorService newScheduledThreadPool(
 }
 ```
 
-`newSingleThreadScheduledExecutor`方法 `newScheduledThreadPool` 方法基本一样，只是直接指定了核心线程数为 1
+`newSingleThreadScheduledExecutor` 方法 `newScheduledThreadPool` 方法基本一样，只是直接指定了核心线程数为 1
 
 ```java
 public static ScheduledExecutorService newSingleThreadScheduledExecutor() {
-    return new DelegatedScheduledExecutorService
-        (new ScheduledThreadPoolExecutor(1));
+    return new DelegatedScheduledExecutorService(new ScheduledThreadPoolExecutor(1));
 }
 
-public static ScheduledExecutorService newSingleThreadScheduledExecutor(ThreadFactory threadFactory) {
-    return new DelegatedScheduledExecutorService
-        (new ScheduledThreadPoolExecutor(1, threadFactory));
+public static ScheduledExecutorService newSingleThreadScheduledExecutor(
+        ThreadFactory threadFactory) {
+    return new DelegatedScheduledExecutorService(
+            new ScheduledThreadPoolExecutor(1, threadFactory));
 }
 ```
 

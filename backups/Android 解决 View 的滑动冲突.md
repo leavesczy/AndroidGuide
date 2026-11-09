@@ -7,16 +7,18 @@
 父容器根据需要在 `onInterceptTouchEvent` 方法中对触摸事件进行选择性拦截，思路可以看以下伪代码
 
 ```java
-	public boolean onInterceptTouchEvent(MotionEvent event) {
-        boolean intercepted = false;
-        int x = (int) event.getX();
-        int y = (int) event.getY();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
+public boolean onInterceptTouchEvent(MotionEvent event) {
+    boolean intercepted = false;
+    int x = (int) event.getX();
+    int y = (int) event.getY();
+    switch (event.getAction()) {
+        case MotionEvent.ACTION_DOWN:
+            {
                 intercepted = false;
                 break;
             }
-            case MotionEvent.ACTION_MOVE: {
+        case MotionEvent.ACTION_MOVE:
+            {
                 if (满足父容器的拦截要求) {
                     intercepted = true;
                 } else {
@@ -24,17 +26,18 @@
                 }
                 break;
             }
-            case MotionEvent.ACTION_UP: {
+        case MotionEvent.ACTION_UP:
+            {
                 intercepted = false;
                 break;
             }
-            default:
-                break;
-        }
-        mLastXIntercept = x;
-        mLastYIntercept = y;
-        return intercepted;
+        default:
+            break;
     }
+    mLastXIntercept = x;
+    mLastYIntercept = y;
+    return intercepted;
+}
 ```
 - 根据实际的业务需求，判断是否需要处理 ACTION_MOVE 事件，如果父 View 需要处理则返回 true，否则返回 false 并交由子 View 去处理
 - ACTION_DOWN 事件需要返回 false，父容器不能进行拦截，否则根据 View 的事件分发机制，后续的 ACTION_MOVE 与 ACTION_UP 事件都将默认交由父容器进行处理
@@ -47,15 +50,17 @@
 子 View 修改其 `dispatchTouchEvent` 方法
 
 ```java
-	public boolean dispatchTouchEvent(MotionEvent event) {
-        int x = (int) event.getX();
-        int y = (int) event.getY();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
+public boolean dispatchTouchEvent(MotionEvent event) {
+    int x = (int) event.getX();
+    int y = (int) event.getY();
+    switch (event.getAction()) {
+        case MotionEvent.ACTION_DOWN:
+            {
                 parent.requestDisallowInterceptTouchEvent(true);
                 break;
             }
-            case MotionEvent.ACTION_MOVE: {
+        case MotionEvent.ACTION_MOVE:
+            {
                 int deltaX = x - mLastX;
                 int deltaY = y - mLastY;
                 if (父容器需要此类点击事件) {
@@ -63,28 +68,29 @@
                 }
                 break;
             }
-            case MotionEvent.ACTION_UP: {
+        case MotionEvent.ACTION_UP:
+            {
                 break;
             }
-            default:
-                break;
-        }
-        mLastX = x;
-        mLastY = y;
-        return super.dispatchTouchEvent(event);
+        default:
+            break;
     }
+    mLastX = x;
+    mLastY = y;
+    return super.dispatchTouchEvent(event);
+}
 ```
 父容器修改其 `onInterceptTouchEvent` 方法
 
 ```java
-	public boolean onInterceptTouchEvent(MotionEvent event) {
-        int action = event.getAction();
-        if (action == MotionEvent.ACTION_DOWN) {
-            return false;
-        } else {
-            return true;
-        }
+public boolean onInterceptTouchEvent(MotionEvent event) {
+    int action = event.getAction();
+    if (action == MotionEvent.ACTION_DOWN) {
+        return false;
+    } else {
+        return true;
     }
+}
 ```
 - 内部拦截法要求父容器不能拦截 ACTION_DOWN 事件，否则一旦父容器拦截 ACTION_DOWN 事件，那么后续的触摸事件都不会传递给子View
 - 滑动策略的逻辑放在子 View 的 `dispatchTouchEvent` 方法的 ACTION_MOVE 事件中，如果父容器需要处理事件则调用 `parent.requestDisallowInterceptTouchEvent(false)` 方法让父容器去拦截事件
@@ -110,7 +116,6 @@ public class MyViewPager extends ViewPager {
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         return false;
     }
-
 }
 ```
 这里用一个布尔变量来控制 ViewPager 中每一个页面包含的是 ListView 还是 TextView
@@ -139,7 +144,8 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < 30; i++) {
                     dataList.add("leavesC " + i);
                 }
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
+                ArrayAdapter<String> adapter =
+                        new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
                 listView.setAdapter(adapter);
                 view = listView;
             } else {
@@ -151,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
             viewList.add(view);
         }
     }
-
 }
 ```
 当子 View 为 TextView 时
@@ -159,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
 然而此时还是没有发生滑动冲突，ViewPager 还是可以正常使用。这是因为 TextView 默认是不可点击的，因此 TextView 并不会消费触摸事件，触摸事件最后还是传回给 ViewPager 进行处理，因为此时还是可以正常使用
 
-如果为 TextView 设置  `textView.setClickable(true);`，就会使得 ViewPager 无法滑动
+如果为 TextView 设置 `textView.setClickable(true);`，就会使得 ViewPager 无法滑动
 ![](https://upload-images.jianshu.io/upload_images/2552605-c1ebb7dd9129207b.gif?imageMogr2/auto-orient/strip)
 
 当子 View 为 ListView 时，则只能上下滑动，而无法左右滑动
@@ -193,22 +198,22 @@ public class MyViewPager extends ViewPager {
         final int action = ev.getAction() & MotionEvent.ACTION_MASK;
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                //不拦截此事件
+                // 不拦截此事件
                 intercepted = false;
-                //调用 ViewPager的 onInterceptTouchEvent 方法用于初始化 mActivePointerId
+                // 调用 ViewPager的 onInterceptTouchEvent 方法用于初始化 mActivePointerId
                 super.onInterceptTouchEvent(ev);
                 break;
             case MotionEvent.ACTION_MOVE:
-                //横向位移增量
+                // 横向位移增量
                 int deltaX = x - lastXIntercept;
-                //竖向位移增量
+                // 竖向位移增量
                 int deltaY = y - lastYIntercept;
-                //如果横向滑动距离大于竖向滑动距离，则认为使用者是想要左右滑动
-                //此时就使 ViewPager 拦截此事件
+                // 如果横向滑动距离大于竖向滑动距离，则认为使用者是想要左右滑动
+                // 此时就使 ViewPager 拦截此事件
                 intercepted = Math.abs(deltaX) > Math.abs(deltaY);
                 break;
             case MotionEvent.ACTION_UP:
-                //不拦截此事件
+                // 不拦截此事件
                 intercepted = false;
                 break;
             default:
@@ -218,7 +223,6 @@ public class MyViewPager extends ViewPager {
         lastYIntercept = y;
         return intercepted;
     }
-
 }
 ```
 ### 五、通过内部拦截法解决滑动冲突
@@ -250,12 +254,12 @@ public class MyListView extends ListView {
                 getParent().requestDisallowInterceptTouchEvent(true);
                 break;
             case MotionEvent.ACTION_MOVE:
-                //横向位移增量
+                // 横向位移增量
                 int deltaX = x - lastX;
-                //竖向位移增量
+                // 竖向位移增量
                 int deltaY = y - lastY;
-                //如果横向滑动距离大于竖向滑动距离，则认为使用者是想要左右滑动
-                //此时就通知父容器 ViewPager 处理此事件
+                // 如果横向滑动距离大于竖向滑动距离，则认为使用者是想要左右滑动
+                // 此时就通知父容器 ViewPager 处理此事件
                 if (Math.abs(deltaX) > Math.abs(deltaY)) {
                     getParent().requestDisallowInterceptTouchEvent(false);
                 }
@@ -269,7 +273,6 @@ public class MyListView extends ListView {
         lastY = y;
         return super.dispatchTouchEvent(ev);
     }
-
 }
 ```
 同时也需要修改 MyViewPager 的 `onInterceptTouchEvent` 方法
@@ -294,6 +297,5 @@ public class MyViewPager extends ViewPager {
         }
         return true;
     }
-
 }
 ```

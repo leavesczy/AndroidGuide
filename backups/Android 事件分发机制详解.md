@@ -44,25 +44,25 @@ public boolean onTouchEvent(MotionEvent event)
 ```
 该方法返回 true 表示当前视图可以处理对应的事件，事件将不会传递给父视图；返回 false 表示当前视图不处理这个事件，事件会被传递给父视图的相同方法进行处理
 
-#### 2.4、联系: 
+#### 2.4、联系:
 
 三个方法之间的联系可以以如下伪代码来表示：
 ```java
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        boolean consume = false;
-        if (onInterceptTouchEvent(ev)) {
-            consume = onTouchEvent(ev);
-        } else {
-            consume = child.dispatchTouchEvent(ev);
-        }
-        return consume;
+public boolean dispatchTouchEvent(MotionEvent ev) {
+    boolean consume = false;
+    if (onInterceptTouchEvent(ev)) {
+        consume = onTouchEvent(ev);
+    } else {
+        consume = child.dispatchTouchEvent(ev);
     }
+    return consume;
+}
 ```
 对于一个根 ViewGroup 来说，点击事件发生后，首先会传递给它，这时它的 `dispatchTouchEvent` 方法就会被调用，如果它的 `onInterceptTouchEvent` 方法返回 true 就表示要拦截当前事件，接着事件就会交由 ViewGroup 的 `onTouchEvent` 方法进行处理。如果 `onInterceptTouchEvent` 方法返回 fasle，就表示它不拦截当前事件，事件会继续传递给 ViewGroup 的子元素，再次重复以上步骤
 
-此外，View 的 `onTouchEvent` 方法默认都会返回 true，即消耗事件，除非 View 是不可点击的（**clickable 和 longClickable 同时为 false**）。View 的 longClickable 属性默认都为 false，clickable 属性则不一定，例如 Button 的clickable 属性默认为 true，TextView 的clickable 属性默认为 false。View 的 enable 属性不影响 onTouchEvent 方法的默认返回值。即时View是 disable 状态的，只要它的 clickable 或者 longClickable 有一个为 true，则 onTouchEvent 方法就返回 true 
+此外，View 的 `onTouchEvent` 方法默认都会返回 true，即消耗事件，除非 View 是不可点击的（**clickable 和 longClickable 同时为 false**）。View 的 longClickable 属性默认都为 false，clickable 属性则不一定，例如 Button 的clickable 属性默认为 true，TextView 的clickable 属性默认为 false。View 的 enable 属性不影响 onTouchEvent 方法的默认返回值。即时View是 disable 状态的，只要它的 clickable 或者 longClickable 有一个为 true，则 onTouchEvent 方法就返回 true
 
-我们可以为 View 设置 `setOnTouchListener` 方法和 `setOnClickListener` 方法，与 View 内部的 `onTouchEvent` 方法的优先级进行比较，依次是 **setOnTouchListener > onTouchEvent > setOnClickListener** 
+我们可以为 View 设置 `setOnTouchListener` 方法和 `setOnClickListener` 方法，与 View 内部的 `onTouchEvent` 方法的优先级进行比较，依次是 **setOnTouchListener > onTouchEvent > setOnClickListener**
 此外，如果为 View 设置了 `setOnClickListener` 方法和 `setOnLongClickListener` 方法，则会分别将 View 的 clickable 和 longClickable 设置为 true
 
 ### 三、View 的事件传递流程
@@ -122,7 +122,6 @@ public class MyTextView extends AppCompatTextView {
     }
 
 }
-
 ```
 在布局文件中声明使用 MyTextView
 
@@ -144,13 +143,12 @@ public class MyTextView extends AppCompatTextView {
         android:text="点击" />
 
 </LinearLayout>
-
 ```
 
 重写 MainActivity 中与触摸事件相关的两个方法，输出相应的触摸事件类型，并为 MyTextView 设置 TouchEvent 事件监听
 
 ```java
-public class MainActivity extends AppCompatActivity implements View.OnTouchListener{
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
 
     private final String TAG = "Activity";
 
@@ -214,7 +212,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         }
         return false;
     }
-
 }
 ```
 此时，运行程序后点击 MyTextView 控件，输出的 Log 如下所示：
@@ -230,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 ```
 在默认情况下，Activity 与 MyTextView 的各个触摸事件相关方法的调用顺序如上所示。可以看到，MyTextView 的 onTouch 方法比 onTouchEvent 方法更早被调用，说明 onTouch 方法的优先级更高。
 
-dispatchTouchEvent 方法和  onTouchEvent 方法的返回值存在三种情况：
+dispatchTouchEvent 方法和 onTouchEvent 方法的返回值存在三种情况：
 
  - 返回 true
  - 返回 false
@@ -353,7 +350,6 @@ Activity 的布局文件代码如下所示：
 06-18 04:22:54.669 12309-12309/com.czy.touchevent E/Activity: onTouchEvent  ACTION_DOWN
 06-18 04:22:54.764 12309-12309/com.czy.touchevent E/Activity: dispatchTouchEvent  ACTION_UP
 06-18 04:22:54.764 12309-12309/com.czy.touchevent E/Activity: onTouchEvent  ACTION_UP
-
 ```
 在默认情况下，Activity 、ViewGroup 和 View 的各个触摸事件相关方法的调用顺序如上所示
 通过不断改变 Activity、ViewGroup 和 View 中各个方法的返回值，可以得到如下所示的 TouchEvent 事件发布机制流程图：
@@ -369,4 +365,3 @@ Activity 的布局文件代码如下所示：
 从上边展示的事件传递默认的方法调用顺序可以看出来，Action_Up 事件都是直接交由 Activity 进行处理，而没有传递给内部的 ViewGroup 或 View
 其实，`dispatchTouchEvent` 方法具有“记忆”功能。如果 Action_Down 事件传递给了某 ViewGroup（或者Activity），ViewGroup 默认继续向下传递交由子View进行处理，ViewGroup 会记录该事件是否被子View给消费了。那 ViewGroup 如何知道子 View 是否消费了该事件呢？如果该事件会再次向上传递给 ViewGroup 的 `onTouchEvent` 方法进行处理，那就说明子 View 没能消费掉该事件。当第二次事件（Action_Move或者Action_Up）向下传递到该 ViewGroup， ViewGroup 的 `dispatchTouchEvent` 方法会进行判断，若子 View 消费了上次的 Action_Down 事件，那么本次事件就继续向下传递交由子 View 进行处理，若上次的事件没有被子 View 所消费，那么本次的事件就不会继续向下传递了，ViewGroup 直接调用自己的 `onTouchEvent` 方法来处理该事件
 “记忆”的有效期只在单次的触摸事件中，即从Action_Down 事件开始，在 Action_Up 事件结束
-

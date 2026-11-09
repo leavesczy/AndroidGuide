@@ -184,4 +184,4 @@ Android 13 细化的媒体权限解决了 READ_EXTERNAL_STORAGE 带来的隐私�
 - 在 Android 13 之前依然还是通过应用内置的图片选择器来实现业务功能
 - 在 Android 13 开始之后的版本仅使用系统内置的图片选择器，完全弃用 READ_EXTERNAL_STORAGE 权限
 
-此次 Android 13 版本还是有点东西的 ~ 
+此次 Android 13 版本还是有点东西的 ~

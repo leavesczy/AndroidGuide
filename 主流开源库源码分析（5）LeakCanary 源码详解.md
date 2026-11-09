@@ -1,12 +1,12 @@
-> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助 🤣🤣🤣
+> 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助
 
 [LeakCanary](https://github.com/square/leakcanary/) 是由 [Square](https://github.com/square) 公司开源的用于 Android 的内存泄漏检测工具，可以帮助开发者发现内存泄露情况并且找出泄露源头，有助于减少 `OutOfMemoryError` 情况的发生。在目前的应用开发中也算作是性能优化的一个重要实现途径，很多面试官在考察性能优化时都会问到 LeakCanary 的实现原理
 
-本文就来对其实现原理进行分析，具体的 Git 版本节点是：**9f62126e**，来了解 LeakCanary 的整体运行流程和实现原理 😂😂
+本文就来对其实现原理进行分析，具体的 Git 版本节点是：**9f62126e**，来了解 LeakCanary 的整体运行流程和实现原理
 
 # 一、支持的内存泄露类型
 
-我们经常说 LeakCanary 能检测到应用内发生的内存泄露，那么它到底具体支持什么类型的内存泄露情况呢？LeakCanary   官网有对此进行介绍：
+我们经常说 LeakCanary 能检测到应用内发生的内存泄露，那么它到底具体支持什么类型的内存泄露情况呢？LeakCanary 官网有对此进行介绍：
 
 LeakCanary automatically detects leaks of the following objects:
 
@@ -72,8 +72,8 @@ data class Config(
 
 ```groovy
 dependencies {
-  // debugImplementation because LeakCanary should only run in debug builds.
-  debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
+    // debugImplementation because LeakCanary should only run in debug builds.
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
 }
 ```
 一般来说，像这类第三方库都是需要由外部传入一个 `ApplicationContext` 对象进行初始化并启动的，LeakCanary 的 1.x 版本也是如此，但在 2.x 版本中，LeakCanary 将初始过程交由 `AppWatcherInstaller` 这个 `ContentProvider` 来自动完成
@@ -132,7 +132,7 @@ internal object InternalAppWatcher {
     if (isDebuggableBuild) {
       SharkLog.logger = DefaultCanaryLog()
     }
-	//拿到默认配置，默认四种类型都进行检测
+    //拿到默认配置，默认四种类型都进行检测
     val configProvider = { AppWatcher.config }
     //检测 Activity
     ActivityDestroyWatcher.install(application, objectWatcher, configProvider)
@@ -151,7 +151,7 @@ LeakCanary 具体进行内存泄露检测的逻辑可以分为三类：
 - ActivityDestroyWatcher。检测 Activity 的内存泄露情况
 - FragmentDestroyWatcher。检测 Fragment、FragmentView、ViewModel 的内存泄露情况
 
-当中，`ActivityDestroyWatcher` 和 `FragmentDestroyWatcher` 都需要依靠 `ObjectWatcher` 来完成，因为 `Activity、Fragment、FragmentView、ViewModel`  本质上都属于不同类型的 `Object` 
+当中，`ActivityDestroyWatcher` 和 `FragmentDestroyWatcher` 都需要依靠 `ObjectWatcher` 来完成，因为 `Activity、Fragment、FragmentView、ViewModel` 本质上都属于不同类型的 `Object`
 
 # 三、ObjectWatcher：检测任意对象
 
@@ -222,7 +222,7 @@ fun watch(watchedObject: Any, description: String) {
 1. 为每个 `watchedObject` 生成一个**唯一标识 key**，通过该 key 构建一个 `watchedObject` 的弱引用 `KeyedWeakReference`，将该弱引用保存到 `watchedObjects` 中。`ObjectWatcher` 可以先后监测多个对象，每个对象都会先被存入到 `watchedObjects` 中
 2. 外部通过传入的 `checkRetainedExecutor` 来指定检测内存泄露的触发时机，通过 `moveToRetained` 方法来判断是否真的发生了内存泄露
 
-`KeyedWeakReference`  是一个自定义的 `WeakReference` 子类，包含一个唯一 key 来标识特定对象，也包含一个 `retainedUptimeMillis` 字段用来标记是否发生了内存泄露
+`KeyedWeakReference` 是一个自定义的 `WeakReference` 子类，包含一个唯一 key 来标识特定对象，也包含一个 `retainedUptimeMillis` 字段用来标记是否发生了内存泄露
 
 ```kotlin
 class KeyedWeakReference(
@@ -279,7 +279,7 @@ private fun removeWeaklyReachableObjects() {
     } while (ref != null)
 }
 ```
-# 四、ActivityDestroyWatcher：检测Activity 
+# 四、ActivityDestroyWatcher：检测Activity
 
 理解了 `ObjectWatcher` 的流程后来看 `ActivityDestroyWatcher` 就会比较简单了。`ActivityDestroyWatcher` 会向 `Application` 注册一个 `ActivityLifecycleCallbacks` 回调，当收到每个 Activity 执行了 `onDestroy` 的回调后，就会将将 Activity 对象转交由 `ObjectWatcher` 来进行监听
 
@@ -304,7 +304,7 @@ internal class ActivityDestroyWatcher private constructor(private val objectWatc
 
 }
 ```
-# 五、FragmentDestroyWatcher：检测Fragment 
+# 五、FragmentDestroyWatcher：检测Fragment
 
 做 Android 应用开发的应该都知道，现在 Google 提供的基础依赖包分为了 **Support** 和 **AndroidX** 两种，**Support** 版本已经不再维护，主流的都是使用 **AndroidX** 了。而 LeakCanary 为了照顾老项目，就贴心的为这两种版本分别提供了 Fragment 的内存检测功能
 
@@ -316,73 +316,73 @@ internal class ActivityDestroyWatcher private constructor(private val objectWatc
 - 通过反射 Class.forName 来判断开发者使用的是 Support 包还是 AndroidX 包
 - 由于 Fragment 都需要被挂载在 Activity 上，所有向 Application 注册一个 ActivityLifecycleCallback，每当有 Activity 被创建时就监听该 Activity 内可能存在的 Fragment
 
-> 这里令我很疑惑的一个点就是：当系统版本大于等于  8.0 时，AndroidOFragmentDestroyWatcher 不就会和 AndroidSupportFragmentDestroyWatcher 或者 AndroidXFragmentDestroyWatcher 重复了吗？这算咋回事:joy:
+> 这里令我很疑惑的一个点就是：当系统版本大于等于 8.0 时，AndroidOFragmentDestroyWatcher 不就会和 AndroidSupportFragmentDestroyWatcher 或者 AndroidXFragmentDestroyWatcher 重复了吗？这算咋回事:joy:
 
 ```kotlin
 internal object FragmentDestroyWatcher {
 
-  private const val ANDROIDX_FRAGMENT_CLASS_NAME = "androidx.fragment.app.Fragment"
-  private const val ANDROIDX_FRAGMENT_DESTROY_WATCHER_CLASS_NAME =
-    "leakcanary.internal.AndroidXFragmentDestroyWatcher"
+    private const val ANDROIDX_FRAGMENT_CLASS_NAME = "androidx.fragment.app.Fragment"
+    private const val ANDROIDX_FRAGMENT_DESTROY_WATCHER_CLASS_NAME =
+        "leakcanary.internal.AndroidXFragmentDestroyWatcher"
 
-  // Using a string builder to prevent Jetifier from changing this string to Android X Fragment
-  @Suppress("VariableNaming", "PropertyName")
-  private val ANDROID_SUPPORT_FRAGMENT_CLASS_NAME =
-    StringBuilder("android.").append("support.v4.app.Fragment")
-        .toString()
-  private const val ANDROID_SUPPORT_FRAGMENT_DESTROY_WATCHER_CLASS_NAME =
-    "leakcanary.internal.AndroidSupportFragmentDestroyWatcher"
+    // Using a string builder to prevent Jetifier from changing this string to Android X Fragment
+    @Suppress("VariableNaming", "PropertyName")
+    private val ANDROID_SUPPORT_FRAGMENT_CLASS_NAME =
+        StringBuilder("android.").append("support.v4.app.Fragment")
+                .toString()
+    private const val ANDROID_SUPPORT_FRAGMENT_DESTROY_WATCHER_CLASS_NAME =
+        "leakcanary.internal.AndroidSupportFragmentDestroyWatcher"
 
-  fun install(
-    application: Application,
-    objectWatcher: ObjectWatcher,
-    configProvider: () -> AppWatcher.Config
-  ) {
-    val fragmentDestroyWatchers = mutableListOf<(Activity) -> Unit>()
+    fun install(
+        application: Application,
+        objectWatcher: ObjectWatcher,
+        configProvider: () -> AppWatcher.Config
+    ) {
+        val fragmentDestroyWatchers = mutableListOf<(Activity) -> Unit>()
 
-    if (SDK_INT >= O) {
-      fragmentDestroyWatchers.add(
-          AndroidOFragmentDestroyWatcher(objectWatcher, configProvider)
-      )
-    }
-
-    //AndroidX 
-    getWatcherIfAvailable(
-        ANDROIDX_FRAGMENT_CLASS_NAME,
-        ANDROIDX_FRAGMENT_DESTROY_WATCHER_CLASS_NAME,
-        objectWatcher,
-        configProvider
-    )?.let {
-      fragmentDestroyWatchers.add(it)
-    }
-
-    //Support 
-    getWatcherIfAvailable(
-        ANDROID_SUPPORT_FRAGMENT_CLASS_NAME,
-        ANDROID_SUPPORT_FRAGMENT_DESTROY_WATCHER_CLASS_NAME,
-        objectWatcher,
-        configProvider
-    )?.let {
-      fragmentDestroyWatchers.add(it)
-    }
-
-    if (fragmentDestroyWatchers.size == 0) {
-      return
-    }
-
-    application.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks by noOpDelegate() {
-      override fun onActivityCreated(
-        activity: Activity,
-        savedInstanceState: Bundle?
-      ) {
-        for (watcher in fragmentDestroyWatchers) {
-          watcher(activity)
+        if (SDK_INT >= O) {
+            fragmentDestroyWatchers.add(
+                    AndroidOFragmentDestroyWatcher(objectWatcher, configProvider)
+            )
         }
-      }
-    })
-  }
 
-  ···
+        //AndroidX 
+        getWatcherIfAvailable(
+                ANDROIDX_FRAGMENT_CLASS_NAME,
+                ANDROIDX_FRAGMENT_DESTROY_WATCHER_CLASS_NAME,
+                objectWatcher,
+                configProvider
+        )?.let {
+            fragmentDestroyWatchers.add(it)
+        }
+
+        //Support 
+        getWatcherIfAvailable(
+                ANDROID_SUPPORT_FRAGMENT_CLASS_NAME,
+                ANDROID_SUPPORT_FRAGMENT_DESTROY_WATCHER_CLASS_NAME,
+                objectWatcher,
+                configProvider
+        )?.let {
+            fragmentDestroyWatchers.add(it)
+        }
+
+        if (fragmentDestroyWatchers.size == 0) {
+            return
+        }
+
+        application.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks by noOpDelegate() {
+            override fun onActivityCreated(
+                activity: Activity,
+                savedInstanceState: Bundle?
+            ) {
+                for (watcher in fragmentDestroyWatchers) {
+                    watcher(activity)
+                }
+            }
+        })
+    }
+
+    ···
 }
 ```
 由于 `AndroidXFragmentDestroyWatcher`、`AndroidSupportFragmentDestroyWatcher`、`AndroidOFragmentDestroyWatcher` 在逻辑上很类似，且就 `AndroidXFragmentDestroyWatcher` 同时提供了 `ViewModel` 内存泄露的检测功能，所以这里只看 `AndroidXFragmentDestroyWatcher` 就行
@@ -395,52 +395,52 @@ internal object FragmentDestroyWatcher {
 
 ```kotlin
 internal class AndroidXFragmentDestroyWatcher(
-  private val objectWatcher: ObjectWatcher,
-  private val configProvider: () -> Config
+    private val objectWatcher: ObjectWatcher,
+    private val configProvider: () -> Config
 ) : (Activity) -> Unit {
 
-  private val fragmentLifecycleCallbacks = object : FragmentManager.FragmentLifecycleCallbacks() {
+    private val fragmentLifecycleCallbacks = object : FragmentManager.FragmentLifecycleCallbacks() {
 
-    override fun onFragmentCreated(
-      fm: FragmentManager,
-      fragment: Fragment,
-      savedInstanceState: Bundle?
-    ) {
-      ViewModelClearedWatcher.install(fragment, objectWatcher, configProvider)
+        override fun onFragmentCreated(
+            fm: FragmentManager,
+            fragment: Fragment,
+            savedInstanceState: Bundle?
+        ) {
+            ViewModelClearedWatcher.install(fragment, objectWatcher, configProvider)
+        }
+
+        override fun onFragmentViewDestroyed(
+            fm: FragmentManager,
+            fragment: Fragment
+        ) {
+            val view = fragment.view
+            if (view != null && configProvider().watchFragmentViews) {
+                objectWatcher.watch(
+                        view, "${fragment::class.java.name} received Fragment#onDestroyView() callback " +
+                        "(references to its views should be cleared to prevent leaks)"
+                )
+            }
+        }
+
+        override fun onFragmentDestroyed(
+            fm: FragmentManager,
+            fragment: Fragment
+        ) {
+            if (configProvider().watchFragments) {
+                objectWatcher.watch(
+                        fragment, "${fragment::class.java.name} received Fragment#onDestroy() callback"
+                )
+            }
+        }
     }
 
-    override fun onFragmentViewDestroyed(
-      fm: FragmentManager,
-      fragment: Fragment
-    ) {
-      val view = fragment.view
-      if (view != null && configProvider().watchFragmentViews) {
-        objectWatcher.watch(
-            view, "${fragment::class.java.name} received Fragment#onDestroyView() callback " +
-            "(references to its views should be cleared to prevent leaks)"
-        )
-      }
+    override fun invoke(activity: Activity) {
+        if (activity is FragmentActivity) {
+            val supportFragmentManager = activity.supportFragmentManager
+            supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, true)
+            ViewModelClearedWatcher.install(activity, objectWatcher, configProvider)
+        }
     }
-
-    override fun onFragmentDestroyed(
-      fm: FragmentManager,
-      fragment: Fragment
-    ) {
-      if (configProvider().watchFragments) {
-        objectWatcher.watch(
-            fragment, "${fragment::class.java.name} received Fragment#onDestroy() callback"
-        )
-      }
-    }
-  }
-
-  override fun invoke(activity: Activity) {
-    if (activity is FragmentActivity) {
-      val supportFragmentManager = activity.supportFragmentManager
-      supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, true)
-      ViewModelClearedWatcher.install(activity, objectWatcher, configProvider)
-    }
-  }
 }
 ```
 Fragment 和 FragmentView 走向 `Destroyed` 时，正常情况下它们都是不会被复用的，应该会很快就被 GC 回收，且它们本质上都只是一种对象，所以直接使用 `ObjectWatcher` 进行检测即可
@@ -457,47 +457,47 @@ Fragment 和 FragmentView 走向 `Destroyed` 时，正常情况下它们都是�
 
 ```kotlin
 internal class ViewModelClearedWatcher(
-        storeOwner: ViewModelStoreOwner,
-        private val objectWatcher: ObjectWatcher,
-        private val configProvider: () -> Config
+                storeOwner: ViewModelStoreOwner,
+                private val objectWatcher: ObjectWatcher,
+                private val configProvider: () -> Config
 ) : ViewModel() {
 
-    private val viewModelMap: Map<String, ViewModel>?
+        private val viewModelMap: Map<String, ViewModel>?
 
-    init {
-        // We could call ViewModelStore#keys with a package spy in androidx.lifecycle instead,
-        // however that was added in 2.1.0 and we support AndroidX first stable release. viewmodel-2.0.0
-        // does not have ViewModelStore#keys. All versions currently have the mMap field.
-        viewModelMap = try {
-            val mMapField = ViewModelStore::class.java.getDeclaredField("mMap")
-            mMapField.isAccessible = true
-            @Suppress("UNCHECKED_CAST")
-            mMapField[storeOwner.viewModelStore] as Map<String, ViewModel>
-        } catch (ignored: Exception) {
-            null
+        init {
+                // We could call ViewModelStore#keys with a package spy in androidx.lifecycle instead,
+                // however that was added in 2.1.0 and we support AndroidX first stable release. viewmodel-2.0.0
+                // does not have ViewModelStore#keys. All versions currently have the mMap field.
+                viewModelMap = try {
+                        val mMapField = ViewModelStore::class.java.getDeclaredField("mMap")
+                        mMapField.isAccessible = true
+                        @Suppress("UNCHECKED_CAST")
+                        mMapField[storeOwner.viewModelStore] as Map<String, ViewModel>
+                } catch (ignored: Exception) {
+                        null
+                }
         }
-    }
 
-    override fun onCleared() {
-        if (viewModelMap != null && configProvider().watchViewModels) {
-            viewModelMap.values.forEach { viewModel ->
-                objectWatcher.watch(
-                        viewModel, "${viewModel::class.java.name} received ViewModel#onCleared() callback"
-                )
-            }
+        override fun onCleared() {
+                if (viewModelMap != null && configProvider().watchViewModels) {
+                        viewModelMap.values.forEach { viewModel ->
+                                objectWatcher.watch(
+                                                viewModel, "${viewModel::class.java.name} received ViewModel#onCleared() callback"
+                                )
+                        }
+                }
         }
-    }
 
-    companion object {
-        fun install(storeOwner: ViewModelStoreOwner, objectWatcher: ObjectWatcher, configProvider: () -> Config) {
-            val provider = ViewModelProvider(storeOwner, object : Factory {
-              @Suppress("UNCHECKED_CAST")
-              override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-                      ViewModelClearedWatcher(storeOwner, objectWatcher, configProvider) as T
-            })
-            provider.get(ViewModelClearedWatcher::class.java)
+        companion object {
+                fun install(storeOwner: ViewModelStoreOwner, objectWatcher: ObjectWatcher, configProvider: () -> Config) {
+                        val provider = ViewModelProvider(storeOwner, object : Factory {
+                            @Suppress("UNCHECKED_CAST")
+                            override fun <T : ViewModel?> create(modelClass: Class<T>): T =
+                                            ViewModelClearedWatcher(storeOwner, objectWatcher, configProvider) as T
+                        })
+                        provider.get(ViewModelClearedWatcher::class.java)
+                }
         }
-    }
 }
 ```
 # 七、检测到内存泄露后的流程
@@ -572,23 +572,23 @@ class ObjectWatcher constructor(private val clock: Clock, private val checkRetai
 ```kotlin
 internal object InternalAppWatcher {
 
-  ···	
-    
-  private val mainHandler by lazy {
-    Handler(Looper.getMainLooper())
-  }
+    ···   
 
-  private val checkRetainedExecutor = Executor {
-    mainHandler.postDelayed(it, AppWatcher.config.watchDurationMillis)
-  }
-  
-  val objectWatcher = ObjectWatcher(
-      clock = clock,
-      checkRetainedExecutor = checkRetainedExecutor,
-      isEnabled = { true }
-  )
+    private val mainHandler by lazy {
+        Handler(Looper.getMainLooper())
+    }
 
-  ···
+    private val checkRetainedExecutor = Executor {
+        mainHandler.postDelayed(it, AppWatcher.config.watchDurationMillis)
+    }
+
+    val objectWatcher = ObjectWatcher(
+            clock = clock,
+            checkRetainedExecutor = checkRetainedExecutor,
+            isEnabled = { true }
+    )
+
+    ···
 
 }
 ```
@@ -601,11 +601,11 @@ internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedList
     
     override fun onObjectRetained() = scheduleRetainedObjectCheck()
 
-	fun scheduleRetainedObjectCheck() {
-    	if (this::heapDumpTrigger.isInitialized) {
-      		heapDumpTrigger.scheduleRetainedObjectCheck()
-    	}
- 	}
+    fun scheduleRetainedObjectCheck() {
+        if (this::heapDumpTrigger.isInitialized) {
+            heapDumpTrigger.scheduleRetainedObjectCheck()
+        }
+    }
     
     ···
     
@@ -783,20 +783,20 @@ internal class HeapDumpTrigger(
 
 ## 1、检测任意对象
 
-除了 LeakCanary 默认支持的四种类型外，我们还可以主动检测任意对象。例如，可以检测 Service： 
+除了 LeakCanary 默认支持的四种类型外，我们还可以主动检测任意对象。例如，可以检测 Service：
 
 ```kotlin
 class MyService : Service {
 
-  // ...
+    // ...
 
-  override fun onDestroy() {
-    super.onDestroy()
-    AppWatcher.objectWatcher.watch(
-      watchedObject = this,
-      description = "MyService received Service#onDestroy() callback"
-    )
-  }
+    override fun onDestroy() {
+        super.onDestroy()
+        AppWatcher.objectWatcher.watch(
+            watchedObject = this,
+            description = "MyService received Service#onDestroy() callback"
+        )
+    }
 }
 ```
 ## 2、更改配置项
@@ -806,10 +806,10 @@ LeakCanary 提供的默认配置项大多数情况已经很适合我们在项目
 ```kotlin
 class DebugExampleApplication : Application() {
 
-  override fun onCreate() {
-    super.onCreate()
-    AppWatcher.config = AppWatcher.config.copy(watchFragmentViews = false)
-  }
+    override fun onCreate() {
+        super.onCreate()
+        AppWatcher.config = AppWatcher.config.copy(watchFragmentViews = false)
+    }
 }
 ```
 由于 LeakCanary 的引用方式是 `debugImplementation`，在 `releas` 环境下是引用不到 LeakCanary 的，所以为了避免在生成 `release` 包时需要主动来删除这行配置项，需要将 `DebugExampleApplication` 放到 `src/debug/java` 文件夹中
@@ -818,4 +818,4 @@ class DebugExampleApplication : Application() {
 
 可以看出 **Activity、Fragment、FragmentView、ViewModel** 等四种类型的内存检测都是需要依靠 `ObjectWatcher` 来完成的，因为这四种类型本质上都是属于不同的对象。而 `ObjectWatcher` 需要依靠引用队列 `ReferenceQueue` 来实现，因此 LeakCanary 的基本实现基础就是来源于 Java 的原生特性
 
-LeakCanary 的整体源码讲得也差不多了，后边就再来写一篇关于**内存泄露**的扩展阅读 😂😂
+LeakCanary 的整体源码讲得也差不多了，后边就再来写一篇关于**内存泄露**的扩展阅读
