@@ -280,7 +280,6 @@ ssh-keygen -t rsa -C "initobject@gmail.com"（自己的邮箱地址）
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-24d01646685bcf1a?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-
 此时，我们要做的是把在本地电脑的工程提交到GitHub，所以需要先在GitHub上建立一个仓库，工程名和描述可以随意写
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-d7ee1e726efd1a78?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)

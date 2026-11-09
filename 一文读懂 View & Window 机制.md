@@ -594,10 +594,10 @@ void makeVisible() {
 最近比较倾向于只用一篇文章来写一个知识点，也懒得总是想文章标题，就一直沿用一开始用的**一文读懂XXX**，写着写着也攒了蛮多篇文章了，之前也已经写了几篇关于 View 系统的文章，希望对你有所帮助
 
 - [一文读懂 View 的 Measure、Layout、Draw 流程](https://juejin.cn/post/6939540905581887502)
-- [一文读懂 View.Post 的原理及缺陷](https://juejin.cn/post/6939763855216082974)
+- [一文读懂 View Post 的原理及缺陷](https://juejin.cn/post/6939763855216082974)
 - [一文读懂 View 事件分发机制](https://juejin.cn/post/6931914294980411406)
-- [一文读懂 Handler 机制全家桶](https://juejin.cn/post/6901682664617705485)
+- [一文读懂 Handler 机制](https://juejin.cn/post/6901682664617705485)
 - [一文读懂 SharedPreferences 的缺陷及一点点思考](https://juejin.cn/post/6932277268110639112)
-- [一文读懂 Java & Kotlin 泛型难点](https://juejin.cn/post/6935322686943920159)
+- [一文读懂 Java 和 Kotlin 的泛型难点](https://juejin.cn/post/6935322686943920159)
 - [一文快速入门 Kotlin 协程](https://juejin.cn/post/6908271959381901325)
 - [一文快速入门 ConstraintLayout](https://juejin.cn/post/6911710012750430215)

@@ -20,7 +20,6 @@ ConstraintLayout 最基本的属性控制有以下几个，即 layout_constraint
  - layout_constraintEnd_toStartOf
  - layout_constraintEnd_toEndOf
 
-
 各个方位的参照图可以看以下图片
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-fcbaeb45150186d9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)

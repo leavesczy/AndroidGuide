@@ -362,7 +362,7 @@ class OptimizedThreadTransform(private val config: OptimizedThreadConfig) : Base
 
 所以说，在针对线程池进行整治的时候，需要同时考虑该线程池是应用于什么业务场景，根据用途来进行特殊配置
 
-关于线程池的实现细节，可以看我写的一篇 ThreadPoolExecutor 解读文章，对设计初衷和实现始末进行了详细介绍：[聊聊 Java 多线程（5）-超详细的 ThreadPoolExecutor 源码解析](https://juejin.cn/post/6901317365561032712)
+关于线程池的实现细节，可以看我写的一篇 ThreadPoolExecutor 解读文章，对设计初衷和实现始末进行了详细介绍：[Java 多线程编程（五）- 超详细的 ThreadPoolExecutor 源码解析](https://juejin.cn/post/6901317365561032712)
 
 # 四、源码
 

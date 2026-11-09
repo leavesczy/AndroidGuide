@@ -103,7 +103,7 @@ internal sealed class AppWatcherInstaller : ContentProvider() {
 ```
 由于 `ContentProvider` 会在 `Application` 被创建之前就由系统调用其 `onCreate()` 方法来完成初始化，所以 LeakCanary 通过 `AppWatcherInstaller` 就可以拿到 `Context` 来完成初始化并随应用一起启动，通过这种方式就简化了使用者的引入成本。而且由于我们的引用方式是 `debugImplementation`，所以**正式版本**会自动移除对 LeakCanary 的所有引用，进一步简化了引入成本
 
-Jetpack 也包含了一个组件来实现**通过 ContentProvider 来完成初始化的逻辑**：[AppStartup](https://juejin.im/post/6847902224069165070)。在实现思路上两者很类似，但是如果每个三方库都通过自定义 `ContentProvider` 来实现初始化的话，那么应用的启动速度就会很感人了吧 :joy:，所以 Jetpack 官方推出的 `AppStartup` 应该是以后的主流才对
+Jetpack 也包含了一个组件来实现**通过 ContentProvider 来完成初始化的逻辑**：[从源码看 Jetpack（五）- Startup 源码详解](https://juejin.im/post/6847902224069165070)。在实现思路上两者很类似，但是如果每个三方库都通过自定义 `ContentProvider` 来实现初始化的话，那么应用的启动速度就会很感人了吧 :joy:，所以 Jetpack 官方推出的 `AppStartup` 应该是以后的主流才对
 
 `AppWatcherInstaller` 最终会将 `Application` 对象传给 `InternalAppWatcher` 的 `install(Application)` 方法
 
@@ -447,7 +447,7 @@ Fragment 和 FragmentView 走向 `Destroyed` 时，正常情况下它们都是�
 
 # 六、ViewModelClearedWatcher：检测ViewModel
 
-和 Fragment、FragmentView 相比，ViewModel 就比较特殊了，由于可能存在一个 Activity 和多个 Fragment 同时持有一个 ViewModel 实例的情况，而 leakcanary 无法知道 ViewModel 到底是同时被几个持有者所持有，所以无法通过单独一个 Activity 和 Fragment 的 `Destroyed` 回调来启动对 ViewModel 的检测。幸好 ViewMode 也提供了 `onCleared()` 的回调事件，leakcanary 就通过该回调来知道 ViewModel 是什么时候需要被回收。对 ViewModel 的实现原理不清楚的同学可以看我的这篇文章：[从源码看 Jetpack（6）-ViewModel源码详解](https://juejin.im/post/6873356946896846856)
+和 Fragment、FragmentView 相比，ViewModel 就比较特殊了，由于可能存在一个 Activity 和多个 Fragment 同时持有一个 ViewModel 实例的情况，而 leakcanary 无法知道 ViewModel 到底是同时被几个持有者所持有，所以无法通过单独一个 Activity 和 Fragment 的 `Destroyed` 回调来启动对 ViewModel 的检测。幸好 ViewMode 也提供了 `onCleared()` 的回调事件，leakcanary 就通过该回调来知道 ViewModel 是什么时候需要被回收。对 ViewModel 的实现原理不清楚的同学可以看我的这篇文章：[从源码看 Jetpack（六）- ViewModel 源码详解](https://juejin.im/post/6873356946896846856)
 
 `ViewModelClearedWatcher` 的主要逻辑是：
 

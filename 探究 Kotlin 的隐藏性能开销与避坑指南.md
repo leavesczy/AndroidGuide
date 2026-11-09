@@ -606,7 +606,6 @@ public final class UserBean {
 
 其实，通过查看 Gson 内部源码，可以知道 Gson 是通过 Unsafe 包来实例化 UserBean 对象的，Unsafe 提供了一个非常规实例化对象的方法：`allocateInstance`，该方法提供了通过 Class 对象就可以创建出相应实例的功能，而且不需要调用其构造函数、初始化代码、JVM 安全检查等，即使构造函数是 private 的也能通过此方法进行实例化。因此 Gson 实际上并不会调用到 UserBean 的构造函数，相当于绕过了 Kotlin 的 null 检查，所以即使 userName 值为 null 最终也能够反序列化成功
 
-
 ![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/af135d36b80341e68befd0c0bbe091ce~tplv-k3u1fbpfcp-watermark.image?)
 
 此问题的出现场景大多是在移动端解析服务端传来的数据的时候，移动端将数据声明为非空类型，但服务端给过来的数据却为 null 值，此时用户看到的可能就是应用崩溃了……
@@ -717,7 +716,7 @@ Kotlin 这套为属性自动生成 `getValue` 和 `setValue` 方法的机制有�
 
 # 推荐阅读
 
-- [Gson 和 Kotlin data class 的避坑指南](https://juejin.cn/post/6908391430977224718)
+- [Gson 和 Kotlin Data Class 的避坑指南](https://juejin.cn/post/6908391430977224718)
 
   更加详细地介绍了 Gson 和 Kotlin data class 在配套使用时可能出现的坑，值得一看 ！！！
 

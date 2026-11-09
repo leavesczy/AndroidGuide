@@ -393,7 +393,6 @@ git branch -a
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-c866f39924de80a5?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-
 切换回master分支，为1.txt文件增添一个单词：**object**
 现在的内容应该是
 

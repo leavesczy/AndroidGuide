@@ -480,7 +480,6 @@ public class HandlersReferenceLeakActivity extends AppCompatActivity {
      * */
      private Handler leakyHandler = new Handler();
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -570,7 +569,6 @@ public class ThreadReferenceLeakActivity extends AppCompatActivity {
         redirectToNewScreen();
     }
 
-
     private void createThread() {
         thread = new LeakyThread();
         thread.start();
@@ -579,7 +577,6 @@ public class ThreadReferenceLeakActivity extends AppCompatActivity {
     private void redirectToNewScreen() {
         startActivity(new Intent(this, SecondActivity.class));
     }
-
 
     /*
      * Mistake Number 2: Non-static anonymous classes hold an 

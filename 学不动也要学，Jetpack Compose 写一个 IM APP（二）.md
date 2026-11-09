@@ -1,4 +1,4 @@
-历经两年的打磨，在 2021 年七月底的时候，Google 终于发布了 Jetpack Compose 的正式版本。我对 Jetpack Compose 的很多特性都很感兴趣，也觉得其很可能会成为以后 Android 原生应用开发时的首选技术方案，所以在正式版发布之前就开始了一次实战演练，花了两个月时间断断续续写了一个完全用 Jetpack Compose 实现的 IM APP，实现了基本的聊天功能，同时也写了一篇文章对其进行介绍：[学不动也要学，Jetpack Compose 写一个 IM APP](https://juejin.cn/post/6991429231821684773)
+历经两年的打磨，在 2021 年七月底的时候，Google 终于发布了 Jetpack Compose 的正式版本。我对 Jetpack Compose 的很多特性都很感兴趣，也觉得其很可能会成为以后 Android 原生应用开发时的首选技术方案，所以在正式版发布之前就开始了一次实战演练，花了两个月时间断断续续写了一个完全用 Jetpack Compose 实现的 IM APP，实现了基本的聊天功能，同时也写了一篇文章对其进行介绍：[学不动也要学，Jetpack Compose 写一个 IM APP（一）](https://juejin.cn/post/6991429231821684773)
 
 在文章中，我以 [compose_chat](https://github.com/leavesczy/compose_chat) 为例，详细地介绍了 Jetpack Compose 的很多重要概念和基础特性，包括：
 
@@ -307,7 +307,7 @@ fun ChatScreen() {
 
 在 Jetpack Compose 中，我们的业务处理逻辑应该都是放在 ViewModel 中的，可组合函数不应该包含任何业务处理逻辑，而应该只根据入参参数的变化来进行视图更新
 
-为了能够在可组合函数中**创建**或者是**拿到已有的** ViewModel 实例，一个必要的前提就是当前可组合函数要拥有 ViewModelStoreOwner 实例，两者的关系可以看我的另一篇文章：[从源码看 Jetpack（6）-ViewModel 源码详解](https://juejin.cn/post/6873356946896846856)
+为了能够在可组合函数中**创建**或者是**拿到已有的** ViewModel 实例，一个必要的前提就是当前可组合函数要拥有 ViewModelStoreOwner 实例，两者的关系可以看我的另一篇文章：[从源码看 Jetpack（六）- ViewModel 源码详解](https://juejin.cn/post/6873356946896846856)
 
 简单来说就是 ViewModel 需要依靠 ViewModelStoreOwner 来创建和存储，所有 ViewModel 实例都需要保存在 ViewModelStoreOwner 中，详情可以去看我的源码解读文章，这里不再赘述
 
@@ -820,7 +820,7 @@ fun CoilImage(
 }
 ```
 
-关于 Coil 的详细源码介绍可以看我的另一篇文章，当时 Coil 刚发布 1.0 正式版本不久我就写了这篇文章：[三方库源码笔记（13）-可能是全网第一篇 Coil 的源码分析文章](https://juejin.cn/post/6897872882051842061)
+关于 Coil 的详细源码介绍可以看我的另一篇文章，当时 Coil 刚发布 1.0 正式版本不久我就写了这篇文章：[Android 主流开源库源码分析（十三）- 可能是全网第一篇 Coil 源码分析文章](https://juejin.cn/post/6897872882051842061)
 
 # 九、结尾
 

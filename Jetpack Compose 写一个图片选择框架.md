@@ -499,7 +499,6 @@ class SmartCaptureStrategy(private val authority: String) : CaptureStrategy {
 | MediaStoreCaptureStrategy | Android 10 之前需要 WRITE_EXTERNAL_STORAGE 权限，Android 10 开始不需要权限 | 无 | 是，图片存储在系统相册内，对用户可见 |
 | SmartCaptureStrategy | 无 | 需要配置 FileProvider | 在 Android 10 之前的系统版本不可见，和 FileProviderCaptureStrategy 一样。在 Android 10 开始之后的系统版本可见，和 MediaStoreCaptureStrategy 一样 |
 
-
 开发者根据自己的实际情况来选择拍照策略：
 
 - 如果应用本身就需要申请 WRITE_EXTERNAL_STORAGE 权限的话，选 MediaStoreCaptureStrategy，拍摄的图片会保存在系统相册中也比较符合用户的认知

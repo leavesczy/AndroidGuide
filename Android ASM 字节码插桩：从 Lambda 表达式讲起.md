@@ -2,10 +2,10 @@
 
 我之前就写过几篇文章，介绍了几种通过 ASM 实现字节码插桩的案例
 
-- [ASM 字节码插桩：实现双击防抖](https://juejin.cn/post/7042328862872567838)
-- [ASM 字节码插桩：进行线程整治](https://juejin.cn/post/7044339202997092383)
-- [ASM 字节码插桩：助力隐私合规](https://juejin.cn/post/7046207125785149448)
-- [ASM 字节码插桩：监控大图加载](https://juejin.cn/post/7074970389188706318)
+- [Android ASM 字节码插桩：实现双击防抖](https://juejin.cn/post/7042328862872567838)
+- [Android ASM 字节码插桩：进行线程整治](https://juejin.cn/post/7044339202997092383)
+- [Android ASM 字节码插桩：助力隐私合规](https://juejin.cn/post/7046207125785149448)
+- [Android ASM 字节码插桩：监控大图加载](https://juejin.cn/post/7074970389188706318)
 
 本篇文章再来详细介绍下在实现字节码插桩的过程中，我们难免会遇到的一个难点，也即从 Java 8 开始支持的一个新语法：Lambda 表达式，再以此扩展介绍向 Lambda 表达式进行字节码插桩的大致思路
 
@@ -19,14 +19,14 @@
 public class Lambda {
 
     private void lambda() {
-        Runnable runnable =
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        System.out.println("Hello World!");
-                    }
-                };
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Hello World!");
+            }
+        };
     }
+
 }
 ```
 

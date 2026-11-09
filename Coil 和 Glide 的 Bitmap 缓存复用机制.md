@@ -692,7 +692,7 @@ public abstract class BitmapTransformation implements Transformation<Bitmap> {
 
 # 五、相关联文章
 
-- [三方库源码笔记（9）-超详细的 Glide 源码详解](https://juejin.im/post/6891307560557608967)
-- [三方库源码笔记（10）-Glide 你可能不知道的知识点](https://juejin.im/post/6892751013544263687)
-- [三方库源码笔记（13）-可能是全网第一篇 Coil 的源码分析文章](https://juejin.cn/post/6897872882051842061)
-- [聊聊 Bitmap 的一些知识点](https://juejin.cn/post/6952429810207424526)
+- [Android 主流开源库源码分析（九）- Glide 源码详解](https://juejin.im/post/6891307560557608967)
+- [Android 主流开源库源码分析（十）- Glide 你可能不知道的知识点](https://juejin.im/post/6892751013544263687)
+- [Android 主流开源库源码分析（十三）- 可能是全网第一篇 Coil 源码分析文章](https://juejin.cn/post/6897872882051842061)
+- [探究 Bitmap 的优化手段](https://juejin.cn/post/6952429810207424526)

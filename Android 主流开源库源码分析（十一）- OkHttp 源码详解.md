@@ -939,6 +939,6 @@ completed
 
 关于 OkHttp 的源码讲解到这里就结束了，但本文还缺少了对 ConnectInterceptor 和 CallServerInterceptor 的讲解，这两者是 OkHttp 完成实际网络请求的地方，涉及到了 Connection 和 Socket 这些比较底层的领域，我没法讲得多清晰，就直接略过这块内容了~~
 
-OkHttp 的运行效率很高，但在使用上还是比较原始，一般我们还是需要在 OkHttp 之上进行一层封装，Retrofit 就是一个对 OkHttp 的优秀封装库，对 Retrofit 的源码讲解可以看我的这篇文章：[三方库源码笔记（7）-Retrofit 源码详解](https://juejin.im/post/6886121327845965838)
+OkHttp 的运行效率很高，但在使用上还是比较原始，一般我们还是需要在 OkHttp 之上进行一层封装，Retrofit 就是一个对 OkHttp 的优秀封装库，对 Retrofit 的源码讲解可以看我的这篇文章：[Android 主流开源库源码分析（七）- Retrofit 源码详解](https://juejin.im/post/6886121327845965838)
 
 下篇文章就来写关于 OkHttp 拦截器的实战内容吧

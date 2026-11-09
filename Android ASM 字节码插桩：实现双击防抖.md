@@ -459,7 +459,6 @@ fun MethodNode.hasCheckViewAnnotation(config: DoubleClickConfig): Boolean {
     return hasAnnotation(config.formatCheckViewOnClickAnnotation)
 }
 
-
 val methodNameWithDesc = methodNode.nameWithDesc
 if (methodNode.onlyOneViewParameter) {
     if (methodNode.hasCheckViewAnnotation(config)) {

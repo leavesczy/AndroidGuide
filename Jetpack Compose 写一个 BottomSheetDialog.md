@@ -290,7 +290,6 @@ BottomSheetDialog(
     DialogContent()
 }
 
-
 @Composable
 private fun DialogContent(onDismissRequest: () -> Unit) {
     Column(

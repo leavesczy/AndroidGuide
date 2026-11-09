@@ -372,7 +372,6 @@ public class StartIntentServiceActivity extends AppCompatActivity {
 
 #### **4.1.5、要断开与服务的连接需调用 unbindService()方法。如果应用在客户端仍处于绑定状态时销毁客户端，会导致客户端取消绑定，更好的做法是在客户端与服务交互完成后立即取消绑定客户端，这样可以关闭空闲服务**
 
-
 示例代码：
 ```java
 public class MyBindService extends Service {
@@ -501,8 +500,6 @@ public class BindServiceActivity extends AppCompatActivity {
  - 如果只需要在 Activity 可见时与服务交互，则应在 onStart() 期间绑定，在 onStop() 期间取消绑定
  - 如果希望 Activity 在后台停止运行状态下仍可接收响应，则可在 onCreate() 期间绑定，在 onDestroy() 期间取消绑定。这意味着 Activity 在其整个运行过程中（包括后台运行期间）都需要使用此服务
  - 通常情况下，切勿在 Activity 的 onResume() 和 onPause() 期间绑定和取消绑定，因为每一次生命周期转换都会发生这些回调，应该使发生在这些转换期间的处理保持在最低水平。假设有两个Activity需要绑定到同一服务，从Activity A跳转到Activity B，这个过程中会依次执行A-onPause，B-onCreate，B-onStart，B-onResume，A-onStop。这样系统会在A-onPause的时候销毁服务，又在B-onResume的时候重建服务。当Activity B回退到Activity A时，会依次执行B-onPause，A-onRestart，A-onStart，A-onResume，B-onStop，B-onDestroy。此时，系统会在B-onPause时销毁服务，又在A-onResume时重建服务。这样就造成了多次的销毁与重建，因此需要选定好绑定服务与取消绑定服务的时机
-
-
 
 ## **五、在前台运行Service**
 

@@ -501,7 +501,6 @@ private static Message getPostMessage(Runnable r) {
 
 4. 可以创建关联到另一个线程 Looper 的 Handler，只要本线程能够拿到另外一个线程的 Looper 实例
 
-
 ```java
         new Thread("Thread_1") {
             @Override

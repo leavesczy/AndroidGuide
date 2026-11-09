@@ -37,7 +37,7 @@ Android 13 在最近也发布了正式版，此次版本中新增的隐私安全
 
 几个月前我发布了一个开源库， 一个用 Jetpack Compose 实现的 Android 图片选择框架：[Matisse](https://github.com/leavesczy/Matisse)
 
-也发表了一篇文章进行介绍：[Jetpack Compose 实现一个图片选择框架](https://juejin.cn/post/7108420791502372895)
+也发表了一篇文章进行介绍：[Jetpack Compose 写一个图片选择框架](https://juejin.cn/post/7108420791502372895)
 
 ![](https://upload-images.jianshu.io/upload_images/2552605-8772ec10193468d5.png)
 

@@ -225,7 +225,6 @@ options.inJustDecodeBounds = false
 val bitmap = BitmapFactory.decodeResource(resources, R.drawable.icon_awe, options)
 imageView.setImageBitmap(bitmap)
 
-
 fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
     // Raw height and width of image
     val (height: Int, width: Int) = options.run { outHeight to outWidth }

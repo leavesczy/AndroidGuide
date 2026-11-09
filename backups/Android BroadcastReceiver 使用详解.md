@@ -335,8 +335,6 @@ public class MainActivity extends AppCompatActivity {
 | LocalBroadcastManager.getInstance(this).sendBroadcast(Intent) | 发送异步广播 |
 | LocalBroadcastManager.getInstance(this).sendBroadcastSync(Intent) | 发送同步广播 |
 
-
-
 首先，创建一个 BroadcastReceiver 用于接收本地广播
 
 ```java

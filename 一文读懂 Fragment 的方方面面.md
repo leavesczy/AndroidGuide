@@ -415,8 +415,8 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
 > 关于 Lifecycle 和 LiveData 的源码解析可以看这两篇文章：
 >
-> - [从源码看 Jetpack（1）-Lifecycle 源码详解](https://juejin.cn/post/6847902220755992589)
-> - [从源码看 Jetpack（3）-LiveData 源码详解](https://juejin.cn/post/6847902222345633806)
+> - [从源码看 Jetpack（一）- Lifecycle 源码详解](https://juejin.cn/post/6847902220755992589)
+> - [从源码看 Jetpack（三）- LiveData 源码详解](https://juejin.cn/post/6847902222345633806)
 
 ## 5、未来的计划
 
@@ -1045,7 +1045,7 @@ public void onDestroy() {
     ···
 }
 ```
-> 更多细节看这篇文章：[从源码看 Jetpack（1）-Lifecycle 源码详解](https://juejin.cn/post/6847902220755992589)
+> 更多细节看这篇文章：[从源码看 Jetpack（一）- Lifecycle 源码详解](https://juejin.cn/post/6847902220755992589)
 
 ### Glide
 
@@ -1113,7 +1113,7 @@ public class SupportRequestManagerFragment extends Fragment {
     }
 }
 ```
-> 更多细节看这篇文章：[三方库源码笔记（9）-Glide 源码详解](https://juejin.cn/post/6891307560557608967)
+> 更多细节看这篇文章：[Android 主流开源库源码分析（九）- Glide 源码详解](https://juejin.cn/post/6891307560557608967)
 
 ## 2、方法代理
 

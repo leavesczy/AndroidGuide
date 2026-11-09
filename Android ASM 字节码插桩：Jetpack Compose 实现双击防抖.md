@@ -2,14 +2,13 @@ Android 开发者们对 Jetpack Compose 应该已经很熟悉了吧？我在项�
 
 最近我想要来为项目做一些能够提升 **应用性能** 或者是 **用户体验** 的优化项，想了想就敲定了一个目标：通过字节码插桩的方式，来为项目中所有和 Jetpack Compose 关联的业务实现全局的双击防抖功能
 
-在之前，我已经为 Android 的 View 体系实现过相同的功能了：[ASM 字节码插桩：实现双击防抖](https://juejin.cn/post/7042328862872567838) ，想着在 Jetpack Compose 中应该也差不多，不会太麻烦，可在编码过程中才发现这一个功能并不好做，遇到了一些不太好解决的问题，后面来一一进行讲解
+在之前，我已经为 Android 的 View 体系实现过相同的功能了：[Android ASM 字节码插桩：实现双击防抖](https://juejin.cn/post/7042328862872567838) ，想着在 Jetpack Compose 中应该也差不多，不会太麻烦，可在编码过程中才发现这一个功能并不好做，遇到了一些不太好解决的问题，后面来一一进行讲解
 
 # 一、基本思路
 
 在 Jetpack Compose 中，我们一般都是通过 Modifier 的 `clickable` 或者 `combinedClickable` 这两个扩展函数来为可组合函数的点击事件设置监听，方法均位于 `compose.foundation` 库的 Clickable 类中，一共有四个方法可供使用
 
 `clickable` 和 `combinedClickable` 方法均包含了重载函数，差别只在于是否包含 `interactionSource` 和 `indication` 这两个入参参数，重载函数之间还是属于直接调用的关系，所以只需关注第二个和第四个方法即可
-
 
 ```kotlin
 fun Modifier.clickable(

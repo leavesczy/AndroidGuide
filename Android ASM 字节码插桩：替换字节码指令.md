@@ -9,7 +9,7 @@ Track 在 v1.0.0 版本包含以下四个功能点：
 
 最近有位同学向 Track 提了一个 [issues](https://github.com/leavesczy/Track/issues/6)，说希望我为 Track 添加一个代码替换功能，其本意是 **想要将项目中所有获取 Android ID 的方法指向到其它自定义的方法**
 
-这个需求也许是来源于当前国内严格的隐私安全合规要求：在用户同意隐私协议之前，应用不能有收集用户隐私数据（Android ID、Device ID、MAC）的行为。这就和我以前写过的一篇文章有点关系了：[ASM 字节码插桩：助力隐私合规](https://juejin.cn/post/7046207125785149448)
+这个需求也许是来源于当前国内严格的隐私安全合规要求：在用户同意隐私协议之前，应用不能有收集用户隐私数据（Android ID、Device ID、MAC）的行为。这就和我以前写过的一篇文章有点关系了：[Android ASM 字节码插桩：助力隐私合规](https://juejin.cn/post/7046207125785149448)
 
 在这篇文章里，我介绍了如何通过字节码插桩的方式来定位项目中的隐私合规问题，以 **静态扫描** 加上 **动态记录** 的方式来排查当前项目中所有的隐私操作。这种方式已经能够排查出大部分的隐私合规问题了，但并不保险。因为随着项目更迭，随时可能有新的隐私安全问题被引入进来，而如果每次发版前都要重新走一遍上述流程来排查问题的话，效率也十分感人。更为保险的做法应该是直接拦截项目中所有获取敏感数据的方法，根据用户是否已同意隐私协议来动态决定是否要真正去执行敏感操作
 
@@ -346,7 +346,7 @@ internal object OptimizedExecutors {
 
 > `optimizedThreadTrack` 和 `toastTrack` 均都是通过 `replaceMethodTrack` 来实现的，Track 仅是对其进行了封装，使其更加容易接入。开发者直接通过 `replaceMethodTrack` 也可以实现相同的功能。也正因如此，`toastTrack` 和 `optimizedThreadTrack` 才要求开发者自定义的方法名必须和原始的方法名保持一致，这样 Track 才能将方法一一对应上
 
-我之所以会想到要开发 `optimizedThreadTrack` 这个功能点，也是源于我以前的一篇文章：[ASM 字节码插桩：进行线程整治](https://juejin.cn/post/7044339202997092383)，更多的应用场景可以参照该文章
+我之所以会想到要开发 `optimizedThreadTrack` 这个功能点，也是源于我以前的一篇文章：[Android ASM 字节码插桩：进行线程整治](https://juejin.cn/post/7044339202997092383)，更多的应用场景可以参照该文章
 
 需要注意，上述的手段并不全是可以在项目中进行全盘套用的
 
@@ -356,7 +356,7 @@ internal object OptimizedExecutors {
 
 所以说，在针对线程池进行整治的时候，需要同时考虑该线程池是应用于什么业务场景，根据用途来进行特殊配置
 
-关于线程池的实现细节，可以看我写的一篇 ThreadPoolExecutor 解读文章，对设计初衷和实现始末进行了详细介绍：[聊聊 Java 多线程（5）-超详细的 ThreadPoolExecutor 源码解析](https://juejin.cn/post/6901317365561032712)
+关于线程池的实现细节，可以看我写的一篇 ThreadPoolExecutor 解读文章，对设计初衷和实现始末进行了详细介绍：[Java 多线程编程（五）- 超详细的 ThreadPoolExecutor 源码解析](https://juejin.cn/post/6901317365561032712)
 
 ## Github
 

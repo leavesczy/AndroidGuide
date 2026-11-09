@@ -189,8 +189,8 @@ Coil 在我看来是一个比较“**激进**”的开源库，热衷于使用�
 
 > 关于 Glide 的源码解析可以看我的这两篇文章：
 >
-> - [三方库源码笔记（9）-超详细的 Glide 源码详解](https://juejin.im/post/6891307560557608967)
-> - [三方库源码笔记（10）-Glide 你可能不知道的知识点](https://juejin.im/post/6892751013544263687)
+> - [Android 主流开源库源码分析（九）- Glide 源码详解](https://juejin.im/post/6891307560557608967)
+> - [Android 主流开源库源码分析（十）- Glide 你可能不知道的知识点](https://juejin.im/post/6892751013544263687)
 
 我看源码时习惯从最基础的使用方式来入手，分析其整个调用链关系和会涉及到的模块，这里也不例外，就从 Coil 加载一张网络图片来入手
 
@@ -665,7 +665,7 @@ private suspend fun executeMain(initialRequest: ImageRequest, type: Int): ImageR
 ```
 `executeChain` 方法就比较有意思了，有看过 OkHttp 源码的同学应该会对 RealInterceptorChain 有点印象，OkHttp 的拦截器就是通过该同名类来实现的，很显然 Coil 借鉴了 OkHttp 的实现思路，极大方便了后续功能扩展，也给了外部控制整个图片加载流程的入口，可扩展性 +100
 
-> 不了解 OkHttp 的 RealInterceptorChain 实现思路的可以看我的这篇文章，这里不再赘述：[三方库源码笔记（11）-OkHttp 源码详解](https://juejin.cn/post/6895369745445748749)
+> 不了解 OkHttp 的 RealInterceptorChain 实现思路的可以看我的这篇文章，这里不再赘述：[Android 主流开源库源码分析（十一）- OkHttp 源码详解](https://juejin.cn/post/6895369745445748749)
 
 ```kotlin
 private val interceptors = registry.interceptors + EngineInterceptor(registry, bitmapPool, referenceCounter,

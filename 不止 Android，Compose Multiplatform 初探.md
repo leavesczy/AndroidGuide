@@ -1,6 +1,6 @@
 在 2021 年的七月份，Google 发布了 Jetpack Compose 的 1.0 正式版本，这是一个适用于 Android 平台的声明式 UI 开发框架，可供开发者在生产环境中使用。到了十二月份，JetBrains 也随之发布了适用于多个平台的声明式 UI 开发框架 Compose Multiplatform 的 1.0 正式版本，意味着此时也适用于商业项目了
 
-既然 Compose Multiplatform 发布了正式版，我也想着来做一次实践，之前我曾经用 Jetpack Compose 写了一个 **俄罗斯方块** 小游戏：[学不动也要学，Jetpack Compose 玩一把俄罗斯方块](https://juejin.cn/post/6974585048762679310)，由于整个应用的逻辑和 UI 都是完全用 Kotlin 和 Jetpack Compose 实现的，因此很简单地就通过 Compose Multiplatform 将其移植到了 Windows 平台：[compose_tetris](https://github.com/leavesczy/compose_tetris)
+既然 Compose Multiplatform 发布了正式版，我也想着来做一次实践，之前我曾经用 Jetpack Compose 写了一个 **俄罗斯方块** 小游戏：[学不动也要学，Jetpack Compose 写一个俄罗斯方块](https://juejin.cn/post/6974585048762679310)，由于整个应用的逻辑和 UI 都是完全用 Kotlin 和 Jetpack Compose 实现的，因此很简单地就通过 Compose Multiplatform 将其移植到了 Windows 平台：[compose_tetris](https://github.com/leavesczy/compose_tetris)
 
 整个移除过程十分顺利，移植成本不高，最终效果看着也不错，此文章就来简单讲讲 Compose Multiplatform 的一些小细节，希望对你有所帮助 ~
 
@@ -315,7 +315,7 @@ class DesktopTetrisViewModel(delegate: TetrisLogicImpl) : ITetrisLogic by delega
 
 从 Jetpack Compose 发布正式版那段时间起，我先后写了几篇关于 Jetpack Compose 的文章，可以帮助读者更快入门，希望对你有所帮助 ~
 
-- [学不动也要学，Jetpack Compose 玩一把俄罗斯方块](https://juejin.cn/post/6974585048762679310)
+- [学不动也要学，Jetpack Compose 写一个俄罗斯方块](https://juejin.cn/post/6974585048762679310)
 - [学不动也要学，Jetpack Compose 写一个 IM APP（一）](https://juejin.cn/post/6991429231821684773)
 - [学不动也要学，Jetpack Compose 写一个 IM APP（二）](https://juejin.cn/post/7028397244894330917)
 

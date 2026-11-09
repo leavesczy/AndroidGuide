@@ -42,7 +42,7 @@ Glide 的缓存机制分为 **内存缓存** 和 **磁盘缓存** 两级。默�
 
 通常，我们加载的图片最终是要显示在 ImageView 中的，而 ImageView 是会挂载在 Activity 或者 Fragment 等容器上的，当容器处于后台或者已经被 finish 时，此时加载图片的操作就应该被取消或者停止，否则也是在浪费宝贵的系统资源和网络资源，甚至可能发生内存泄露或者 NPE 问题。那么，显而易见的一个问题就是，Glide 是如何判断容器是否还处于活跃状态的呢？
 
-**类似于 Jetpack 组件中的 Lifecycle 的实现思路，Glide 也是通过一个无 UI 界面的 Fragment 来间接获取容器的生命周期状态的。Lifecycle 的实现思路可以看我的这篇源码讲解文章：[从源码看 Jetpack（1） -Lifecycle源码解析](https://juejin.im/post/6847902220755992589)**
+**类似于 Jetpack 组件中的 Lifecycle 的实现思路，Glide 也是通过一个无 UI 界面的 Fragment 来间接获取容器的生命周期状态的。Lifecycle 的实现思路可以看我的这篇源码讲解文章：[从源码看 Jetpack（一）- Lifecycle 源码详解](https://juejin.im/post/6847902220755992589)**
 
 Glide 实现**生命周期监听**涉及到的类包含以下几个：
 
