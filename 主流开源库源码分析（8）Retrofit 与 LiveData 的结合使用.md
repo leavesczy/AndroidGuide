@@ -3,10 +3,6 @@
 在上篇文章中我讲解了 Retrofit 是如何实现支持不同的 API 返回值的。例如，对于同一个 API 接口，我们既可以使用 Retrofit 原生的 `Call<ResponseBody>`方式来作为返回值，也可以使用 `Observable<ResponseBody>`这种 RxJava 的方式来发起网络请求
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 interface ApiService {
 
     //Retrofit 原始请求方式
@@ -19,7 +15,6 @@ interface ApiService {
 
 }
 ```
-
 我们在搭建项目的网络请求框架的时候，一个重要的设计环节就是要**避免由于网络请求结果的异步延时回调导致内存泄漏情况的发生**，所以在使用 RxJava 的时候我们往往是会搭配 RxLifecycle 来一起使用。而 Google 推出的 Jetpack 组件一个很大的亮点就是提供了生命周期安全保障的 LiveData：[从源码看 Jetpack（3）-LiveData 源码解析](https://juejin.im/post/6847902222345633806)
 
 LiveData 是基于观察者模式来实现的，也完全符合我们在进行网络请求时的使用习惯。所以，本篇文章就来动手实现一个 **LiveDataCallAdapter**，即实现以下方式的网络请求回调
@@ -44,7 +39,6 @@ class MainActivity : AppCompatActivity() {
 
 }
 ```
-
 # 一、基础定义
 
 假设我们的项目中 API 接口的返回值的数据格式都是如下所示。通过 status 来标明本次网络请求结果是否成功，在 data 里面存放具体的目标数据
@@ -58,7 +52,6 @@ class MainActivity : AppCompatActivity() {
 	}
 }
 ```
-
 对应我们项目中的实际代码就是一个泛型类
 
 ```kotlin
@@ -69,7 +62,6 @@ data class HttpWrapBean<T>(val status: Int, val msg: String, val data: T) {
 
 }
 ```
-
 所以，ApiService 就可以如下定义，用 LiveData 作为目标数据的包装类
 
 ```kotlin
@@ -82,7 +74,6 @@ interface ApiService {
 
 }
 ```
-
 而网络请求不可避免会有异常发生，我们还需要预定义几个 Exception，对常见的异常类型：**无网络** 或者 **status!=200** 的情况进行封装
 
 ```kotlin
@@ -139,7 +130,6 @@ class ServerCodeNoSuccessException(bean: HttpWrapBean<*>) :
 class UnknownException(errorMessage: String, realException: Throwable?) :
     BaseHttpException(CODE_UNKNOWN, errorMessage, realException)
 ```
-
 而在网络请求失败的时候，我们往往是需要向用户 Toast 失败原因的，所以此时一样需要向 LiveData postValue，以此将异常情况回调出去。因为还需要一个可以根据 Throwable 来生成对应的 HttpWrapBean 对象的方法
 
 ```kotlin
@@ -159,7 +149,6 @@ data class HttpWrapBean<T>(val status: Int, val msg: String, val data: T) {
 
 }
 ```
-
 # 二、LiveDataCallAdapter
 
 首先需要继承 CallAdapter.Factory 类，在 LiveDataCallAdapterFactory 类中判断是否支持特定的 API 方法，在类型校验通过后返回 LiveDataCallAdapter
@@ -194,14 +183,9 @@ class LiveDataCallAdapterFactory private constructor() : CallAdapter.Factory() {
 
 }
 ```
-
 LiveDataCallAdapter 的逻辑也比较简单，如果**网络请求成功且状态码等于 200 **则直接返回接口值，否则就需要根据不同的失败原因构建出不同的 HttpWrapBean 对象
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class LiveDataCallAdapter<R>(private val responseType: Type) : CallAdapter<R, LiveData<R>> {
 
     override fun responseType(): Type {
@@ -241,7 +225,6 @@ class LiveDataCallAdapter<R>(private val responseType: Type) : CallAdapter<R, Li
 
 }
 ```
-
 然后在构建 Retrofit 的时候添加 LiveDataCallAdapterFactory
 
 ```kotlin
@@ -257,14 +240,9 @@ object RetrofitManager {
 
 }
 ```
-
 然后就可以直接在 Activity 中发起网络请求了。当 Activity 处于后台时 LiveData 不会回调任何数据，避免了常见的内存泄漏和 NPE 问题
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 @Router(EasyRouterPath.PATH_RETROFIT)
 class LiveDataCallAdapterActivity : AppCompatActivity() {
 
@@ -288,7 +266,6 @@ class LiveDataCallAdapterActivity : AppCompatActivity() {
 
 }
 ```
-
 # 三、GitHub
 
-LiveDataCallAdapter 的实现逻辑挺简单的，在使用上也很简单。本篇文章也算作是在了解了 Retrofit 源码后所做的一个实战 😁😁 这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesCZY/AndroidOpenSourceDemo)
+LiveDataCallAdapter 的实现逻辑挺简单的，在使用上也很简单。本篇文章也算作是在了解了 Retrofit 源码后所做的一个实战 😁😁 这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)

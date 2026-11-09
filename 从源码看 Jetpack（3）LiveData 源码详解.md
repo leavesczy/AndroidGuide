@@ -407,7 +407,7 @@ static final int START_VERSION = -1;
 
 private int mVersion;
 
-/
+/**
  * Creates a LiveData initialized with the given {@code value}.
  *
  * @param value initial value
@@ -417,7 +417,7 @@ public LiveData(T value) {
     mVersion = START_VERSION + 1;
 }
 
-/
+/**
  * Creates a LiveData with no value assigned to it.
  */
 public LiveData() {

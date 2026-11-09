@@ -230,7 +230,7 @@ class LifecycleBoundObserver extends ObserverWrapper implements LifecycleEventOb
 
 # 七、引入依赖
 
-EventLiveData 已托管到 jitpack，可以直接远程依赖。GitHub 地址：https://github.com/leavesCZY/EventLiveData
+EventLiveData 已托管到 jitpack，可以直接远程依赖。GitHub 地址：https://github.com/leavesczy/EventLiveData
 
 ```groovy
 allprojects {
@@ -240,7 +240,7 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.leavesCZY:EventLiveData:1.0.2'
+    implementation 'com.github.leavesczy:EventLiveData:1.0.2'
 }
 ```
 

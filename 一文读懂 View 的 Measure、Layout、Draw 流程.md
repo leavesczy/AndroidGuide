@@ -1498,7 +1498,7 @@ public static int getDefaultSize(int size, int measureSpec) {
 
 我在蛮久前曾写过几个自定义 View 来练手，这次就趁着写本篇文章的机会用 Kotlin 重写了一遍，需要的同学可以参照下
 
-点击这里获取代码：[AndroidOpenSourceDemo](https://github.com/leavesCZY/AndroidOpenSourceDemo)
+点击这里获取代码：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)
 
 
 ![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b406f719153140a8aaff808730665813~tplv-k3u1fbpfcp-watermark.image?)

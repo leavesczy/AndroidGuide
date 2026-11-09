@@ -979,8 +979,8 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.leavesCZY:KVHolder:latest_version'
+    implementation 'com.github.leavesczy:KVHolder:latest_version'
 }
 ```
 
-GitHub 点击这里：[KVHolder](https://github.com/leavesCZY/KVHolder)
+GitHub 点击这里：[KVHolder](https://github.com/leavesczy/KVHolder)

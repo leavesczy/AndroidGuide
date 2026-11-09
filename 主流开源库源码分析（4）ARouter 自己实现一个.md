@@ -7,7 +7,6 @@ EasyRouter 支持同个模块间及跨模块实现 Activity 的跳转，仅需�
 ```kotlin
 EasyRouter.navigation(EasyRouterPath.PATH_HOME)
 ```
-
 最终实现的效果：
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/aba28a3aebf24575a181d2b9d116a02f~tplv-k3u1fbpfcp-zoom-1.image)
@@ -45,7 +44,6 @@ public class EasyRouterappLoader {
     }
 }
 ```
-
 由于静态变量和静态方法块在类被加载前是不会被初始化的，所以也可以做到按需加载。即只有在外部发起跳转到 app 这个模块的请求的时候，EasyRouter 才会去实例化 EasyRouterappLoader 类，此时才会去加载 app 模块的所有路由表信息，从而避免了内存浪费
 
 下面再来简单介绍下 EasyRouter 的实现过程
@@ -63,7 +61,6 @@ kapt {
     }
 }
 ```
-
 最终生成的辅助文件对应的包名会是固定的，但类名会包含这个唯一标识。而由于包名和类名的生成规则是有规律的，也方便在运行时拿到这个类，同时这也就要求同个模块下的路由路径 path 必须是属于同个 group
 
 ```java
@@ -86,15 +83,9 @@ public class EasyRouterRouterTestLoader {
     }
 }
 ```
-
 `@Router` 用于对 Activity 进行标注，仅需要设置一个参数 `path` 即可，`path` 包含的第一个单词就是 `group`
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 @MustBeDocumented
 @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.CLASS)
@@ -102,17 +93,11 @@ annotation class Router(val path: String)
 
 data class RouterBean(val targetClass: Class<*>, val path: String, val group: String)
 ```
-
 # 二、注解处理器
 
 声明一个 EasyRouterProcessor 类继承于 AbstractProcessor，在编译阶段通过扫描代码元素从而拿到 `@Router` 注解的信息
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 class EasyRouterProcessor : AbstractProcessor() {
 
     companion object {
@@ -158,7 +143,6 @@ class EasyRouterProcessor : AbstractProcessor() {
 
 }
 ```
-
 首先需要生成的 `routerMap`这个用于存储路由表信息的 Map 字段，其 key 值即 path，value 值即 path 对应的页面信息
 
 ```kotlin
@@ -179,7 +163,6 @@ private fun generateSubscriberField(): FieldSpec {
         .build()
 }
 ```
-
 之后就需要生成静态方法块。拿到 `@Router` 注解包含的 path 属性，及被注解的类对应的 Class 对象，以此来构建一个 RouterBean 对象并存到 `routerMap`中
 
 ```kotlin
@@ -207,7 +190,6 @@ private fun generateInitializerBlock(
     )
 }
 ```
-
 然后在 `process`方法中完成辅助文件的生成
 
 ```kotlin
@@ -235,17 +217,11 @@ override fun process(
     return true
 }
 ```
-
 # 三、EasyRouter
 
 EasyRouter 这个单例对象即最终提供给外部的调用入口，总代码行数不到五十行。外部通过调用 `navigation` 方法并传入目标页面 path 来实现跳转，通过 path 来判断其所属 group，并尝试加载其所在模块生成的辅助文件，如果加载成功则能成功跳转，否则就 Toast 提示
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 object EasyRouter {
 
     private const val PACKAGE_NAME = "github.leavesc.easyrouter"
@@ -295,7 +271,6 @@ object EasyRouter {
 
 }
 ```
-
 # 四、GitHub
 
-由于只是为了加深对 ARouter 的实现原理的理解，所以才来尝试实现 EasyRouter，也不打算实现得多么功能齐全，但对于一些读者来说我觉得还是有参考价值的😂😂 这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesCZY/AndroidOpenSourceDemo)
+由于只是为了加深对 ARouter 的实现原理的理解，所以才来尝试实现 EasyRouter，也不打算实现得多么功能齐全，但对于一些读者来说我觉得还是有参考价值的😂😂 这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)

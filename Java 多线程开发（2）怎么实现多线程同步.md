@@ -56,7 +56,6 @@ public class Test {
 
 }
 ```
-
 `synchronize` 关键字修饰的代码块就被称为同步块。当中，`lock`被称为锁句柄。锁句柄是对一个对象的引用，锁句柄对应的监视器就称为相应同步块的引导锁
 
 ```java
@@ -73,7 +72,6 @@ public class Test {
 
 }
 ```
-
 锁句柄如果为当前对象（this），那就相当于同步实例方法，如下两个同步方法是等价的
 
 ```java
@@ -91,7 +89,6 @@ public class Test {
 
 }
 ```
-
 同步静态方法则相当于以当前类对象为引导锁的同步块，如下两个同步方法是等价的
 
 ```java
@@ -109,7 +106,6 @@ public class Test {
 
 }
 ```
-
 作为锁句柄的变量通常使用 `private final`修饰，这是因为锁句柄的变量一旦被改变，会导致执行同一个同步块的多个线程实际上使用不同的锁，从而导致竞态
 
 对于内部锁来说，线程在执行临界区内代码之前必须获得该临界区的引导锁，执行完后就会自动释放引导锁，引导锁的申请和释放是由 Java 虚拟机代为执行的，这也是 `synchronized`被称为内部锁的原因。且由于 Java 编译器对同步块代码的特殊处理，即使临界区抛出异常，内部锁也会被自动释放，所以内部锁不会导致锁泄漏
@@ -134,7 +130,6 @@ private void funName() {
     }
 }
 ```
-
 ReentrantLock 既支持公平调度策略也支持非公平调度策略，通过其一个参数的构造函数来指定，传值为 true 表示公平锁，false 表示非公平锁， 默认使用非公平调度策略。此外，由于虚拟机并不会自动为我们释放锁，所以为了避免锁泄漏，一般会将 `Lock.unlock()`方法放在 `finally` 中执行，以保证临界区内的代码不管是正常结束还是异常退出，相应的锁释放操作都会被执行
 
 ## 3、内部锁和显式锁的比较
@@ -191,7 +186,6 @@ public interface ReadWriteLock {
     Lock writeLock();
 }
 ```
-
 读线程在访问共享变量的时候必须持有读锁，读锁是可以共享的，它可以同时被多个线程持有，提高了只读操作的并发性。写线程在访问共享变量的时候必须持有写锁，写锁是排他的，即一个线程持有写锁的时候其它线程无法获得同个读写锁的读锁和写锁
 
 读写锁的使用方式与显式锁相似，也需要由开发者自己来保障避免锁泄露
@@ -225,7 +219,6 @@ public class Test {
 
 }
 ```
-
 读写锁在原子性、可见性和有序性保障方面，它所起的作用和普通的排他锁是一样的，但由于读写锁内部实现比内部锁和其它显式锁要复杂很多，因此读写锁适合于在以下条件同时得以满足的场景下使用：
 
 - 只读操作比写操作要频繁得多
@@ -242,10 +235,6 @@ public class Test {
 首先，`Printer` 接口定义了读线程和写线程需要做的行为操作，`ReadWriteLockPrinter` 类是读写锁方式的实现，`SynchronizedPrinter` 类是内部锁方式的实现
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 interface Printer {
 
     fun read()
@@ -258,10 +247,6 @@ interface Printer {
 
 }
 
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class ReadWriteLockPrinter : Printer {
 
     private val readWriteLock = ReentrantReadWriteLock(true)
@@ -294,10 +279,6 @@ class ReadWriteLockPrinter : Printer {
     }
 }
 
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class SynchronizedPrinter : Printer {
 
     private var index = 0
@@ -317,14 +298,9 @@ class SynchronizedPrinter : Printer {
 
 }
 ```
-
 再来定义读线程和写线程，两种线程使用的是同个 Printer 对象
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class PrinterReadThread(private val printer: Printer) : Thread() {
 
     override fun run() {
@@ -341,14 +317,9 @@ class PrinterWriteThread(private val printer: Printer) : Thread() {
 
 }
 ```
-
 通过切换不同的 Printer 实现即可大致对比不同的锁的性能高低
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 fun main() {
     val printer: Printer = SynchronizedPrinter()
 	//val printer: Printer = ReadWriteLockPrinter()
@@ -375,7 +346,6 @@ fun main() {
 
 }
 ```
-
 最后的日志输出类似如下所示。虽然即使多次运行来取平均值也不具备严格的对比意义，但是也可以大致对比出不同锁之间的性能高低。从日志也可以看出，当使用读写锁时多个读线程读取数据所需要的总耗时几乎是零
 
 ```kotlin
@@ -401,7 +371,6 @@ fun main() {
 写入数据： 9，time: 1597151022463
 写入数据： 10，time: 1597151022663
 
-
 # 读写锁 消耗 2000 毫秒 
 写入数据： 1，time: 1597151078704
 写入数据： 2，time: 1597151078904
@@ -424,7 +393,6 @@ fun main() {
 读取到数据： 10，time: 1597151080704
 读取到数据： 10，time: 1597151080704
 ```
-
 ## 6、锁的开销
 
 锁的开销主要包含几点：
@@ -462,7 +430,6 @@ synchronized(someObject){
     doAction()
 }
 ```
-
 当中，**保护条件**是一个包含共享变量的布尔表达式
 
 当保护条件不成立时，因执行 `someObject.wait()` 而被暂停的线程就被称为对象 someObject 上的等待线程。由于一个对象的 `wait()` 方法可以被多个线程执行，因此一个对象可能存在多个等待线程。此外，由于一个线程只有在持有一个对象的内部锁的情况下才能够调用该对象的 `wait()` 方法，因此 `Object.wait()` 总是放在相应对象所引导的临界区之中。`someObject.wait()` 会以原子操作的方式使其执行线程（即等待线程）暂停并使该线程释放其持有的 someObject 对应的内部锁。当等待线程被暂停的时候其对 `someObject.wait()` 方法的调用并不会返回，只有当等待线程被通知线程唤醒且重新申请到 someObject 对应的内部锁时，才会继续执行 `someObject.wait()` 内部剩余的指令，这时 `wait()` 才会返回
@@ -483,7 +450,6 @@ synchronized(someObject){
     someObject.notify()
 }
 ```
-
 由于只有在持有一个对象的内部锁的情况下才能够执行该对象的 `notify()` 方法，所以 `Object.notify()` 方法也总是放在相应对象内部锁所引导的临界区之内。也正因为如此， `Object.wait()` 在暂停其执行线程的同时也必须释放 Object 的内部锁，否则通知线程就永远也无法来唤醒等待线程。和 `Object.wait()` 不同，`Object.notify()` 方法本身并不会释放内部锁，只有在其所在的临界区代码执行结束后才会被释放。因此，为了使得等待线程在被唤醒后能够尽快获得相应的内部锁，我们要尽量将 `Object.notify()` 代码放在靠近临界区结束的地方，否则如果 `Object.notify()`唤醒了等待线程而通知线程又迟迟不释放内部锁，就有可能导致等待线程再次经历上下文切换，从而浪费系统资源
 
 调用 `Object.notify()` 所唤醒的线程仅是 Object 对象上的任意一个等待线程，所以被唤醒的线程有可能并不是我们真正想要唤醒的线程。因此，有时我们需要改用 `Object.notifyAll()` 方法，该方法可以唤醒 Object 上的所有等待线程。被唤醒的线程就都有了抢夺相应 Object 对象的内部锁的机会。而如果被唤醒的线程在占用处理器继续运行后且申请到内部锁之前，有其它线程（被唤醒的等待线程之一或者是新到来的线程）先持有了内部锁，那么这个被唤醒的线程可能又会再次被暂停，等待再次被唤醒的机会，而这个过程会导致上下文切换
@@ -502,7 +468,6 @@ public final synchronized void join(long millis) throws InterruptedException {
     }
 }
 ```
-
 ## 3、wait / notify 存在的问题
 
 用 wait / notify 实现的等待和通知可能会遇到以下两个问题：
@@ -517,10 +482,6 @@ wait 和 notify 两个方法的协作可以通过一个经典的问题来展示�
 上述的生产者与消费者分别对应多个线程，商店就相当于多个线程间的共享数据。生产者线程的运行保护条件是：**当前商品总数不能大于等于 MAX_COUNT**。消费者线程的运行保护条件是：**当前商品总数要大于 0**
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 private val LOCK = Object()
 
 private const val MAX_COUNT = 10
@@ -585,7 +546,6 @@ class Consumer(private val shop: Shop, name: String) : Thread(name) {
 
 }
 ```
-
 其运行结果类似于如下所示
 
 ```kotlin
@@ -614,7 +574,6 @@ class Consumer(private val shop: Shop, name: String) : Thread(name) {
 
 ······
 ```
-
 # 四、线程同步工具类
 
 ## 1、Condition
@@ -686,7 +645,6 @@ class ConditionDemo {
 
 }
 ```
-
 这里通过设计一个简单的阻塞队列来演示下 Condition 的用法
 
 在 Queue 中，Lock 保障了 put 操作和 take 操作的线程安全性，两个不同的 Condition 实例又保障了 putThread 和 takeThread 在各自运行保护条件成立时，可以只唤醒相应的线程
@@ -740,7 +698,6 @@ class Queue<T> constructor(private val size: Int) {
 
 }
 ```
-
 PutThread 负责循环向阻塞队列存入八条数据，TakeThread 负责循环从阻塞队列获取九条数据，TakeThread 随机休眠的时间相对 PutThread 会更长，而阻塞队列的队长为四，那么在程序运行过程中大概率可以看到由于阻塞队列已满从而导致 PutThread 被暂停的现象，且程序运行到最后 TakeThread 会为了获取第九条数据而一直处于等待状态
 
 ```kotlin
@@ -766,10 +723,6 @@ class TakeThread(private val intQueue: Queue<Int>) : Thread() {
 
 }
 
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 fun main() {
     val intQueue = Queue<Int>(4)
     val putThread = PutThread(intQueue)
@@ -778,7 +731,6 @@ fun main() {
     takeThread.start()
 }
 ```
-
 从程序的输出结果可以看到 TakeThread 最终将一直处于等待状态
 
 ```kotlin
@@ -809,7 +761,6 @@ TakeThread get value : 7
 TakeThread get value : 8
 当前队列为空，暂停 take 操作...
 ```
-
 ## 2、CountDownLatch
 
 有时候会存在某个线程需要等待其它线程完成特定操作后才能继续运行的需求，此时使用 `Object.wait()` 和 `Object.notify()`也可以满足需求，但是使用上会比较繁琐，此时可以考虑通过 CountDownLatch 来实现
@@ -821,10 +772,6 @@ CountDownLatch 可用来实现一个或多个线程等待其它线程完成特�
 来看一个简单的例子。假设在程序启动时需要确保三个基础服务（ServiceA、ServiceB、ServiceC）先被初始化完成，且为了加快初始化速度，每个基础服务均交由一个工作者线程来完成初始化任务。此时就可以通过 CountDownLatch 来保证 main 线程一直处于等待状态直到所有的工作者线程的任务均结束（不管初始化成功还是失败）
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 fun main() {
     val serviceManager = ServicesManager()
     serviceManager.startServices()
@@ -914,7 +861,6 @@ class ServiceC(private val serviceName: String, countDownLatch: CountDownLatch) 
 
 }
 ```
-
 ServiceC 会随机抛出异常，所以程序的运行结果会分为以下两种可能。且为了保证当任务失败时 main 线程也可以收到唤醒通知，需要确保 `CountDownLatch.countDown()` 是放在 finally 代码块中
 
 ```kotlin
@@ -924,7 +870,6 @@ ServiceA执行完毕
 ServiceC执行完毕
 ServiceB执行完毕
 执行结果： true
-
 
 # 失败的情况
 等待所有 Services 执行完毕
@@ -937,7 +882,6 @@ Exception in thread "Thread-2" java.lang.RuntimeException: ServiceC failed
 ServiceB执行完毕
 执行结果： false
 ```
-
 ## 3、CyclicBarrier
 
 JDK 1.5 引入了 `java.util.concurrent.CyclicBarrier` 类用于实现多个线程间的相互等待。CyclicBarrier 可用于这么一种场景：假设存在一个集合点，在所有线程均执行到集合点之前，每个执行到指定集合点的线程均会被暂停。当所有线程均执行到指定集合点时，即当最后一个线程执行到集合点时，所有被暂停的线程都会自动被唤醒并继续执行
@@ -976,7 +920,6 @@ fun main() {
     }
 }
 ```
-
 程序的输出结果类似如下所示。每一轮输出的三条数据先后顺序并不固定，但每一轮的内容一定不会重复
 
 ```kotlin
@@ -1002,7 +945,6 @@ fun main() {
 
 ...
 ```
-
 ## 4、Semaphore
 
 Semaphore 可用于实现互斥以及流量控制，在某些资源有限的场景下限制可以同时访问资源的最大线程数。例如，假设当前有几十上百个线程需要连接数据库进行数据存取，而数据库支持的最大连接数只有十个，此时就可以通过 Semaphore 来限制线程的最大并发数，当已经有十个线程连接到了数据库时，多余的请求线程就会被暂停
@@ -1027,7 +969,6 @@ fun main() {
     }
 }
 ```
-
 ## 5、Exchanger
 
 Exchanger 可用于实现在两个线程之间交换数据的功能。当线程 A 先通过 Exchanger 发起交换数据的请求时，线程 A 会被暂停运行直到线程 B 也发起交换数据的请求，当数据交换完成后，两个线程就会各自继续运行
@@ -1053,12 +994,10 @@ fun main() {
     threadB.start()
 }
 ```
-
 ```kotlin
 Thread B: A
 Thread A: B
 ```
-
 # 五、ThreadLocal
 
 以上介绍的几个线程同步工具类，目的都是为了在多个线程之间实现一种等待机制，即在线程 A 完成目标行为前，线程 B 能够依靠这些线程同步工具类进行等待，直到线程 A 完成
@@ -1082,12 +1021,10 @@ public static void main(String[] args) throws InterruptedException {
     System.out.println("mainThread: " + threadLocal.get());
 }
 ```
-
 ```java
 subThread :null
 mainThread: 业志陈
 ```
-
 这里来简单看下 ThreadLocal 的源码实现
 
 ThreadLocal 是一个泛型类，其对外部开放的方法主要就是 `get()、set(T)、remove()、initialValue()` 四个方法
@@ -1134,7 +1071,6 @@ void createMap(Thread t, T firstValue) {
     t.threadLocals = new ThreadLocalMap (this, firstValue);
 }
 ```
-
 `set(T)` 和 `remove()`两个方法也是以当前 ThreadLocal 作为 key，对 ThreadLocalMap 进行赋值操作和移除操作
 
 ```java
@@ -1153,7 +1089,6 @@ public void set(T value) {
          m.remove(this);
  }
 ```
-
 可以看到，ThreadLocal 的主要实现逻辑还是在于 ThreadLocalMap，每个 Thread 都有自己单独的一个 ThreadLocalMap 对象，ThreadLocal 就以自身作为 key 来存储在 ThreadLocalMap 中，每个 ThreadLocal 就用于为本线程维护一个特定的值，从而使得不同线程间即使是使用同个 ThreadLocal 对象也可以单独维护一个特定的值
 
 ```java
@@ -1163,7 +1098,6 @@ public class Thread implements Runnable {
     
 }
 ```
-
 由于一个线程可以关联多个 ThreadLocal，所以 ThreadLocalMap 就以数组的形式 `Entry[]` 来存储 ThreadLocal
 
 ```java
@@ -1196,7 +1130,6 @@ static class ThreadLocalMap {
     ···
 }
 ```
-
 ThreadLocal 和关联的 value 会被包装为一个 Entry 对象，Entry 以弱引用的方式来保存 ThreadLocal。ThreadLocalMap 的一个重要知识点就是考察为什么要以弱引用的方式来保存 ThreadLocal
 
 想象这么一个场景，就能明白为什么不使用强引用的方式
@@ -1233,7 +1166,6 @@ public class Thread implements Runnable {
     
 }
 ```
-
 目标线程收到中断请求后所执行的操作，被称为目标线程对中断的响应，简称中断响应。目标线程对中断的响应类型一般包括：
 
 - 无影响。例如，`ReentrantLock.lock()` 或者内部锁申请等操作时，都不会对中断进行响应，即不会停止当前正在执行的操作
@@ -1250,7 +1182,6 @@ public final void acquireInterruptibly(int arg) throws InterruptedException {
         doAcquireInterruptibly(arg);
 }
 ```
-
 如果目标线程在收到中断请求的时候已经由于执行了一些阻塞操作而处于暂停状态，那么 Java 虚拟机可能会将目标线程唤醒，从而使得目标线程被唤醒后继续执行的代码可以再次得到响应中断的机会
 
 # 七、如何实现单例模式
@@ -1279,7 +1210,6 @@ public final class Singleton {
 
 }
 ```
-
 ## 2、双重检查锁定
 
 对于上述的在单线程环境下可以正常使用的单例模式，在多线程环境下就很容易出现问题。`getInstance()`方法本身是基于 **check-then-act** 操作来判断是否需要初始化共享变量的，该操作并不是一个原子操作。在 instance 还为 null 时，假设有两个线程 T1 和 T2 同时执行到操作1，接着在 T1 执行操作2之前 T2 已经执行完操作2，在下一时刻，当 T1 执行到操作2的时候，即使 instance 当前已经不为 null，但是 T1 此时依然会多创建一个实例，这就导致了多个实例的创建
@@ -1296,7 +1226,6 @@ public static Singleton getInstance() {
     return instance;
 }
 ```
-
 上述方式实现的单例模式固然是线程安全的，但是这也意味着 `getInstance()`方法的任何一个执行线程都需要申请锁，为了避免无谓的锁开销，人们又想到以下这种方法，即双重检查锁定。在执行临界区代码前先判断 instance 是否为 null，如果不为 null ，则直接返回 instance 变量，否则才执行临界区代码来完成 instance 变量的初始化
 
 ```java
@@ -1311,7 +1240,6 @@ public static Singleton getInstance() {
     return instance;
 }
 ```
-
 上述代码表现出来的初始化逻辑可以分为两种情况，这两种情况的前置前提是：存在两个线程 T1 和 T2 ，线程 T1 执行到了操作1，线程 T2 执行到了临界区
 
 - 当线程 T1 执行到操作1的时候线程 T2 已经执行完了操作3，发现此时 instance 不为 null，直接返回 instance 变量，避免了锁的开销
@@ -1326,7 +1254,6 @@ objRef = allocate(Singleton.class) //子操作1，分配对象所需的存储空
 invokeConstructor(objRef) //子操作2，初始化 objRef 引用的对象
 instance = objRef //子操作3，将对象引用写入共享变量
 ```
-
 由于临界区内的代码是有可能被重排序的，因此，JIT 编译器可能将上述的子操作重排序为：子操作1 -> 子操作3 -> 子操作2。即在初始化对象之前将对象的引用写入实例变量 instance。由于锁对有序性的保障是有条件的，而线程 T1 在临界区之外检查 instance 是否为 null 的时候并没有加锁，因此上述重排序对于线程 T1 来说是有影响的，这会使得线程 T1 得到一个不为 null 但内部还未完全初始化完毕的 instance 变量，从而造成一些意想不到的错误
 
 在分析清楚问题的原因后，解决方法也就不难想到：只要将 instance 变量采用 volatile 修饰即可，这实际上是利用了 volatile 关键字的以下两个作用：
@@ -1362,7 +1289,6 @@ public final class Singleton {
 
 }
 ```
-
 ## 3、静态内部类
 
 类的静态变量被初次访问时会触发 Java 虚拟机对该类进行初始化，即该类的静态变量的值会变为其初始值而不再是默认值（例如，引用型变量的默认值是 null，int 的默认值是 0）。因此，静态方法 `getInstance()` 被调用的时候 Java 虚拟机会初始化这个方法所访问的内部静态类 InstanceHolder。这使得 InstanceHolder 的静态变量 INSTANCE 被初始化，从而使得 Singleton 类的唯一实例得以创建。由于类的静态变量只会创建一次，因此 Singleton 也只会有一个实例变量
@@ -1390,7 +1316,6 @@ public final class Singleton {
 
 }
 ```
-
 ## 4、枚举类
 
 枚举类 Singleton 相当于一个单例类，其字段 INSTANCE 相当于该类的唯一实例。这个实例是在 `Singleton.INSTANCE` 初次被引用的时候才会被初始化的。仅访问 Singleton 本身（例如 `Singleton.class.getName()` ）并不会导致 Singleton 的唯一实例被初始化

@@ -28,7 +28,6 @@ implementation 'androidx.appcompat:appcompat:1.3.0-beta01'
 implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.0"
 implementation "androidx.savedstate:savedstate:1.1.0"
 ```
-
 # 一、使用示例
 
 SavedStateHandle 的引入使得开发者无需直接使用 `onSaveInstanceState(Bundle)` 等方法来完成数据的保存和重建，而只需要在 ViewModel 里来完成即可
@@ -40,10 +39,6 @@ SavedStateHandle 的引入使得开发者无需直接使用 `onSaveInstanceState
 - 传给`getLiveData`方法的 String 参数是一个唯一 Key，最终保存到 Bundle 中的键值对就以该值作为 Key，以 LiveData 的值作为 value
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class SavedStateViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     companion object {
@@ -83,7 +78,6 @@ class MainActivity : AppCompatActivity() {
 
 }
 ```
-
 打开开发者模式中"不保留活动"的选项，以此来模拟 Activity 由于系统内存不足被销毁的情况
 
 当 MainActivity 第一次启动时，两个 LiveData 中的值都是为 null
@@ -94,7 +88,6 @@ E/MainActivity: savedStateViewModel.name: null
 E/MainActivity: savedStateViewModel.blog: null
 E/MainActivity: onCreate
 ```
-
 点击按钮为这两个 LiveData 进行赋值，按 Home 键退出应用，此时 MainActivity 在后台就会被销毁。重新打开应用，此时就可以看到 ViewModel 其实已经是新的一个实例了，但通过 SavedStateHandle 构建的 `nameLiveData` 中还保留着之前的值，而 `blogLiveData` 中就还是默认值 null
 
 ```kotlin
@@ -103,7 +96,6 @@ E/MainActivity: savedStateViewModel.name: 业志陈
 E/MainActivity: savedStateViewModel.blog: null
 E/MainActivity: onCreate
 ```
-
 以上例子就展示了 SavedStateHandle 在 Activity 被意外杀死时也可以保留数据的能力，使得我们可以直接在 ViewModel 里完成整个数据的重建逻辑。**此外，再强调一次，如果 Activity 是由于系统资源限制导致被销毁重建的话，ViewModel 实例是不会被保留下来的，所以在以上例子中第二次得到的是一个新的 ViewModel  实例，此时只能依赖 Activity 原生的数据恢复机制来保存少量简单的数据**
 
 而 SavedStateHandle 其实也是通过封装 `onSaveInstanceState(Bundle)`和 `onCreate(Bundle)`两个方法来实现的，SavedStateHandle 会在 Activity 被销毁时通过`onSaveInstanceState(Bundle)`方法将数据保存在 Bundle 中，在重建时又将数据从 `onCreate(Bundle?)`中取出，开发者只负责向 SavedStateHandle 存取数据即可，并不需要和 Activity 直接做交互，从而简化了整个开发流程
@@ -127,7 +119,6 @@ public interface SavedStateRegistryOwner extends LifecycleOwner {
     SavedStateRegistry getSavedStateRegistry();
 }
 ```
-
 # 三、SavedStateRegistryController
 
 ComponentActivity 将数据的**保存和恢复**逻辑都转发给了 SavedStateRegistryController 来处理，在 `onSaveInstanceState` 方法里通过调用 `performSave` 方法来保存数据，在 `onCreate` 方法里通过调用 `performRestore` 方法来恢复数据
@@ -177,7 +168,6 @@ public class ComponentActivity extends androidx.core.app.ComponentActivity imple
         
 }
 
-
 public final class SavedStateRegistryController {
     private final SavedStateRegistryOwner mOwner;
     private final SavedStateRegistry mRegistry;
@@ -215,7 +205,6 @@ public final class SavedStateRegistryController {
     }
 }
 ```
-
 # 四、SavedStateRegistry
 
 ## 拿数据的入口
@@ -243,7 +232,6 @@ public interface SavedStateProvider {
     Bundle saveState();
 }
 ```
-
 ## 保存数据
 
 既然已经指定了拿数据的入口，那么就来看下 `performSave` 方法是如何保存数据的，其主要逻辑是：
@@ -276,7 +264,6 @@ void performSave(@NonNull Bundle outBundle) {
     outBundle.putBundle(SAVED_COMPONENTS_KEY, components);
 }
 ```
-
 ## 恢复数据
 
 再来看下 `performRestore` 是如何恢复数据的，其主要逻辑是：
@@ -318,7 +305,6 @@ void performRestore(@NonNull Lifecycle lifecycle, @Nullable Bundle savedState) {
     mRestored = true;
 }
 ```
-
 ## 消费数据
 
 数据被恢复了并不意味着 Activity 已经恢复到了被销毁前的状态，被恢复的数据还存在 Bundle 里，此时还需要开发者通过取**键值对**的方式来消费数据，将**用户数据或者 UI 状态**恢复到销毁前的状态
@@ -344,7 +330,6 @@ public Bundle consumeRestoredStateForKey(@NonNull String key) {
     return null;
 }
 ```
-
 ## 联系
 
 可以看到，SavedStateRegistry 已经代理了 Activity 的 `onCreate(Bundle)` 和`onSaveInstanceState(Bundle)`这两个方法，已经串联起了整个流程，后面我们只需要看是谁向 SavedStateRegistry 提供了数据，又是被谁消费了数据即可，即主要就看是谁调用了 `registerSavedStateProvider` 和 `consumeRestoredStateForKey` 这两个方法
@@ -382,7 +367,6 @@ public final class SavedStateHandle {
 
 }
 ```
-
 `getLiveData` 方法会返回一个和 `key` 还有 `mRegular`关联的 LiveData 对象，LiveData 对象的初始默认值会从`mRegular`和`initialValue`两个之间选取，每次生成的 LiveData 对象也都会被保存在 `mLiveDatas` 中，以便后续复用
 
 ```java
@@ -424,7 +408,6 @@ private <T> MutableLiveData<T> getLiveDataInternal(
     return mutableLd;
 }
 ```
-
 当外部对 LiveData 进行值更新操作时，SavedStateHandle 需要拿到最新值，因为最终持久化保存的肯定也需要是最新值。所以 `getLiveDataInternal`方法返回的 SavingStateLiveData 对象就会在 `setValue` 方法被调用后，同步更新 `mRegular` 中的键值对数据
 
 ```java
@@ -457,7 +440,6 @@ static class SavingStateLiveData<T> extends MutableLiveData<T> {
     }
 }
 ```
-
 SavedStateHandle 也提供了另外一种声明需要缓存的键值对数据的方法。SavedStateHandle 开放了一个 `setSavedStateProvider` 方法交由外部来传入 SavedStateProvider 对象，外部负责实现 `saveState()`方法来返回想要持久化缓存的 Bundle 对象，由 SavedStateHandle 来负责调用该方法
 
 ```java
@@ -473,7 +455,6 @@ public void setSavedStateProvider(@NonNull String key, @NonNull SavedStateProvid
     mSavedStateProviders.put(key, provider);
 }
 ```
-
 我们在 ViewModel 层通过向 `mRegular`存取值，就是在决定一旦 Activity 被意外销毁重建时需要恢复的数据有哪些，所以最终 `mRegular`还是要被存到 Bundle 里，这个过程就由 `mSavedStateProvider`来实现，其内部会遍历`mSavedStateProviders`和 `mRegular`，将 key 和 value 按照对应关系顺序存入两个不同的 ArrayList 里，最后将两个 ArrayList 都保存到 Bundle 里
 
 ```java
@@ -511,7 +492,6 @@ SavedStateProvider savedStateProvider() {
     return mSavedStateProvider;
 }
 ```
-
 # 六、关联上
 
 这里来做个小小的总结

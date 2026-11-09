@@ -64,7 +64,6 @@ public class HandlerActivity extends AppCompatActivity {
     
 }
 ```
-
 在声明Handler对象后，IDE会给开发者一个提示：
 
 ```java
@@ -125,7 +124,6 @@ public class HandlerActivity extends AppCompatActivity {
        handler.removeCallbacksAndMessages(null);
     }
 ```
-
 ### **2.3、Thread**
 
 当在开启一个子线程用于执行一个耗时操作后，此时如果改变配置（例如横竖屏切换）导致了Activity重新创建，一般来说旧Activity就将交给GC进行回收。但如果创建的线程被声明为非静态内部类或者匿名类，那么线程会保持有旧Activity的隐式引用。当线程的run()方法还没有执行结束时，线程是不会被销毁的，因此导致所引用的旧的Activity也不会被销毁，并且与该Activity相关的所有资源文件也不会被回收，因此造成严重的内存泄露。
@@ -277,17 +275,12 @@ public class ThreadActivity extends AppCompatActivity {
 
 }
 ```
-
 ### **2.4、Context**
 
 在使用Toast的过程中，如果应用连续弹出多个Toast，那么就会造成Toast重叠显示的情况
 因此，可以使用如下方法来保证当前应用任何时候只会显示一个Toast，且Toast的文本信息能够得到立即更新
 
 ```java
-/**
- * @Author: leavesCZY
- * @Date:  2017/4/4 14:05
- */
 public class ToastUtils {
 
     private static Toast toast;
@@ -336,14 +329,9 @@ public Toast(Context context) {
                 com.android.internal.R.integer.config_toastDefaultGravity);
     }
 ```
-
 解决办法是改为使用 ApplicationContext 即可，因为ApplicationContext会随着应用的存在而存在，而不依赖于Activity的生命周期
 
 ```java
-/**
- * @Author: leavesCZY
- * @Date:  2017/4/4 14:05
- */
 public class ToastUtils {
 
     private static Toast toast;
@@ -358,7 +346,6 @@ public class ToastUtils {
 
 }
 ```
-
 ### **2.5、集合**
 
 有时候我们需要把一些对象加入到集合容器（例如ArrayList）中，当不再需要当中某些对象时，如果不把该对象的引用从集合中清理掉，也会使得GC无法回收该对象。如果集合是static类型的话，那内存泄漏情况就会更为严重。
@@ -381,10 +368,6 @@ Gradle强大的可配置性，可以确保只在编译 debug 版本时才会检�
 如果只是想监测Activity的内存泄漏，在自定义的Application中进行如下初始化即可
 
 ```java
-/**
- * @Author: leavesCZY
- * @Date:  2017/4/4 12:41
- */
 public class MyApplication extends Application {
 
     @Override
@@ -398,10 +381,6 @@ public class MyApplication extends Application {
 如果还想监测Fragmnet的内存泄漏情况，则在自定义的Application中进行如下初始化
 
 ```java
-/**
- * @Author: leavesCZY
- * @Date:  2017/4/4 12:41
- */
 public class MyApplication extends Application {
 
     private RefWatcher refWatcher;
@@ -434,6 +413,5 @@ public class BaseFragment extends Fragment {
 	
 }
 ```
-
 当在测试debug版本的过程中出现内存泄露时，LeakCanary将会自动展示一个通知栏显示检测结果
 ![](http://upload-images.jianshu.io/upload_images/2552605-79f58a267695f59e?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)

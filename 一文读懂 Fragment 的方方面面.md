@@ -17,7 +17,6 @@ dependencies {
     implementation "androidx.fragment:fragment-ktx:1.3.6"
 }
 ```
-
 # 1、如何使用
 
 本节内容先来介绍如何将 Fragment 添加到 Activity 中
@@ -52,13 +51,11 @@ public class Fragment implements ComponentCallbacks, View.OnCreateContextMenuLis
 
 }
 ```
-
 因此，最简单的情况下我们仅需要一行代码就可以声明一个 Fragment 子类
 
 ```kotlin
 class PlaceholderFragment : Fragment(R.layout.fragment_placeholder)
 ```
-
 ## 2、添加 Fragment
 
 Fragment 一般情况下都需要和 FragmentActivity 组合使用，而我们日常使用的 AppCompatActivity 就已经直接继承于 FragmentActivity 了。此外，虽然 Fragment 可以选择任意 ViewGroup 作为其容器，但官方强烈推荐使用 FrameLayout 的子类 FragmentContainerView，因为其修复了 Fragment 在执行转场动画时的一些问题
@@ -80,15 +77,9 @@ Fragment 一般情况下都需要和 FragmentActivity 组合使用，而我们�
 
 </LinearLayout>
 ```
-
 如果想要通过代码在合适的时机再来主动注入 Fragment，那么也可以不声明 name 属性，改为通过 `supportFragmentManager` 来主动执行 `add` 操作。此外，由于当发生 Configuration Change 时，系统会自动恢复重建每个 Activity 和 Fragment，因此我们需要主动判断当前 Activity 是否属于正常启动，对应`savedInstanceState == null`，此时才去主动添加 Fragment，否则就会造成两个 Fragment 重叠在一起
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @公众号：字节数组
- */
 class MyFragmentActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,7 +96,6 @@ class MyFragmentActivity : AppCompatActivity() {
 
 }
 ```
-
 `supportFragmentManager.commit`方法是`fragment-ktx`库中提供的扩展方法，实际上也只是对 FragmentManager 和 FragmentTransaction 做了一层封装
 
 ```kotlin
@@ -122,7 +112,6 @@ public inline fun FragmentManager.commit(
     }
 }
 ```
-
 > 本文大部分的示例代码都不会去考虑 Activity 销毁重建的情况，但读者在实际开发中需要考虑这种情况
 
 # 2、生命周期
@@ -171,7 +160,6 @@ override fun onAttach(context: Context) {
     })
 }
 ```
-
 ## 2、回退栈 & 事务
 
 Fragment 的生命周期不仅仅只有以上那种线性流程那么简单，不然 Fragment 也不会总是被人吐槽状态过于复杂多变了。Fragment 生命周期的开始节点是 `onAttach` 方法，结束节点是 `onDetach` 方法，这个过程中 `onCreateView` 到 `onDestroyView` 之间可以被执行 N 多次，就像下图所示
@@ -191,7 +179,6 @@ supportFragmentManager.commit {
     )
 }
 ```
-
 **我们可以通过点击返回键退出 FragmentB，因此直观感受上似乎就是 FragmentB 被添加到了回退栈中，但实际上被添加的并不是 Fragment，而是那些包含了 `addToBackStack(String)` 方法的一整个事务**
 
 这句话看着很抽象，我举一个例子来帮助读者理解
@@ -211,7 +198,6 @@ supportFragmentManager.commit {
     replace(R.id.fragmentContainerView, Fragment2())
 }
 ```
-
 ![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/2d24f4ff05bc4755a8ec32b8a6e7af84~tplv-k3u1fbpfcp-watermark.image)
 
 从执行 add 操作到点击返回键，两个 Fragment 的生命周期方法的调用顺序就大致如下所示，省去了部分方法
@@ -245,7 +231,6 @@ Fragment-2: onDestroyView-start
 Fragment-2: onDestroy-start
 Fragment-2: onDetach-start
 ```
-
 这整个过程的调用关系可以总结为：
 
 - 当执行 replace 操作时。Fragment 1 会先执行到 `onStop`，意味着 Fragment 1 已经被切换到后台了。然后就开始执行 Fragment 2 的生命周期直到 `onResume` ，意味着 Fragment 2 已经被切换到前台了。之后就会接着执行 Fragment 1 的 `onDestroyView` ，此时就意味着 Fragment 1 不仅被切换到了后台，其 View 也被销毁了
@@ -274,7 +259,6 @@ supportFragmentManager.commit {
     replace(R.id.fragmentContainerView, Fragment2())
 }
 ```
-
 ![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a65f87c69fa448d3ae051606bd15d2cf~tplv-k3u1fbpfcp-watermark.image)
 
 从执行 add 操作到点击两次返回键，两个 Fragment 的生命周期方法的调用顺序就大致如下所示，省去了部分方法
@@ -305,7 +289,6 @@ Fragment-2: onDestroyView-start
 Fragment-2: onDestroy-start
 Fragment-2: onDetach-start
 ```
-
 - 当第一次点击返回键时。由于 replace 事务并没有被添加到回退栈中，而 add 操作有，所以此时响应了返回事件的是 add 操作，点击返回键就相当于把 add 操作给撤销掉了，因此 Fragment 1 就会执行到 `onDetach` 方法，Fragment 2 不受影响
 - 当第二次点击返回键时，由于此时 FragmentTransaction 的回退栈为空，所以此时响应了返回事件的其实是 Activity，所以 Activity 会退出，连带着 Fragment 2 也一起被销毁了
 
@@ -330,7 +313,6 @@ class PageFragment : Fragment() {
     
 }
 ```
-
 `Lifecycle.State` 一共包含五种值，FragmentLifecycle 会在这五个值中不断流转，例如当切换为 DESTROYED 状态时，也即意味 `onDestory()、onDetach()` 等方法被调用了，至此 Fragment 的本次生命周期也就结束了
 
 ```kotlin
@@ -342,7 +324,6 @@ public enum State {
     RESUMED;
 }
 ```
-
 ## 4、FragmentViewLifecycle
 
 Fragment 相对于 Activity 来说比较特殊，因为其关联的 View 对象可以在单次 FragmentLifecycle 过程中先后多次加载和销毁，因此实际上 **FragmentView 的生命周期和 Fragment 并不同步**
@@ -360,7 +341,6 @@ static final int STARTED = 5;                // Created and started, not resumed
 static final int AWAITING_ENTER_EFFECTS = 6; // Upward state, awaiting enter effects
 static final int RESUMED = 7;                // Created started and resumed.
 ```
-
 状态值切换到 DESTROYED，对于 FragmentLifecycle 来说意味着 `onDestroy、onDetach` 等方法被调用，对于 FragmentViewLifecycle 来说则意味着`onDestroyView`方法被调用，因此 FragmentViewLifecycle 的跨度范围要比 FragmentLifecycle 小一些。而且 FragmentLifecycle 切换到 DESTROYED 后状态值是不可逆的，无法再次更改，而 FragmentViewLifecycle 切换到 DESTROYED 后是有机会再次更改的，因为 View 对象可以先后多次加载和销毁，每次加载就意味着生命周期的重新开始
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ac4e51b89052484ea83c8f6b14d05f82~tplv-k3u1fbpfcp-watermark.image)
@@ -382,7 +362,6 @@ public LifecycleOwner getViewLifecycleOwner() {
 }
 
 ```
-
 ---
 
 FragmentViewLifecycle 非常有用，我们在日常开发中可以根据实际情况使用 FragmentViewLifecycle 来替代 FragmentLifecycle，因为 FragmentLifecycle 存在着一些并不明显的使用误区，很容易就造成 bug
@@ -398,7 +377,6 @@ private val pageViewModel by lazy {
     }
 }
 ```
-
 ```kotlin
 private val pageViewModel by lazy {
     ViewModelProvider(this).get(PageViewModel::class.java)
@@ -411,7 +389,6 @@ override fun onCreate(savedInstanceState: Bundle?) {
     })
 }
 ```
-
 这两种方式都可以避免重复订阅的问题，但此时还存在另一个藏得很深的问题：**假如 FragmentView 真的销毁重建了，重建后的 FragmentView 也收不到 textLiveData 已有的数据！！！**
 
 会出现该问题的本质原因还是因为 FragmentView 的生命周期和 Fragment 并不同步。如果 Fragment 已经接收过 textLiveData 的回调了，那么当 FragmentView 销毁重建后，由于 textLiveData 的值没有发生变化，和 textLiveData 绑定的 LifecycleOwner 也还一直存在着，那么重建后的 FragmentView 自然就不会收到 textLiveData 的回调了，从而导致无法根据回调来重建页面
@@ -430,7 +407,6 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     })
 }
 ```
-
 在大部分情况下，我们在 Fragment 中执行的操作都是和 FragmentView 强关联的，属于视图操纵行为，此时就可以使用 FragmentViewLifecycle 来替代 FragmentLifecycle，从而保证事件一定只有在 FragmentView 存在且活跃的情况下才会被回调，且保证了每次 FragmentView 被销毁重建的时候都能够得到最新数据。而对于那些依赖于 Fragment 完整生命周期的事件，就还是只能继续使用 FragmentLifecycle 了
 
 > 关于 Lifecycle 和 LiveData 的源码解析可以看这两篇文章：
@@ -482,7 +458,6 @@ public void setUserVisibleHint(boolean isVisibleToUser) {
     }
 }
 ```
-
 `setMaxLifecycle`方法从名字就可以看出来是用于为 Fragment 设置一个最大的生命周期状态，实际上也的确是，state 参数值我们只能选择 CREATED、STARTED、RESUMED 三者之一
 
 ```kotlin
@@ -493,7 +468,6 @@ public FragmentTransaction setMaxLifecycle(@NonNull Fragment fragment,
     return this;
 }
 ```
-
 在正常情况下，我们在 Activity 中 add 一个 Fragment 后其生命周期流程是会直接执行到 `onResume` 方法的
 
 ```kotlin
@@ -509,7 +483,6 @@ supportFragmentManager.commit {
     addToBackStack(null)
 }
 ```
-
 ```kotlin
 Fragment-1: onAttach
 Fragment-1: onCreate
@@ -520,7 +493,6 @@ Fragment-1: onViewStateRestored
 Fragment-1: onStart
 Fragment-1: onResume
 ```
-
 而如果设置了`setMaxLifecycle(fragment, Lifecycle.State.CREATED)`的话，就会发现 Fragment 只会执行到 `onCreate` 方法，且 Fragment 也不会显示，毕竟 FragmentView 没有被创建，自然也不会被挂载到 Activity 中
 
 ```kotlin
@@ -537,12 +509,10 @@ supportFragmentManager.commit {
     addToBackStack(null)
 }
 ```
-
 ```kotlin
 Fragment-1: onAttach
 Fragment-1: onCreate
 ```
-
 而如果 Fragment 已经回调了 `onResume` 方法，此时再来为其设置 `setMaxLifecycle(fragment, Lifecycle.State.STARTED)` 的话，就会发现 Fragment 会回调 `onPause` 方法
 
 ```kotlin
@@ -557,7 +527,6 @@ Fragment-1: onResume
 
 Fragment-1: onPause
 ```
-
 怎么理解以上三种情况的差异呢？
 
 其实，`setMaxLifecycle` 控制的是 FragmentLifecycle，同个 FragmentLifecycle 状态值对应的可能是不同的生命周期方法，就像以下图片所示。`onResume`方法对应的是 RESUMED，此时我们要求 FragmentLifecycle 的最大值是 STARTED，那么 Fragment 只能执行`onPause` 方法将状态值切换到 STARTED。而如果我们一开始就设置了最大值是 STARTED 的话，Fragment 就只会从 `onAttach` 执行到 `onStart` 方法，此时 FragmentLifecycle 一样是 STARTED
@@ -598,7 +567,6 @@ void updateFragmentMaxLifecycle(boolean dataSetChanged) {
     }
 }
 ```
-
 # 4、FragmentFactory
 
 在以前，Fragment 要求开发者必须为每个子类均声明一个**无参构造函数**，因为当系统发生 Configuration Change 时，系统需要恢复重建每个 Fragment，如果 Fragment 包含一个或者多个**有参构造函数**的话，系统不知道应该调用哪个构造函数，而且也无法自动生成**构造参数**，因此只能选择通过**反射无参构造函数**的方式来完成实例化，这就要求每个子类都必须拥有一个无参构造函数了
@@ -630,7 +598,6 @@ class FragmentFactoryFragment : BaseFragment(R.layout.fragment_fragment_factory)
 
 }
 ```
-
 通过反射无参构造函数来实例化 Fragment 并注入 `arguments` 的过程，就对应 Fragment 中的 `instantiate` 方法
 
 ```java
@@ -664,7 +631,6 @@ public static Fragment instantiate(@NonNull Context context, @NonNull String fna
     }
 }
 ```
-
 为了解决**无法自由定义有参构造函数的问题**，Fragment 如今也提供了 FragmentFactory 来参与实例化 Fragment 的过程
 
 首先，假设 Fragment 的构造函数需要一个 int 类型的构造参数
@@ -680,7 +646,6 @@ class FragmentFactoryFragment(private val bgColor: Int) :
 
 }
 ```
-
 继承 FragmentFactory，在 `instantiate`方法中判断当前要实例化的是哪一个 Fragment，在此根据 bgColor 实例化 Fragment 并返回
 
 ```kotlin
@@ -696,7 +661,6 @@ class MyFragmentFactory(private val bgColor: Int) : FragmentFactory() {
 
 }
 ```
-
 之后我们在代码中仅需要向 `supportFragmentManager` 声明需要注入的 Fragment Class 即可，无需显式实例化，实例化过程交由 MyFragmentFactory 来完成
 
 ```kotlin
@@ -717,7 +681,6 @@ class FragmentFactoryActivity : BaseActivity() {
 
 }
 ```
-
 FragmentFactory 的好处有：
 
 - 将本应该直接传递给 Fragment 的构造参数转交给了 FragmentFactory，这样系统在恢复重建时就能统一通过 `instantiate` 方法来重新实例化 Fragment，而无需关心 Fragment 的构造函数
@@ -781,7 +744,6 @@ class GetLocation : ActivityResultContract<String, String>() {
 
 }
 ```
-
 ActivityResultApiTestActivity 按照我们惯常的方式获取到请求参数，返回 RESULT_OK 状态码和结果值
 
 ```kotlin
@@ -800,7 +762,6 @@ class ActivityResultApiTestActivity : BaseActivity() {
 
 }
 ```
-
 ActivityResultApiFragment 通过 `registerForActivityResult` 方法来注册 GetLocation，需要的时候再通过`getLocation.launch("业志陈")`来传入用户名并启动 GetLocation，最终在 `onActivityResult` 方法中获取到请求结果
 
 ```kotlin
@@ -825,7 +786,6 @@ class ActivityResultApiFragment :
 
 }
 ```
-
 ![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3cc3d421480f430e8d4e1b6d9f3906b8~tplv-k3u1fbpfcp-watermark.image)
 
 类似地，官方也提供了一个用于请求权限的 ActivityResultContract 实现类：RequestMultiplePermissions，通过该 Contract 我们也能以很简单的方式完成以前割裂且麻烦的申请操作
@@ -860,7 +820,6 @@ class ActivityResultApiFragment :
 
 }
 ```
-
 使用 Activity Result API 的好处有：
 
 - 完全隔绝了请求的发起者和处理者之间的引用关系，发起者直接面向于 ActivityResultContract，无需知道请求最终是交由谁处理，这样开发者就可以随时替换 ActivityResultContract 的具体实现逻辑了，避免耦合且易于测试
@@ -968,7 +927,6 @@ class FragmentResultApiActivity : BaseActivity() {
 
 }
 ```
-
 ![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4a7ec84eb47a4ff3a4cd3c98aff613ce~tplv-k3u1fbpfcp-watermark.image)
 
 使用 Fragment Result API 的好处有：
@@ -1007,7 +965,6 @@ class PlaceholderFragment(private val sectionNumber: Int) :
     
 }
 ```
-
 # 8、Fragment 妙用
 
 ## 1、监听生命周期
@@ -1030,7 +987,6 @@ protected void onCreate(@Nullable Bundle savedInstanceState) {
     ReportFragment.injectIfNeededIn(this);
 }
 ```
-
 ReportFragment 的 `injectIfNeededIn()` 是一个静态方法，以 `android.app.Activity` 对象作为入参参数，此方法内部就会向 Activity 添加一个无 UI 界面的 ReportFragment
 
 ```kotlin
@@ -1049,7 +1005,6 @@ ReportFragment 的 `injectIfNeededIn()` 是一个静态方法，以 `android.app
     }
 }
 ```
-
 ReportFragment 就通过自身的各个回调方法来间接获得 Activity 生命周期事件的回调通知
 
 ```java
@@ -1074,7 +1029,6 @@ public void onDestroy() {
     ···
 }
 ```
-
 > 更多细节看这篇文章：[从源码看 Jetpack（1）-Lifecycle 源码详解](https://juejin.cn/post/6847902220755992589)
 
 ### Glide
@@ -1092,7 +1046,6 @@ public interface LifecycleListener {
   void onDestroy();
 }
 ```
-
 ActivityFragmentLifecycle 用于 SupportRequestManagerFragment 这个 Fragment 中来使用（省略了部分代码）。可以看到，在 Fragment 的三个生命周期回调事件中，都会相应通知 ActivityFragmentLifecycle。那么，不管 ImageView 的载体是 Activity 还是 Fragment，我们都可以向其注入一个无 UI 界面的 SupportRequestManagerFragment，以此来监听载体在整个生命周期内活跃状态的变化
 
 ```java
@@ -1143,7 +1096,6 @@ public class SupportRequestManagerFragment extends Fragment {
     
 }
 ```
-
 > 更多细节看这篇文章：[三方库源码笔记（9）-Glide 源码详解](https://juejin.cn/post/6891307560557608967)
 
 ## 2、方法代理
@@ -1153,11 +1105,6 @@ Fragment 还有一种特殊的用法。我们平时是通过 `requestPermissions
 这里提供一个简单的小例子，代码很简单，就不再过多讲解了
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @公众号：字节数组
- */
 class RequestPermissionsFragment : Fragment() {
 
     companion object {
@@ -1213,7 +1160,6 @@ class RequestPermissionsFragment : Fragment() {
 
 }
 ```
-
 之后在 FragmentActivity 或者 Fragment 中就可以通过以下方式来完成整个权限申请操作了，直接在回调里拿到申请结果
 
 ```kotlin
@@ -1230,11 +1176,10 @@ RequestPermissionsFragment.request(
     }
 }
 ```
-
 ![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/05db3926efb84aedac886cb298ab40e0~tplv-k3u1fbpfcp-watermark.image)
 
 # 9、结尾
 
 自我感觉本篇文章已经讲清楚了 Fragment 大部分的知识点了，陆陆续续写了一万多字，有基础知识也有新知识，也许也包含了一些你还没了解过的知识点，看完之后你有觉得 Fragment 如今真的在变得越来越好用了吗 🤣🤣 有遗漏的知识点欢迎补充
 
-最后当然也少不了本文的全部示例代码了：[AndroidOpenSourceDemo](https://github.com/leavesCZY/AndroidOpenSourceDemo)
+最后当然也少不了本文的全部示例代码了：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)

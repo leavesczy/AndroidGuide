@@ -11,7 +11,6 @@ ContentProvider是Android系统中提供的专门用户不同应用间进行数�
     /** Return a ContentResolver instance for your application's package. */
     public abstract ContentResolver getContentResolver();
 ```
-
 所以可以在所有继承Context的类中通过 getContentResovler() 方法获取ContentResolver
 
 ```java
@@ -80,7 +79,6 @@ public class MyContentProvider extends ContentProvider {
             android:authorities="com.czy.contentprovideremo.MyContentProvider"
             android:exported="true" />
 ```
-
  - name：ContentProvider的全称类名
  - authorities：唯一标识了一个ContentProvider，外部应用通过该属性值来访问我们的ContentProvider。因此该属性值必须是唯一的，建议在命名时以包名为前缀
  - exported：表明是否允许其他应用调用ContentProvider，true表示支持，false表示不支持。默认值根据开发者的属性设置而会有所不同，如果包含 Intent-Filter 则默认值为true，否则为false
@@ -121,10 +119,6 @@ URI 代表了要操作的数据对象，主要包含了两部分信息：
 创建一个名为"book.db"的数据库，包含“book”和“user”两张表
 
 ```java
-/**
- * @Author: leavesCZY
- * @Date:  2017/4/3 12:07
- */
 public class DbOpenHelper extends SQLiteOpenHelper {
 
     //数据库名
@@ -352,7 +346,6 @@ public class MainActivity extends AppCompatActivity {
 04-03 16:54:34.018 25151-25151/com.czy.contentproviderdemo E/MainActivity: ID:3  UserName:leavesc  Sex:男
 04-03 16:54:34.018 25151-25151/com.czy.contentproviderdemo E/MainActivity: ID:4  UserName:叶叶叶  Sex:男
 ```
-
 ## **六、获取联系人信息**
 
 获取联系人列表

@@ -14,7 +14,7 @@ SparseArray 的使用方式：
 
 ```java
 SparseArray<String> sparseArray = new SparseArray<>();
-sparseArray.put(100,"leavesC");
+sparseArray.put(100,"leavesczy");
 sparseArray.remove(100);
 sparseArray.get(100);
 sparseArray.removeAt(29);

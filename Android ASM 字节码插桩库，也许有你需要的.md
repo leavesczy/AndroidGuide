@@ -9,9 +9,9 @@
 - [ASM 字节码插桩：从 Lambda 表达式讲起](https://juejin.cn/post/7151798531672506398)
 - [ASM 字节码插桩：Jetpack Compose 实现双击防抖](https://juejin.cn/post/7158061389503250445)
 
-发布这几篇文章后，有读者问过我是否支持直接远程依赖使用，由于当时我并没有将代码托管到公共 Maven，仅是在 Github 开源了相关的实现代码而已：[asm-samples](https://github.com/leavesCZY/asm-samples)，所以在当时是不支持的
+发布这几篇文章后，有读者问过我是否支持直接远程依赖使用，由于当时我并没有将代码托管到公共 Maven，仅是在 Github 开源了相关的实现代码而已：[asm-samples](https://github.com/leavesczy/asm-samples)，所以在当时是不支持的
 
-最近比较有空，想着很久没有写文章了，想水一篇，就花了点时间将其中两个我觉得还比较实用的功能点抽取了出来，并新增了两个功能点一并发布到了 Github：[Track](https://github.com/leavesCZY/Track)
+最近比较有空，想着很久没有写文章了，想水一篇，就花了点时间将其中两个我觉得还比较实用的功能点抽取了出来，并新增了两个功能点一并发布到了 Github：[Track](https://github.com/leavesczy/Track)
 
 Track 也发布到了 Gradle Plugins 官网，方便开发者在自己项目中直接远程依赖使用
 
@@ -392,4 +392,4 @@ Track 现阶段就包含以上四个功能点，后续看时间规划我再继�
 
 希望对你有所帮助 ~
 
-Track 的 Github 地址：[Track](https://github.com/leavesCZY/Track)
+Track 的 Github 地址：[Track](https://github.com/leavesczy/Track)

@@ -3,10 +3,6 @@
 读者可以尝试以下操作。可以发现，除了通过 `View.post(Runnable)`这种方式可以获得 View 的真实宽高外，其它方式取得的值都是 0
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class MainActivity : AppCompatActivity() {
 
     private val view by lazy {
@@ -37,7 +33,6 @@ class MainActivity : AppCompatActivity() {
 
 }
 ```
-
 ```java
 github.leavesc.view E/onCreate: width: 0
 github.leavesc.view E/onCreate: height: 0
@@ -48,7 +43,6 @@ github.leavesc.view E/handler: height: 0
 github.leavesc.view E/view.Post: width: 263
 github.leavesc.view E/view.Post: height: 263
 ```
-
 从这就可以引申出几个疑问：
 
 - `View.post(Runnable)` 为什么可以得到 View 的真实宽高
@@ -84,7 +78,6 @@ private HandlerActionQueue getRunQueue() {
     return mRunQueue;
 }
 ```
-
 ## AttachInfo
 
 先来看`View.post(Runnable)`的第一种处理逻辑
@@ -112,7 +105,6 @@ final static class AttachInfo {
     	···
 }
 ```
-
 查找 `mAttachInfo` 的赋值时机可以追踪到 View 的 `dispatchAttachedToWindow` 方法，该方法被调用就意味着 View 已经 Attach 到 Window 上了
 
 ```java
@@ -122,7 +114,6 @@ void dispatchAttachedToWindow(AttachInfo info, int visibility) {
     ···
 }
 ```
-
 再查找`dispatchAttachedToWindow` 方法的调用时机，可以跟踪到 ViewRootImpl 类。ViewRootImpl 内就包含一个 Handler 对象 `mHandler`，并在构造函数中以 `mHandler` 作为构造参数之一来初始化 `mAttachInfo`。ViewRootImpl 的`performTraversals()`方法就会调用 DecorView 的 `dispatchAttachedToWindow` 方法并传入 `mAttachInfo`，从而层层调用整个视图树中所有 View 的 `dispatchAttachedToWindow` 方法，使得所有 childView 都能获取到 `mAttachInfo` 对象
 
 ```java
@@ -150,7 +141,6 @@ private void performTraversals() {
     ···
 }
 ```
-
 此外，`performTraversals()`方法也负责启动整个视图树的 Measure、Layout、Draw 流程，只有当 `performLayout` 被调用后 View 才能确定自己的宽高信息。而 `performTraversals()`本身也是交由 ViewRootHandler 来调用的，即整个视图树的绘制任务也是先插入到 MessageQueue 中，后续再由主线程取出任务进行执行。由于插入到 MessageQueue 中的消息是交由主线程来顺序执行的，所以 `attachInfo.mHandler.post(action)`就保证了 `action` 一定是在 `performTraversals` 执行完毕后才会被调用，因此我们就可以在 Runnable 中获取到 View 的真实宽高了
 
 ## HandlerActionQueue
@@ -212,7 +202,6 @@ public class HandlerActionQueue {
     
 }
 ```
-
 所以说，`getRunQueue().post(action)`只是将我们提交的 Runnable 对象保存到了 `mActions` 中，还需要外部主动调用 `executeActions`方法来执行任务
 
 而这个主动执行任务的操作也是由 View 的 `dispatchAttachedToWindow`来完成的，从而使得 `mActions` 中的所有任务都会被插入到 `mHandler` 的 MessageQueue 中，等到主线程执行完 `performTraversals()` 方法后就会来执行 `mActions`，所以此时我们依然可以获取到 View 的真实宽高
@@ -230,7 +219,6 @@ void dispatchAttachedToWindow(AttachInfo info, int visibility) {
     ···
 }
 ```
-
 # 二、Handler.post(Runnable)
 
 `Handler.post(Runnable)`和`View.post(Runnable)`有什么区别呢？
@@ -276,7 +264,6 @@ public void handleResumeActivity(IBinder token, boolean finalStateRequest, boole
     ···
 }
 ```
-
 此处的 ViewManager 的具体实现类即 WindowManagerImpl，WindowManagerImpl 会将操作转交给 WindowManagerGlobal
 
 ```java
@@ -290,7 +277,6 @@ public void addView(@NonNull View view, @NonNull ViewGroup.LayoutParams params) 
             mContext.getUserId());
 }
 ```
-
 WindowManagerGlobal 就会完成 ViewRootImpl 的初始化并且调用其 `setView` 方法，该方法内部就会再去调用 `performTraversals` 方法启动视图树的绘制流程
 
 ```java
@@ -319,7 +305,6 @@ public void addView(View view, ViewGroup.LayoutParams params,
     }
 }
 ```
-
 所以说， `performTraversals` 方法的调用时机是在 `onResume` 方法之后，所以我们在 `onCreate`和`onResume` 函数中都无法获取到 View 的实际宽高。当然，当 Activity 在单次生命周期过程中第二次调用`onResume` 方法时自然就可以获取到 View 的宽高属性
 
 # 四、View.post(Runnable) 的兼容性
@@ -352,7 +337,6 @@ public boolean post(Runnable action) {
     return true;
 }
 ```
-
 在 Android API 23 及之前的版本上，当 `attachInfo` 为 null 时，会将 Runnable 保存到 ViewRootImpl 内部的一个静态成员变量 `sRunQueues` 中。而 `sRunQueues` 内部是通过 ThreadLocal 来保存 RunQueue 的，这意味着不同线程获取到的 RunQueue 是不同对象，这也意味着**如果我们在子线程中调用`View.post(Runnable)` 方法的话，该 Runnable 永远不会被执行，因为主线程根本无法获取到子线程的 RunQueue**
 
 ```java
@@ -368,7 +352,6 @@ static RunQueue getRunQueue() {
     return rq;
 }
 ```
-
 此外，由于`sRunQueues` 是静态成员变量，主线程会一直对应同一个 RunQueue 对象，如果我们是在主线程中调用`View.post(Runnable)`方法的话，那么该 Runnable 就会被添加到和主线程关联的 RunQueue 中，后续主线程就会取出该 Runnable 来执行
 
 即使该 View 是我们直接 new 出来的对象（就像以下的示例），以上结论依然生效，当系统需要绘制其它视图的时候就会顺便取出该任务，一般很快就会执行到。当然，由于此时 View 并没有 attachedToWindow，所以获取到的宽高值肯定也是 0
@@ -379,7 +362,6 @@ view.post {
     getWidthHeight("view.Post")
 }
 ```
-
 对`View.post(Runnable)`方法的兼容性问题做下总结：
 
 - 当 API < 24 时，如果是在主线程进行调用，那么不管 View 是否有 AttachedToWindow，提交的 Runnable 均会被执行。但只有在 View 被 AttachedToWindow 的情况下才可以获取到 View 的真实宽高
@@ -402,5 +384,4 @@ Activity 的 `onResume` 方法在第一次被调用后，绘制视图树的 Runn
     }
 })
 ```
-
 按照我自己的想法，系统提供`View.post(Runnable)`这个方法的目的不仅仅是为了用来获取 View 的宽高等属性这么简单，有可能是为了提供一种优化手段，使得我们可以在整个视图树均绘制完毕后才去执行一些**不紧急又必须执行**的操作，使得整个视图树可以尽快地呈现出来，以此优化用户体验

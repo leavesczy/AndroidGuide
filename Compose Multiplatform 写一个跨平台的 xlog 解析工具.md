@@ -7,7 +7,7 @@
 - [学不动也要学，Jetpack Compose 写一个俄罗斯方块](https://juejin.cn/post/6974585048762679310)
 - [不止 Android，Compose Multiplatform 初探](https://juejin.cn/post/7062533562460799013)
 
-项目地址：[compose-multiplatform-tetris](https://github.com/leavesCZY/compose-multiplatform-tetris)
+项目地址：[compose-multiplatform-tetris](https://github.com/leavesczy/compose-multiplatform-tetris)
 
 ![](https://upload-images.jianshu.io/upload_images/2552605-30f9781ae1b55f21.png)
 
@@ -232,8 +232,8 @@ compose.desktop {
             packageName = mPackageName
             packageVersion = "1.0.0"
             description = "compose multiplatform xlog decode"
-            copyright = "© 2024 leavesCZY. All rights reserved."
-            vendor = "leavesCZY"
+            copyright = "© 2024 leavesczy. All rights reserved."
+            vendor = "leavesczy"
             val resourcesDir = project.file("src/main/resources")
             windows {
                 menuGroup = packageName
@@ -342,6 +342,6 @@ steps:
       token: ${{secrets.ACTION_TOKEN}}
 ```
 
-相应的代码我都已经开源到了 Github，有兴趣的同学可以去下载试试：[compose-multiplatform-xlog-decode](https://github.com/leavesCZY/compose-multiplatform-xlog-decode) 
+相应的代码我都已经开源到了 Github，有兴趣的同学可以去下载试试：[compose-multiplatform-xlog-decode](https://github.com/leavesczy/compose-multiplatform-xlog-decode) 
 
 另外，如果只想要解析逻辑不需要 GUI 的话，也可以只引用项目中的 core 模块，当中就只包含解析逻辑

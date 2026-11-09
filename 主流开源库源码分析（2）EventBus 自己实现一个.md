@@ -7,11 +7,6 @@
 对于以下两个监听者：EasyEventBusMainActivity 和 EasyEventBusTest，通过标注 `@Event`注解来修饰监听方法，然后使用 EasyEventBus 这个自定义类来进行**注册、反注册和发送消息**
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 class EasyEventBusMainActivity : BaseActivity() {
 
     override val bind by getBind<ActivityEasyEventBusMainBinding>()
@@ -72,7 +67,6 @@ class EasyEventBusTest {
 
 data class HelloBean(val data: String)
 ```
-
 使用起来和真正的 EvnetBus 差不多 😁😁，虽然实际上是要简陋很多的~~
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d9ba6a949d284ba98fe74150a72f764a~tplv-k3u1fbpfcp-zoom-1.image)
@@ -80,11 +74,6 @@ data class HelloBean(val data: String)
 最终自定义的 EasyEventBus 也只有五十行左右的代码量，仅向外部提供了三个方法用于进行**注册、反注册和发送消息**
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 object EasyEventBus {
 
     private val subscriptions = mutableSetOf<Any>()
@@ -138,7 +127,6 @@ object EasyEventBus {
 
 }
 ```
-
 # 一、怎么实现
 
 这里先来想下这个自定义的 EasyEventBus 应该实现什么功能，以及怎么实现
@@ -147,7 +135,7 @@ EasyEventBus 的核心重点就在于其通过**注解处理器**生成辅助文
 
 ```java
 /**
- * 这是自动生成的代码 by leavesCZY
+ * 这是自动生成的代码 by leavesczy
  */
 public class EventBusInject {
 
@@ -178,7 +166,6 @@ public class EventBusInject {
     }
 }
 ```
-
 可以看到，`subscriberIndex`中存储了所有监听方法的签名信息，在应用运行时我们我们只需要通过 `getSubscriberInfo` 方法就可以拿到 `subscriberClass` 的所有监听方法
 
 最后，还需要向外提供一个 API 调用入口，即上面贴出来的自定义的 EasyEventBus 这个自定义类，是提供给使用者运行时调用的，在有消息需要发送的时候通过外部传入的 `subscriberClass` 从 EventBusInject 取出所有监听方法进行反射回调
@@ -198,15 +185,9 @@ public class EventBusInject {
 @Target(AnnotationTarget.FUNCTION)
 annotation class Event
 ```
-
 然后，我们在编译阶段需要预先把所有监听方法抽象保存起来，所以就需要定义两个 JavaBean 来作为承载体
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 data class EventMethodInfo(val methodName: String, val eventType: Class<*>)
 
 data class SubscriberInfo(
@@ -214,15 +195,9 @@ data class SubscriberInfo(
     val methodList: List<EventMethodInfo>
 )
 ```
-
 然后声明一个 EasyEventBusProcessor 类继承于 AbstractProcessor，由编译器在编译阶段传入我们关心的代码元素
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 class EasyEventBusProcessor : AbstractProcessor() {
 
     companion object {
@@ -257,7 +232,6 @@ class EasyEventBusProcessor : AbstractProcessor() {
    
 }
 ```
-
 通过 `collectSubscribers`方法拿到所有的监听方法，保存到 `methodsByClass`中，同时需要对方法签名进行校验：**只能是实例方法，且必须是 public 的，最多且至少包含一个入参参数**
 
 ```kotlin
@@ -334,7 +308,6 @@ private fun checkHasNoErrors(element: ExecutableElement, messager: Messager): Bo
     return true
 }
 ```
-
 然后，再来生成 `subscriberIndex` 这个静态常量，以及对应的静态方法块、`putIndex` 方法
 
 ```kotlin
@@ -406,7 +379,6 @@ private fun generateMethodPutIndex(): MethodSpec {
         .build()
 }
 ```
-
 然后，再来生成 `getSubscriberInfo` 这个公开方法，用于运行时调用
 
 ```kotlin
@@ -423,7 +395,6 @@ private fun generateMethodGetSubscriberInfo(): MethodSpec {
         .build()
 }
 ```
-
 完成以上方法的定义后，就可以在 `process` 方法中完成 EventBusInject 整个类文件的构建了
 
 ```kotlin
@@ -454,17 +425,11 @@ override fun process(
     return true
 }
 ```
-
 # 三、EasyEventBus
 
 EasyEventBus 的逻辑就很简单了，主要是通过反射来生成 EventBusInject 对象，拿到 `subscriber` 关联的 SubscriberInfo，然后在有消息被 Post 出来的时候进行遍历调用即可
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 object EasyEventBus {
 
     private val subscriptions = mutableSetOf<Any>()
@@ -518,7 +483,6 @@ object EasyEventBus {
 
 }
 ```
-
 # 四、GitHub
 
-文本实现的 EasyEventBus 挺简陋的😂😂因为我的想法也只是通过自己动手来加深对 EventBus 的理解而已，这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesCZY/AndroidOpenSourceDemo)
+文本实现的 EasyEventBus 挺简陋的😂😂因为我的想法也只是通过自己动手来加深对 EventBus 的理解而已，这里也提供上述代码的 GitHub 链接：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)

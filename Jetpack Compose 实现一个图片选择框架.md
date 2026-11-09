@@ -33,7 +33,7 @@
 - 框架内部采用的图片加载库是 Coil，且不支持替换。由于目前支持 Jetpack Compose 的图片加载库基本只能选择 Coil 了，因此没有提供替换图片加载库的入口
 - 图片列表的滑动性能要低于原生的 RecyclerView，debug 版本尤为明显。此问题目前无解，只能等 Google 官方后续的优化了
 
-代码我也开源到了 Github，懒得想名字，再加上一开始的设计思路也来自于 Matisse，因此就取了一样的名字，也叫 [Matisse](https://github.com/leavesCZY/Matisse)。下文如果没有特别说明，Matisse 指的就是此 Jetpack Compose 版本的图片选择框架了
+代码我也开源到了 Github，懒得想名字，再加上一开始的设计思路也来自于 Matisse，因此就取了一样的名字，也叫 [Matisse](https://github.com/leavesczy/Matisse)。下文如果没有特别说明，Matisse 指的就是此 Jetpack Compose 版本的图片选择框架了
 
 在 UI 层面上，用 Jetpack Compose 来实现相比原生的 View 体系实在要简单很多，在这一块除了滑动性能之外我也没遇到其它问题。因此，本文的内容和 Jetpack Compose 无关，主要是讲 Matisse 的一些实现细节和遇到的系统兼容性问题
 
@@ -646,4 +646,4 @@ imageView.load(File(filePath).readBytes())
 
 # Github
 
-以上就是 Matisse 的一些实现细节和遇到的系统兼容性问题，更多实现细节请看 Github：[Matisse](https://github.com/leavesCZY/Matisse)
+以上就是 Matisse 的一些实现细节和遇到的系统兼容性问题，更多实现细节请看 Github：[Matisse](https://github.com/leavesczy/Matisse)

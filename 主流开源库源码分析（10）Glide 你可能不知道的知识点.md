@@ -7,10 +7,6 @@
 首先需要继承于 AppGlideModule，在 `applyOptions`方法中设置配置参数，然后为实现类添加 @GlideModule 注解，这样在编译阶段 Glide 就可以通过 APT 解析到我们的这一个实现类，然后将我们的配置参数设置为默认值
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 @GlideModule
 class MyAppGlideModule : AppGlideModule() {
 
@@ -44,7 +40,6 @@ class MyAppGlideModule : AppGlideModule() {
 
 }
 ```
-
 在编译后，我们的工程目录中就会自动生成 GeneratedAppGlideModuleImpl 这个类，该类就包含了 MyAppGlideModule
 
 ```java
@@ -88,7 +83,6 @@ final class GeneratedAppGlideModuleImpl extends GeneratedAppGlideModule {
   }
 }
 ```
-
 在运行阶段，Glide 就会通过反射生成一个 GeneratedAppGlideModuleImpl 对象，然后根据我们的默认配置项来初始化 Glide 实例
 
 ```java
@@ -125,7 +119,6 @@ final class GeneratedAppGlideModuleImpl extends GeneratedAppGlideModule {
     return result;
   }
 
-
  private static void initializeGlide(
       @NonNull Context context,
       @NonNull GlideBuilder builder,
@@ -147,7 +140,6 @@ final class GeneratedAppGlideModuleImpl extends GeneratedAppGlideModule {
     Glide.glide = glide;
   }
 ```
-
 # 二、自定义网络请求组件
 
 默认情况下，Glide 是通过 HttpURLConnection 来进行联网请求图片的，这个过程就由 HttpUrlFetcher 类来实现。HttpURLConnection 相对于我们常用的 OkHttp 来说比较原始低效，我们可以通过使用 Glide 官方提供的`okhttp3-integration`来将网络请求交由 OkHttp 完成
@@ -157,16 +149,11 @@ dependencies {
     implementation "com.github.bumptech.glide:okhttp3-integration:4.11.0"
 }
 ```
-
 如果想方便后续修改的话，我们也可以将`okhttp3-integration`内的代码复制出来，通过 Glide 开放的 Registry 来注册一个自定义的 OkHttpStreamFetcher，这里我也提供一份 kotlin 版本的示例代码
 
 首先需要继承于 DataFetcher，在拿到 GlideUrl 后完成网络请求，并将请求结果通过 DataCallback 回调出去
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class OkHttpStreamFetcher(private val client: Call.Factory, private val url: GlideUrl) :
     DataFetcher<InputStream>, Callback {
 
@@ -236,14 +223,9 @@ class OkHttpStreamFetcher(private val client: Call.Factory, private val url: Gli
 
 }
 ```
-
 之后还需要继承于 ModelLoader，提供构建 OkHttpUrlLoader 的入口
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class OkHttpUrlLoader(private val client: Call.Factory) : ModelLoader<GlideUrl, InputStream> {
 
     override fun buildLoadData(
@@ -276,14 +258,9 @@ class OkHttpUrlLoader(private val client: Call.Factory) : ModelLoader<GlideUrl, 
 
 }
 ```
-
 最后注册 OkHttpUrlLoader ，之后 GlideUrl 类型的请求都会交由其处理
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 @GlideModule
 class MyAppGlideModule : AppGlideModule() {
 
@@ -305,7 +282,6 @@ class MyAppGlideModule : AppGlideModule() {
 
 }
 ```
-
 # 三、实现图片加载进度监听
 
 对于某些高清图片来说，可能一张就是十几MB甚至上百MB大小了，如果没有进度条的话用户可能就会等得有点难受了，这里我就提供一个基于 **OkHttp 拦截器**实现的监听图片加载进度的方法
@@ -313,10 +289,6 @@ class MyAppGlideModule : AppGlideModule() {
 首先需要对 OkHttp 原始的 ResponseBody 进行一层包装，在内部根据 **contentLength** 和**已读取到的流字节数**来计算当前进度值，然后向外部提供通过 imageUrl 来注册 ProgressListener 的入口
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 internal class ProgressResponseBody constructor(
     private val imageUrl: String,
     private val responseBody: ResponseBody?
@@ -409,14 +381,9 @@ internal class ProgressResponseBody constructor(
 
 }
 ```
-
 然后在 Interceptor 中使用 ProgressResponseBody 对原始的 ResponseBody 多进行一层包装，将我们的 ProgressResponseBody 作为一个代理，之后再将 ProgressInterceptor 添加给 OkHttpClient 即可
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class ProgressInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -430,7 +397,6 @@ class ProgressInterceptor : Interceptor {
 
 }
 ```
-
 最终实现的效果：
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dc45cc83a1f745af92317d2d735a9ad6~tplv-k3u1fbpfcp-zoom-1.image)
@@ -442,15 +408,9 @@ class ProgressInterceptor : Interceptor {
 ```kotlin
 https://images.pexels.com/photos/1425174/pexels-photo-1425174.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260&token=tokenValue
 ```
-
 从我的上篇文章内容可以知道，一张图片在进行磁盘缓存时必定会同时对应一个唯一 Key，这样 Glide 在后续加载同样的图片时才能复用已有的缓存文件。对于一张网络图片来说，其唯一 Key 的生成就依赖于 GlideUrl 类的 `getCacheKey()`方法，该方法会直接返回网络图片的 Url 字符串。如果 Url 的 token 值会一直变化，那么 Glide 就无法对应上同一张图片了，导致磁盘缓存完全失效
 
 ```java
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 public class GlideUrl implements Key {
     
   @Nullable private final String stringUrl;
@@ -471,15 +431,9 @@ public class GlideUrl implements Key {
     
 }
 ```
-
 想要解决这个问题，就需要来手动定义磁盘缓存时的唯一 Key。这可以通过继承 GlideUrl，修改`getCacheKey()`方法的返回值来实现，将 Url 移除 token 键值对后的字符串作为缓存 Key 即可
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 class TokenGlideUrl(private val selfUrl: String) : GlideUrl(selfUrl) {
 
     override fun getCacheKey(): String {
@@ -497,13 +451,11 @@ class TokenGlideUrl(private val selfUrl: String) : GlideUrl(selfUrl) {
 
 }
 ```
-
 然后在加载图片的时候使用 TokenGlideUrl 来传递图片 Url 即可
 
 ```kotlin
 Glide.with(Context).load(TokenGlideUrl(ImageUrl)).into(ImageView)
 ```
-
 # 五、如何直接拿到图片
 
 如果想直接取得 Bitmap 而非显示在 ImageView 上的话，可以用以下同步请求的方式来获得 Bitmap。需要注意的是，`submit()`方法就会触发 Glide 去请求图片，此时请求操作还是运行于 Glide 内部的线程池的，但 `get()`操作就会直接阻塞所在线程，直到图片加载结束（不管成功与否）才会返回
@@ -520,7 +472,6 @@ thread {
     }
 }
 ```
-
 也可以用类似的方式来拿到 File 或者 Drawable
 
 ```kotlin
@@ -535,7 +486,6 @@ thread {
     }
 }
 ```
-
 Glide 也提供了以下的异步加载方式
 
 ```kotlin
@@ -555,7 +505,6 @@ Glide.with(this)
         }
     })
 ```
-
 # 六、Glide 如何实现网络监听
 
 在上篇文章我有讲到，RequestTracker 就用于存储所有加载图片的任务，并提供了**开始、暂停和重启**所有任务的方法，一个常见的需要重启任务的情形就是用户的网络**从无信号状态恢复正常了**，此时就应该自动重启所有未完成的任务
@@ -565,7 +514,6 @@ ConnectivityMonitor  connectivityMonitor =
         factory.build(
             context.getApplicationContext(),
             new RequestManagerConnectivityListener(requestTracker));  
-
 
 private class RequestManagerConnectivityListener
       implements ConnectivityMonitor.ConnectivityListener {
@@ -587,7 +535,6 @@ private class RequestManagerConnectivityListener
     }
   }
 ```
-
 可以看出来，RequestManagerConnectivityListener 本身就只是一个回调函数，重点还需要看 ConnectivityMonitor 是如何实现的。ConnectivityMonitor 实现类就在 DefaultConnectivityMonitorFactory 中获取，内部会判断当前应用是否具有 `NETWORK_PERMISSION` 权限，如果没有的话则返回一个空实现 NullConnectivityMonitor，有权限的话就返回 DefaultConnectivityMonitor，在内部根据 ConnectivityManager 来判断当前的网络连接状态
 
 ```java
@@ -614,14 +561,9 @@ public class DefaultConnectivityMonitorFactory implements ConnectivityMonitorFac
   }
 }
 ```
-
 DefaultConnectivityMonitor 的逻辑比较简单，不过多赘述。我觉得比较有价值的一点是：Glide 由于使用人数众多，有比较多的开发者会反馈 issues，DefaultConnectivityMonitor 内部就对各种可能抛出 Exception 的情况进行了捕获，这样相对来说会比我们自己实现的逻辑要考虑周全得多，所以我就把 DefaultConnectivityMonitor 复制出来转为 kotlin 以便后续自己复用了
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- */
 internal interface ConnectivityListener {
     fun onConnectivityChanged(isConnected: Boolean)
 }
@@ -695,7 +637,6 @@ internal class DefaultConnectivityMonitor(
 
 }
 ```
-
 # 七、GitHub
 
-关于 Glide 的知识点扩展也介绍完了，上述的所有示例代码我也都放到 GitHub 了，欢迎 star：[AndroidOpenSourceDemo](https://github.com/leavesCZY/AndroidOpenSourceDemo)
+关于 Glide 的知识点扩展也介绍完了，上述的所有示例代码我也都放到 GitHub 了，欢迎 star：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)

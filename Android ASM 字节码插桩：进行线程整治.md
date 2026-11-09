@@ -41,11 +41,6 @@
 先定义一个 Thread 子类，为其多声明一个入参参数 className，然后手动将 **原始代码中设置的线程名** 和 **className** 按照既定规则拼接在一起作为最终的线程名
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @公众号：字节数组
- */
 class OptimizedThread(runnable: Runnable?, name: String?, className: String) :
     Thread(runnable, generateThreadName(name, className)) {
 
@@ -69,15 +64,9 @@ class OptimizedThread(runnable: Runnable?, name: String?, className: String) :
 
 }
 ```
-
 之后，在 Transform 阶段只要遍历到指向 `java/lang/Thread ` 的 TypeInsnNode，且不是包含在 ThreadFactory 内部的话，那就是要处理的匿名线程了
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @公众号：字节数组
- */
 class OptimizedThreadTransform(private val config: OptimizedThreadConfig) : BaseTransform() {
 
     companion object {
@@ -139,7 +128,6 @@ class OptimizedThreadTransform(private val config: OptimizedThreadConfig) : Base
 
 }
 ```
-
 找到到目标指令后，就将 `java/lang/Thread ` 替换为 OptimizedThread，然后继续向后遍历找到调用 Thread 构造参数的指令，为该指令多插入一个 String 类型的方法入参参数声明，然后将 className 作为构造参数传给 OptimizedThread，至此就完成替换了
 
 ```kotlin
@@ -166,7 +154,6 @@ private fun transformNew(
     }
 }
 ```
-
 # 二、线程池
 
 `java.util.concurrent.Executors` 类中用于获取线程池的方法有十二个之多
@@ -200,7 +187,6 @@ public class Executors {
 
 }
 ```
-
 这十二个静态方法按照入参参数来进行区分的话有三种：
 
 - 不包含入参参数
@@ -221,11 +207,6 @@ JDK 中的源码我们是没法进行 hook 的，而如果要在字节码层面�
 首先是定义拿来进行替换的 OptimizedExecutors，为每个生成的 ThreadPoolExecutor 统一设置五秒的超时时间并允许回收核心线程，在 NamedThreadFactory 中定义统一的线程命名规则
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @公众号：字节数组
- */
 object OptimizedExecutors {
 
     private const val defaultThreadKeepAliveTime = 5000L
@@ -301,15 +282,9 @@ object OptimizedExecutors {
 
 }
 ```
-
 之后，在 Transform 阶段只要遍历到调用了 Executors 中静态方法的指令的话，就将该指令中的 Executors 替换为 OptimizedExecutors，然后添加多插入的参数
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @公众号：字节数组
- */
 class OptimizedThreadTransform(private val config: OptimizedThreadConfig) : BaseTransform() {
 
     companion object {
@@ -377,7 +352,6 @@ class OptimizedThreadTransform(private val config: OptimizedThreadConfig) : Base
 
 }
 ```
-
 # 三、需慎重
 
 需要注意，上述的手段并不全是可以在项目中进行全盘套用的
@@ -392,4 +366,4 @@ class OptimizedThreadTransform(private val config: OptimizedThreadConfig) : Base
 
 # 四、源码
 
-最后也给出完整的源码：[asm-samples](https://github.com/leavesCZY/asm-samples)
+最后也给出完整的源码：[asm-samples](https://github.com/leavesczy/asm-samples)

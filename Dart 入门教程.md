@@ -80,7 +80,7 @@ dart 是强类型语言，无法将一个已声明具体变量类型的变量赋
 `dynamic` 类似于 Java 中的 `Object`，`dynamic` 对象可以用来指向任意类型变量，非 null 的 dynamic 变量会有具体的运行时类型
 
 ```dart
-  dynamic value = "leavesC";
+  dynamic value = "leavesczy";
   print(value.runtimeType); //String
   value = 12121;
   print(value.runtimeType); //int
@@ -96,7 +96,7 @@ const 变量代表的是编译时常量，例如字面量就是一种编译时�
 
 ```dart
 void main() {
-  const URL = "https://github.com/leavesCZY/AndroidGuide";
+  const URL = "https://github.com/leavesczy/AndroidGuide";
   var booleValue = true;
   final name = getName(booleValue);
   print(name);
@@ -104,9 +104,9 @@ void main() {
 
 String getName(boolValue) {
   if (boolValue) {
-    return "leavesC";
+    return "leavesczy";
   } else {
-    return "leavesC =_=";
+    return "leavesczy =_=";
   }
 }
 ```
@@ -145,8 +145,8 @@ void main() {
 除了可以通过单引号或者双引号来声明一个字符串外，也可以通过相邻的字符串字面量来声明一个组合字符串（相当于使用 + 把字符串相加为一个整体），此时可以混用**单引号**和**双引号**，但建议只用单引号
 
 ```dart
-  var stringValue = "leavesC";
-  var stringValue2 = 'leavesC =_=';
+  var stringValue = "leavesczy";
+  var stringValue2 = 'leavesczy =_=';
   var stringValue3 = "分段 "
       "换行了也可以"
       '又换了一行';
@@ -234,9 +234,9 @@ map 是一个关联键和值的数据类型，键和值可以是任何类型的�
 
 ```dart
 void main() {
-  var mapValue = {"name": "leavesC", "age": 24};
-  mapValue["url"] = "https://github.com/leavesCZY";
-  print(mapValue); //{name: leavesC, age: 24, url: https://github.com/leavesCZY}
+  var mapValue = {"name": "leavesczy", "age": 24};
+  mapValue["url"] = "https://github.com/leavesczy";
+  print(mapValue); //{name: leavesczy, age: 24, url: https://github.com/leavesczy}
   print(mapValue.length); //3
   print(mapValue.runtimeType); //_InternalLinkedHashMap<String, Object>
 }
@@ -245,13 +245,13 @@ void main() {
 也可以限定 map 可以存储的数据类型
 
 ```dart
-var mapValue = <String, String>{"name": "leavesC"};
+var mapValue = <String, String>{"name": "leavesczy"};
 ```
 
 与 list 类似，要创建一个编译时常量的 map 需要在 map 的字面量前加上 const 关键字
 
 ```dart
-  var mapValue = const {"name": "leavesC", "age": 24};
+  var mapValue = const {"name": "leavesczy", "age": 24};
   //error，可正常编译，但会导致运行时抛出异常
   mapValue["name"] = "hi";
 ```
@@ -266,10 +266,10 @@ dart 是一种真正的面向对象语言，所以即使函数也是对象，即
 
 ```dart
 void main() {
-  printMsg("leavesC");
+  printMsg("leavesczy");
 
   printMsg2(100);
-  printMsg2("leavesC");
+  printMsg2("leavesczy");
 }
 
 void printMsg(String msg) {
@@ -306,13 +306,13 @@ printValue(value) {
 ```dart
 void main() {
   var printUserFun = printName;
-  printUserFun("leavesC"); //name: leavesC
+  printUserFun("leavesczy"); //name: leavesczy
 
-  var list = ["leavesC", "叶"]; 
-  list.forEach(printName); //name: leavesC   name: 叶
+  var list = ["leavesczy", "叶"]; 
+  list.forEach(printName); //name: leavesczy   name: 叶
 
   var sayHelloFun = (String name) => print("$name , hello");
-  sayHelloFun("leavesC"); //leavesC , hello
+  sayHelloFun("leavesczy"); //leavesczy , hello
 }
 
 void printName(String name) {
@@ -326,8 +326,8 @@ void printName(String name) {
 
 ```dart
 void main() {
-  printUser("leavesC"); //name: leavesC, age: null
-  printUser("leavesC", 25); //name: leavesC, age: 25
+  printUser("leavesczy"); //name: leavesczy, age: null
+  printUser("leavesczy", 25); //name: leavesczy, age: 25
 }
 
 void printUser(String name, [int age]) {
@@ -341,9 +341,9 @@ void printUser(String name, [int age]) {
 
 ```dart
 void main() {
-  printUser("leavesC"); //name: leavesC, age: null
-  printUser("leavesC", age: 25); //name: leavesC, age: 25
-  printUser2("leavesC", age: 25); //name: leavesC, age: 25
+  printUser("leavesczy"); //name: leavesczy, age: null
+  printUser("leavesczy", age: 25); //name: leavesczy, age: 25
+  printUser2("leavesczy", age: 25); //name: leavesczy, age: 25
 }
 
 void printUser(String name, {int age}) {
@@ -361,11 +361,11 @@ void printUser2(String name, {age: int}) {
 
 ```dart
 void main() {
-  printUser("leavesC"); //name: leavesC, age: 30
-  printUser("leavesC", 25); //name: leavesC, age: 25
+  printUser("leavesczy"); //name: leavesczy, age: 30
+  printUser("leavesczy", 25); //name: leavesczy, age: 25
 
-  printUser2("leavesC"); //name: leavesC, age: 30
-  printUser2("leavesC", age: 25); //name: leavesC, age: 25
+  printUser2("leavesczy"); //name: leavesczy, age: 30
+  printUser2("leavesczy", age: 25); //name: leavesczy, age: 25
 }
 
 void printUser(String name, [int age = 30]) {
@@ -384,7 +384,7 @@ void printUser2(String name, {int age = 30}) {
 ```dart
 void main() {
   var printFunction = printUser;
-  printFunction("leavesC");
+  printFunction("leavesczy");
   print(printFunction); //Closure: (String, [int]) => void from Function 'printUser': static.
 }
 
@@ -453,7 +453,7 @@ dart 提供了一些比较简便的运算符来简化操作，大部分和 Java 
 void main() {
   //is 用于判断变量是否是指定的数据类型
   //is! 含义是 is 取反
-  var strValue = "leavesC";
+  var strValue = "leavesczy";
   print(strValue is String); //true
   print(strValue is int); //false
   print(strValue is! String); //false
@@ -469,9 +469,9 @@ void main() {
   //如果 ??= 左边的变量值为 null ,则将其赋值为右边的值
   var name = null;
   var age = 25;
-  name ??= "leavesC";
+  name ??= "leavesczy";
   age ??= 30;
-  print("name：$name"); //name：leavesC
+  print("name：$name"); //name：leavesczy
   print("age: $age"); //age: 25
 
   //如果 ?. 左边的变量值不为 null，则右边的操作生效
@@ -523,11 +523,11 @@ void main() {
   }
 
   //switch
-  String strValue = "leavesC";
+  String strValue = "leavesczy";
   switch (strValue) {
     case "ye":
       break;
-    case "leavesC":
+    case "leavesczy":
       print(strValue);
       break;
     default:
@@ -550,8 +550,8 @@ void main() {
 
 ```dart
   var hasName = true;
-  var info = {if (hasName) "name": "leavesC", "age": 24};
-  print(info); //{name: leavesC, age: 24}
+  var info = {if (hasName) "name": "leavesczy", "age": 24};
+  print(info); //{name: leavesczy, age: 24}
 ```
 
 ```dart
@@ -729,8 +729,8 @@ dart 会自动为 `name` 和 `age` 提供隐式的 `getter` 和 `setter` 方法�
 
 ```dart
 void main() {
-  var person = Person("leavesC", 25);
-  print('${person.name} ${person.age}'); //leavesC 25
+  var person = Person("leavesczy", 25);
+  print('${person.name} ${person.age}'); //leavesczy 25
   print('${person.runtimeType}'); //Person
 }
 ```
@@ -752,7 +752,7 @@ dart 为用于赋予初始值的构造函数提供了简便写法，以下两种
 
 ```dart
   Person.getDefault() {
-    this.name = "leavesC";
+    this.name = "leavesczy";
     this.age = 25;
   }
 ```
@@ -761,7 +761,7 @@ dart 为用于赋予初始值的构造函数提供了简便写法，以下两种
 
 ```dart
   Person.getDefault()
-      : name = "leavesC",
+      : name = "leavesczy",
         age = 25 {}
 ```
 
@@ -770,7 +770,7 @@ dart 为用于赋予初始值的构造函数提供了简便写法，以下两种
 ```dart
 void main() {
   var defaultPerson = Person.getDefault();
-  print('${defaultPerson.name} ${defaultPerson.age}'); //leavesC 25
+  print('${defaultPerson.name} ${defaultPerson.age}'); //leavesczy 25
   print('${defaultPerson.runtimeType}'); //Person
 }
 ```

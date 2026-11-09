@@ -66,7 +66,6 @@ data class Config(
     val enabled: Boolean = true
   )
 ```
-
 # 二、初始化
 
 如今，我们在项目中引入 LeakCanary 只需要添加如下依赖即可，无须任何的初始化行为等附加操作，当应用启动时 LeakCanary 就会自动启动并开始监测了
@@ -77,7 +76,6 @@ dependencies {
   debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
 }
 ```
-
 一般来说，像这类第三方库都是需要由外部传入一个 `ApplicationContext` 对象进行初始化并启动的，LeakCanary 的 1.x 版本也是如此，但在 2.x 版本中，LeakCanary 将初始过程交由 `AppWatcherInstaller` 这个 `ContentProvider` 来自动完成
 
 ```kotlin
@@ -103,7 +101,6 @@ internal sealed class AppWatcherInstaller : ContentProvider() {
     ···
 }
 ```
-
 由于 `ContentProvider` 会在 `Application` 被创建之前就由系统调用其 `onCreate()` 方法来完成初始化，所以 LeakCanary 通过 `AppWatcherInstaller` 就可以拿到 `Context` 来完成初始化并随应用一起启动，通过这种方式就简化了使用者的引入成本。而且由于我们的引用方式是 `debugImplementation`，所以**正式版本**会自动移除对 LeakCanary 的所有引用，进一步简化了引入成本
 
 Jetpack 也包含了一个组件来实现**通过 ContentProvider 来完成初始化的逻辑**：[AppStartup](https://juejin.im/post/6847902224069165070)。在实现思路上两者很类似，但是如果每个三方库都通过自定义 `ContentProvider` 来实现初始化的话，那么应用的启动速度就会很感人了吧 :joy:，所以 Jetpack 官方推出的 `AppStartup` 应该是以后的主流才对
@@ -148,7 +145,6 @@ internal object InternalAppWatcher {
       
 }
 ```
-
 LeakCanary 具体进行内存泄露检测的逻辑可以分为三类：
 
 - ObjectWatcher。检测 Object 的内存泄露情况
@@ -164,10 +160,6 @@ LeakCanary 具体进行内存泄露检测的逻辑可以分为三类：
 这个可以依靠引用队列 `ReferenceQueue` 来实现。先来看个小例子
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 fun main() {
     val referenceQueue = ReferenceQueue<Pair<String, Int>?>()
     var pair: Pair<String, Int>? = Pair("name", 24)
@@ -184,7 +176,6 @@ fun main() {
     println(referenceQueue.poll()) //java.lang.ref.WeakReference@d716361
 }
 ```
-
 可以看到，在 GC 过后 `referenceQueue.poll()` 的返回值变成了**非 null**，这是由于 `WeakReference` 和 `ReferenceQueue` 的一个组合特性导致的：在声明一个 `WeakReference` 对象时如果同时传入了 `ReferenceQueue` 作为构造参数的话，那么当 `WeakReference` 持有的对象被 GC 回收时，JVM 就会把这个**弱引用**存入与之关联的引用队列之中。依靠这个特性，我们就可以实现内存泄露的检测了
 
 例如，当用户按返回键退出 Activity 时，正常情况下该 Activity 对象应该在不久后就被系统回收，我们可以监听 Activity 的 `onDestroy` 回调，在回调时把 Activity 对象保存到和 `ReferenceQueue` 关联的 `WeakReference` 中，在一段时间后（可以主动触发几次 GC）检测 `ReferenceQueue` 中是否有值，如果一直为 null 的话就说明发生了内存泄露。LeakCanary 就是通过这种方法来实现的
@@ -226,7 +217,6 @@ fun watch(watchedObject: Any, description: String) {
     }
 }
 ```
-
 `watch()` 方法的主要逻辑：
 
 1. 为每个 `watchedObject` 生成一个**唯一标识 key**，通过该 key 构建一个 `watchedObject` 的弱引用 `KeyedWeakReference`，将该弱引用保存到 `watchedObjects` 中。`ObjectWatcher` 可以先后监测多个对象，每个对象都会先被存入到 `watchedObjects` 中
@@ -260,7 +250,6 @@ class KeyedWeakReference(
 
 }
 ```
-
 `moveToRetained` 方法就用于判断指定 key 关联的对象是否已经泄露，如果没有泄露则移除对该对象的弱引用，有泄露的话则更新其 `retainedUptimeMillis` 值，以此来标记其发生了泄露，并同时通过回调 `onObjectRetainedListeners` 来分析内存泄露链
 
 ```kotlin
@@ -290,7 +279,6 @@ private fun removeWeaklyReachableObjects() {
     } while (ref != null)
 }
 ```
-
 # 四、ActivityDestroyWatcher：检测Activity 
 
 理解了 `ObjectWatcher` 的流程后来看 `ActivityDestroyWatcher` 就会比较简单了。`ActivityDestroyWatcher` 会向 `Application` 注册一个 `ActivityLifecycleCallbacks` 回调，当收到每个 Activity 执行了 `onDestroy` 的回调后，就会将将 Activity 对象转交由 `ObjectWatcher` 来进行监听
@@ -316,7 +304,6 @@ internal class ActivityDestroyWatcher private constructor(private val objectWatc
 
 }
 ```
-
 # 五、FragmentDestroyWatcher：检测Fragment 
 
 做 Android 应用开发的应该都知道，现在 Google 提供的基础依赖包分为了 **Support** 和 **AndroidX** 两种，**Support** 版本已经不再维护，主流的都是使用 **AndroidX** 了。而 LeakCanary 为了照顾老项目，就贴心的为这两种版本分别提供了 Fragment 的内存检测功能
@@ -398,7 +385,6 @@ internal object FragmentDestroyWatcher {
   ···
 }
 ```
-
 由于 `AndroidXFragmentDestroyWatcher`、`AndroidSupportFragmentDestroyWatcher`、`AndroidOFragmentDestroyWatcher` 在逻辑上很类似，且就 `AndroidXFragmentDestroyWatcher` 同时提供了 `ViewModel` 内存泄露的检测功能，所以这里只看 `AndroidXFragmentDestroyWatcher` 就行
 
 `AndroidXFragmentDestroyWatcher` 的主要逻辑是：
@@ -457,7 +443,6 @@ internal class AndroidXFragmentDestroyWatcher(
   }
 }
 ```
-
 Fragment 和 FragmentView 走向 `Destroyed` 时，正常情况下它们都是不会被复用的，应该会很快就被 GC 回收，且它们本质上都只是一种对象，所以直接使用 `ObjectWatcher` 进行检测即可
 
 # 六、ViewModelClearedWatcher：检测ViewModel
@@ -515,7 +500,6 @@ internal class ViewModelClearedWatcher(
     }
 }
 ```
-
 # 七、检测到内存泄露后的流程
 
 我们不可能在 Activity 刚被回调了 `onDestroy` 方法就马上来判断 `ReferenceQueue` 中是否有值，因为 JVM 的 GC 时机是不确定的，Activity 对象可能不会那么快就被回收，所以需要延迟一段时间后再来检测。而即使延迟检测了，也可能会存在**应用没有发生内存泄露只是系统还未执行 GC** 的情况，所以就需要去主动触发 GC，经过几轮检测后才可以确定当前应用是否的确发生了内存泄露
@@ -583,7 +567,6 @@ class ObjectWatcher constructor(private val clock: Clock, private val checkRetai
     
 }
 ```
-
 `ObjectWatcher` 对象又是在 `InternalAppWatcher` 里初始化的，`checkRetainedExecutor` 在收到任务后会通过 `Handler` 来延时五秒执行
 
 ```kotlin
@@ -609,7 +592,6 @@ internal object InternalAppWatcher {
 
 }
 ```
-
 `ObjectWatcher` 的 `moveToRetained` 方法又会通过 `onObjectRetained` 向外发出通知：**当前可能发生了内存泄露**。`InternalLeakCanary` 会收到这个通知，然后交由 `HeapDumpTrigger` 来进行检测
 
 ```kotlin
@@ -629,7 +611,6 @@ internal object InternalLeakCanary : (Application) -> Unit, OnObjectRetainedList
     
 }
 ```
-
 当 LeakCanary 判定当前真的存在内存泄露时，就会进行 **DumpHeap**，找到泄露对象的引用链，而这个操作是比较**费时费内存**的，可能会直接导致应用页面无响应，所以 LeakCanary 进行 DumpHeap 前会有许多前置检查操作和前置条件，就是为了尽量减少 DumpHeap 次数以及在 DumpHeap 时尽量减少对开发人员的干扰
 
  `heapDumpTrigger` 的 `scheduleRetainedObjectCheck()` 方法的主要逻辑是：
@@ -796,7 +777,6 @@ internal class HeapDumpTrigger(
 
 }
 ```
-
 更后面的流程就涉及具体的 DumpHeap 操作了，这里就不再展开了，因为我也不太懂，后续有机会再单独写一篇文章来介绍了~~
 
 # 八、小提示
@@ -819,7 +799,6 @@ class MyService : Service {
   }
 }
 ```
-
 ## 2、更改配置项
 
 LeakCanary 提供的默认配置项大多数情况已经很适合我们在项目中直接使用了，而如果我们想要更改 LeakCanary 的默认配置项（例如不希望检测 FragmentView），可以在 Application 中进行更改：
@@ -833,7 +812,6 @@ class DebugExampleApplication : Application() {
   }
 }
 ```
-
 由于 LeakCanary 的引用方式是 `debugImplementation`，在 `releas` 环境下是引用不到 LeakCanary 的，所以为了避免在生成 `release` 包时需要主动来删除这行配置项，需要将 `DebugExampleApplication` 放到 `src/debug/java` 文件夹中
 
 # 九、结尾

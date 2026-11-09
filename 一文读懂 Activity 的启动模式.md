@@ -46,7 +46,6 @@ Activity 的启动模式本身是一个挺难理解的知识点，大多数开�
     android:launchMode="singleInstance"
     android:taskAffinity="task.test4" />
 ```
-
 从概念上讲，具有相同 taskAffinity 的 Activity 归属于同一任务栈（实际上并不一定）。从用户的角度来看则是归属于同一“应用”，因为每种 taskAffinity 在最近任务列表中会各自独占一个列表项，看起来就像一个个单独的应用，而实际上这些列表项可能是来自于同个应用
 
 # 4、启动模式
@@ -99,15 +98,9 @@ launchMode 一共包含以下四种属性值：
     android:launchMode="singleInstance"
     android:taskAffinity="task.d" />
 ```
-
 通过打印 Activity 的 `hashCode()` 方法返回值来判断 Activity 的实例是否被复用了，再通过 `getTaskId()` 方法来判断 Activity 处于哪个任务栈中
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @公众号：字节数组
- */
 abstract class BaseLaunchModeActivity : BaseActivity() {
 
     override val bind by getBind<ActivityBaseLaunchModeBinding>()
@@ -157,7 +150,6 @@ class StandardActivity : BaseLaunchModeActivity() {
 
 }
 ```
-
 四个 Activity 相继互相启动，查看输出的日志，可以看出 SingleTaskActivity 和 SingleInstanceActivity 均处于独立的任务栈中，而 StandardActivity 和 SingleTopActivity 处于同个任务栈中。说明 taskAffinity 对于 standard 和 singleTop 这两种模式不起作用
 
 ```kotlin
@@ -166,14 +158,12 @@ E/SingleTopActivity: onCreate hashCode: 95410735 taskId: 37
 E/SingleTaskActivity: onCreate hashCode: 255733510 taskId: 38
 E/SingleInstanceActivity: onCreate hashCode: 20352185 taskId: 39
 ```
-
 再依次启动 SingleTaskActivity 和 SingleTopActivity。可以看到 SingleTaskActivity 被复用了，且在 38 这个任务栈上启动了一个新的 SingleTopActivity 实例。之所以没有复用 SingleTopActivity，是因为之前的 SingleTopActivity 是在 37 任务栈中，并非当前任务栈
 
 ```kotlin
 E/SingleTaskActivity: onNewIntent hashCode: 255733510 taskId: 38
 E/SingleTopActivity: onCreate hashCode: 20652250 taskId: 38
 ```
-
 再启动一次 SingleTopActivity，两次 StandardActivity。可以看到 SingleTopActivity 的确在当前任务栈中被复用了，并均创建了两个新的 StandardActivity 实例。说明 singleTop 想要被复用需要当前任务栈的栈顶就是目标 Activity，而 standard 模式每次均会创建新实例
 
 ```kotlin
@@ -181,7 +171,6 @@ E/SingleTopActivity: onNewIntent hashCode: 20652250 taskId: 38
 E/StandardActivity: onCreate hashCode: 252563788 taskId: 38
 E/StandardActivity: onCreate hashCode: 25716630 taskId: 38
 ```
-
 再依次启动 SingleTaskActivity 和 SingleInstanceActivity。可以看到 SingleTaskActivity 和 SingleInstanceActivity 均被复用了，且 SingleTaskActivity 之上的三个 Activity 均从任务栈中被弹出销毁了，SingleTaskActivity 成为了 task 38 新的栈顶 Activity
 
 ```kotlin
@@ -191,14 +180,12 @@ E/SingleTaskActivity: onNewIntent hashCode: 255733510 taskId: 38
 E/StandardActivity: onDestroy hashCode: 25716630 taskId: 38
 E/SingleInstanceActivity: onNewIntent hashCode: 20352185 taskId: 39
 ```
-
 再依次启动 StandardActivity 和 SingleTopActivity。可以看到创建了一个新的任务栈，且启动的是两个新的 Activity 实例。由于 SingleInstanceActivity 所在的任务栈只会由其自身所独占，所以 StandardActivity 启动时就需要创建一个新的任务栈用来容纳自身
 
 ```kotlin
 E/StandardActivity: onCreate hashCode: 89641200 taskId: 40
 E/SingleTopActivity: onCreate hashCode: 254021317 taskId: 40
 ```
-
 可以做个总结：
 
 - standard 和 singleTop 这两种模式下 taskAffinity 属性均不会生效，这两种模式启动的 Activity 总会尝试加入到启动者所在的任务栈中，如果启动者是 singleInstance 的话则会创建一个新的任务栈
@@ -228,7 +215,6 @@ public @NonNull Intent addFlags(@Flags int flags) {
     return this;
 }
 ```
-
 通过如下方式来添加 flag 并启动 Activity
 
 ```kotlin
@@ -236,7 +222,6 @@ val intent = Intent(this, StandardActivity::class.java)
 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 startActivity(intent)
 ```
-
 如果 Activity 的启动模式只由 launchMode 定义的话，那么在运行时 Activity 的启动模式就再也无法改变了，相当于被写死了，所以 launchMode 适合于那些具有固定情景的业务。而 Intent flag 存在的意义就是为了改变或者补充 launchMode，适合于那些大部分情况下固定，少数情况下需要动态进行变化的场景，例如在某些情况下不希望 singleInstance 模式的 Activity 被重用，此时就可以通过 Intent flag 来动态实现
 
 而这也造成了 Intent flag 很难理清楚逻辑，因为 Intent flag 往往需要组合使用，且还需要考虑和 launchMode 的各种组合配置，两者并不是简单的进行替换
@@ -255,7 +240,6 @@ FLAG_ACTIVITY_NEW_TASK 应该是大多数开发者最熟悉的一个 flag，比�
 ```kotlin
 java.lang.RuntimeException: Unable to start service github.leavesc.launchmode.MyService@e3183b7 with Intent { cmp=github.leavesc.demo/github.leavesc.launchmode.MyService }: android.util.AndroidRuntimeException: Calling startActivity() from outside of an Activity  context requires the FLAG_ACTIVITY_NEW_TASK flag. Is this really what you want?
 ```
-
 从异常信息可以看出此时 Intent 需要添加一个 FLAG_ACTIVITY_NEW_TASK 才行，添加后 Activity 就可以正常启动了
 
 ```kotlin
@@ -263,7 +247,6 @@ val intent = Intent(this, StandardActivity::class.java)
 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 startActivity(intent)
 ```
-
 FLAG_ACTIVITY_NEW_TASK 也有一个隐含的知识点，上文有讲到 **standard 和 singleTop 这两种模式下 taskAffinity 属性均不会生效**，但这个结论也只适用于没有主动添加 Intent flag 的情况
 
 FLAG_ACTIVITY_NEW_TASK 和 standard 模式的组合情况可以总结为：
@@ -291,7 +274,6 @@ FLAG_ACTIVITY_CLEAR_TOP 这个 flag 则是起到了清除目标 Activity 之上�
 E/StandardActivity: onCreate hashCode: 76763823 taskId: 39
 E/SingleTopActivity: onCreate hashCode: 217068130 taskId: 39
 ```
-
 再启动一次 StandardActivity，此时就带上 FLAG_ACTIVITY_CLEAR_TOP。此时就会看到最开始启动的两个 Activity 都会销毁了，并且再次新建了一个 StandardActivity 实例入栈
 
 ```kotlin
@@ -299,7 +281,6 @@ E/StandardActivity: onDestroy hashCode: 76763823 taskId: 39
 E/StandardActivity: onCreate hashCode: 51163106 taskId: 39
 E/SingleTopActivity: onDestroy hashCode: 217068130 taskId: 39
 ```
-
 而如果同时加上 FLAG_ACTIVITY_SINGLE_TOP 和 FLAG_ACTIVITY_CLEAR_TOP 两个 flag 的话，那么 SingleTopActivity 就会被弹出，StandardActivity 会被复用，并且回调其`onNewIntent`方法，两个 flag 相当于组合出了 singleTask 的效果。这一个效果读者可以自行验证
 
 ## FLAG_ACTIVITY_CLEAR_TASK
@@ -314,12 +295,11 @@ E/SingleInstanceActivity: onNewIntent hashCode: 144724929 taskId: 47
 E/SingleInstanceActivity: onCreate hashCode: 106721743 taskId: 47
 E/SingleInstanceActivity: onDestroy hashCode: 144724929 taskId: 47
 ```
-
 # 7、总结
 
 关于 Activity 的启动模式的讲解到这里就结束了，最后再强调一遍，launchMode 和 Intent flag 的各种组合效果还是有点过于难理解了，使得我很难全面地进行描述，再加上似乎还存在版本兼容性问题，使用起来就更加麻烦了，所以我觉得开发者只需要有个大致的印象即可，当真正要使用的时候再来亲自测试验证效果就好，不必强行记忆
 
-以上各个示例 Demo 点这里：[AndroidOpenSourceDemo](https://github.com/leavesCZY/AndroidOpenSourceDemo)
+以上各个示例 Demo 点这里：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)
 
 # 8、参考资料
 

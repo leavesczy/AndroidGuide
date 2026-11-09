@@ -317,4 +317,4 @@ private fun DialogContent(onDismissRequest: () -> Unit) {
 }
 ```
 
-这里给出完整的源码：[ComposeBottomSheetDialog](https://github.com/leavesCZY/ComposeBottomSheetDialog)
+这里给出完整的源码：[ComposeBottomSheetDialog](https://github.com/leavesczy/ComposeBottomSheetDialog)

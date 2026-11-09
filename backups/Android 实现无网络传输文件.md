@@ -2,7 +2,7 @@
 
 Wifi P2P 是在 Android 4.0 以及更高版本系统中加入的功能，通过 Wifi P2P 可以在不连接网络的情况下，直接与配对的设备进行数据交换。相对于蓝牙，Wifi P2P 的搜索速度和传输速度更快，传输距离更远
 
-项目主页：[Android 实现无网络传输文件](https://github.com/leavesCZY/WifiP2P) ，欢迎 star
+项目主页：[Android 实现无网络传输文件](https://github.com/leavesczy/WifiP2P) ，欢迎 star
 
 实现的效果如下所示：
 
@@ -32,7 +32,6 @@ Wifi P2P 技术并不会访问网络，但由于会使用到 Java Socket，所�
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 ```
-
 # 二、注册广播
 
 与 Wifi P2P 相关的广播有以下几个：
@@ -48,7 +47,6 @@ Wifi P2P 技术并不会访问网络，但由于会使用到 Java Socket，所�
 mWifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
 mChannel = mWifiP2pManager.initialize(this, getMainLooper(), this);
 ```
-
 当收到 WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION 广播时，可以判断当前 Wifi P2P是否可用
 
 ```java
@@ -59,7 +57,6 @@ if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
     mDirectActionListener.wifiP2pEnabled(false);                
 }
 ```
-
 当收到 WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION 广播时，意味设备周围的可用设备列表发生了变化，可以通过 requestPeers 方法得到可用的设备列表，之后就可以选择当中的某一个设备进行连接操作
 
 ```java
@@ -70,7 +67,6 @@ mWifiP2pManager.requestPeers(mChannel, new WifiP2pManager.PeerListListener() {
     }
 });
 ```
-
 当收到 WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION 广播时，意味着 Wifi P2P 的连接状态发生了变化，可能是连接到了某设备，或者是与某设备断开了连接
 
 ```java
@@ -88,7 +84,6 @@ if (networkInfo.isConnected()) {
     Log.e(TAG, "与p2p设备已断开连接");
 }
 ```
-
 如果是与某设备连接上了，则可以通过 requestConnectionInfo 方法获取到连接信息
 
 当收到 WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION 广播时，则可以获取到本设备变化后的设备信息
@@ -96,7 +91,6 @@ if (networkInfo.isConnected()) {
 ```java
 (WifiP2pDevice) intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE)
 ```
-
 可以看出 Wifi P2P 的接口高度异步化，到现在已经用到了三个系统的回调函数，一个用于 WifiP2pManager 的初始化，两个用于在广播中异步请求数据，为了简化操作，此处统一使用一个自定义的回调函数，方法含义与系统的回调函数一致
 
 ```java
@@ -114,16 +108,9 @@ public interface DirectActionListener extends WifiP2pManager.ChannelListener {
 
 }
 ```
-
 所以，整个广播接收器使用到的所有代码是：
 
 ```java
-/
- * @Author: leavesCZY
- * @Date: 2019/2/27 23:58
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 public class DirectBroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = "DirectBroadcastReceiver";
@@ -204,7 +191,6 @@ public class DirectBroadcastReceiver extends BroadcastReceiver {
 
 }
 ```
-
 # 三、服务端
 
 假设当设备A搜索到了设备B，并与设备B连接到了一起，此时系统会自动创建一个群组（Group）并随机指定一台设备为群主（GroupOwner）。此时，对于两台设备来说，群主的IP地址是可知的（系统回调函数中有提供），但客户端的IP地址需要再来通过其他方法来主动获取。例如，可以在设备连接成功后，客户端主动发起对服务器端的Socket连接请求，服务器端在指定端口监听客户端的连接请求，当连接成功后，服务器端就可以获取到客户端的IP地址了
@@ -230,7 +216,6 @@ wifiP2pManager.createGroup(channel, new WifiP2pManager.ActionListener() {
     }
 });
 ```
-
 此处，使用 IntentService 在后台监听客户端的 Socket 连接请求，并通过输入输出流来传输文件。此处的代码比较简单，就只是在指定端口一直堵塞监听客户端的连接请求，获取待传输的文件信息模型 FileTransfer ，之后就进行实际的数据传输
 
 ```java
@@ -286,7 +271,6 @@ wifiP2pManager.createGroup(channel, new WifiP2pManager.ActionListener() {
         }
     }
 ```
-
 因为客户端可能会多次发起连接请求，所以当此处文件传输完成后（不管成功或失败），都需要重新 startService ，让服务再次堵塞等待客户端的连接请求
 
 FileTransfer 包含三个字段，MD5码值用于校验文件的完整性，fileLength 是为了用于计算文件的传输进度
@@ -307,7 +291,6 @@ public class FileTransfer implements Serializable {
     
 }
 ```
-
 为了将文件传输进度发布到外部界面，所以除了需要启动Service外，界面还需要绑定Service，此处就需要用到一个更新文件传输状态的接口
 
 ```java
@@ -321,7 +304,6 @@ public class FileTransfer implements Serializable {
 
     }
 ```
-
 因此，需要将 progressChangListener 作为参数传给  WifiServerService ，并在进度变化时更新进度对话框
 
 ```java
@@ -352,7 +334,6 @@ public class FileTransfer implements Serializable {
         }
     };
 ```
-
 # 四、客户端
 
 文件发送界面 SendFileActivity 需要实现 DirectActionListener 接口
@@ -371,7 +352,6 @@ public class FileTransfer implements Serializable {
         registerReceiver(broadcastReceiver, DirectBroadcastReceiver.getIntentFilter());
     }
 ```
-
 通过 discoverPeers 方法搜索周边设备，回调函数用于通知方法是否调用成功
 
 ```java
@@ -388,7 +368,6 @@ mWifiP2pManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
      }
 });
 ```
-
 当搜索结束后，系统就会触发 WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION 广播，此时就可以调用 requestPeers 方法获取设备列表信息，此处用 RecyclerView 展示列表，在  onPeersAvailable 方法刷新列表
 
 ```java
@@ -399,7 +378,6 @@ mWifiP2pManager.requestPeers(mChannel, new WifiP2pManager.PeerListListener() {
     }
 });
 ```
-
 ```java
     @Override
     public void onPeersAvailable(Collection<WifiP2pDevice> wifiP2pDeviceList) {
@@ -410,7 +388,6 @@ mWifiP2pManager.requestPeers(mChannel, new WifiP2pManager.PeerListListener() {
         loadingDialog.cancel();
     }
 ```
-
 之后，通过点击事件选中群主（服务器端）设备，通过 connect 方法请求与之进行连接
 
 ```java
@@ -435,7 +412,6 @@ private void connect() {
     }
 }
 ```
-
 此处依然无法通过函数函数来判断连接结果，需要依靠系统发出的 WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION  方法来获取到连接结果，在此处可以通过 requestConnectionInfo 获取到组连接信息，信息最后通过 onConnectionInfoAvailable 方法传递出来，在此可以判断当前设备是否为群主，获取群组IP地址
 
 ```java
@@ -470,7 +446,6 @@ public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
     }
 }
 ```
-
 至此服务器端和客户端已经通过 Wifi P2P 连接在了一起，客户端也获取到了服务器端的IP地址，在选取好待发送的文件后就可以主动发起对服务器端的连接请求了
 
 发起选取文件的方法
@@ -481,7 +456,6 @@ intent.setType("*/*");
 intent.addCategory(Intent.CATEGORY_OPENABLE);
 startActivityForResult(intent, 1);
 ```
-
 获取选取的文件的实际路径
 
 ```java
@@ -522,16 +496,9 @@ private String getPath(Context context, Uri uri) {
     return null;
 }
 ```
-
 文件的发送操作放到 AsyncTask 中处理，将服务器端的IP地址作为参数传进来，在正式发送文件前，先发送包含文件信息（文件名，文件大小，文件MD5码）的信息模型 FileTransfer ，并在发送文件的过程中同时更新进度
 
 ```java
-/
- * @Author: leavesCZY
- * @Date: 2019/2/27 23:56
- * @Desc: 客户端发送文件
- * @Github：https://github.com/leavesCZY
- */
 public class WifiClientTask extends AsyncTask<String, Integer, Boolean> {
 
     private ProgressDialog progressDialog;
@@ -642,18 +609,11 @@ public class WifiClientTask extends AsyncTask<String, Integer, Boolean> {
 
 }
 ```
-
 # 五、校验文件完整性
 
 传输文件的完整性主要是通过计算文件的MD5码值来保证了，在发送文件前，即在 WifiClientTask 的 doInBackground 方法中进行计算，将MD5码值赋给 FileTransfer 模型，通过如下方法计算得到
 
 ```java
-/
- * @Author: leavesCZY
- * @Date: 2019/2/27 23:57
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 public class Md5Util {
 
     public static String getMd5(File file) {
@@ -697,7 +657,6 @@ public class Md5Util {
 
 }
 ```
-
 因为客户端会将 FileTransfer 传给服务器端，所以服务器端在文件传输结束后，可以重新计算文件的 MD5码值，进行对比以判断文件是否完整
 
-项目主页：[Android 实现无网络传输文件](https://github.com/leavesCZY/WifiP2P) ，欢迎 star
+项目主页：[Android 实现无网络传输文件](https://github.com/leavesczy/WifiP2P) ，欢迎 star

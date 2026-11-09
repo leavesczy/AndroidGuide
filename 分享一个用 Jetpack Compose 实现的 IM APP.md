@@ -1,4 +1,4 @@
-在 Google 刚正式发布 Jetpack Compose 1.0 release 版本的时候，我花了一个多月的时间进行了一次实战演练，用 Jetpack Compose 实现了一个 IM App，提供了完备的聊天功能，并在 Github 开源了：[compose_chat](https://github.com/leavesCZY/compose_chat)
+在 Google 刚正式发布 Jetpack Compose 1.0 release 版本的时候，我花了一个多月的时间进行了一次实战演练，用 Jetpack Compose 实现了一个 IM App，提供了完备的聊天功能，并在 Github 开源了：[compose_chat](https://github.com/leavesczy/compose_chat)
 
 ![](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7085f204d3b8487ca7d6aedc50ab66c5~tplv-k3u1fbpfcp-watermark.image?)
 
@@ -91,4 +91,4 @@ Jetpack Compose 应该会成为以后 Android 原生 UI 开发时的首选方案
 
 
 
-欢迎读者去 Github 下载体验，也欢迎给个 star 和建议：[compose_chat](https://github.com/leavesCZY/compose_chat)
+欢迎读者去 Github 下载体验，也欢迎给个 star 和建议：[compose_chat](https://github.com/leavesczy/compose_chat)

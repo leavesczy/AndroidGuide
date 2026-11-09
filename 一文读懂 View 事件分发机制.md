@@ -1213,4 +1213,4 @@ private boolean dispatchTransformedTouchEvent(MotionEvent event, boolean cancel,
 
 # 十二、Demo 下载
 
-上述的所有示例代码我都放到了 Github 上，按需自取：[AndroidOpenSourceDemo](https://github.com/leavesCZY/AndroidOpenSourceDemo)
+上述的所有示例代码我都放到了 Github 上，按需自取：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)

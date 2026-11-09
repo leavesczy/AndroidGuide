@@ -1,6 +1,6 @@
 在 2021 年的七月份，Google 发布了 Jetpack Compose 的 1.0 正式版本，这是一个适用于 Android 平台的声明式 UI 开发框架，可供开发者在生产环境中使用。到了十二月份，JetBrains 也随之发布了适用于多个平台的声明式 UI 开发框架 Compose Multiplatform 的 1.0 正式版本，意味着此时也适用于商业项目了
 
-既然 Compose Multiplatform 发布了正式版，我也想着来做一次实践，之前我曾经用 Jetpack Compose 写了一个 **俄罗斯方块** 小游戏：[学不动也要学，Jetpack Compose 玩一把俄罗斯方块](https://juejin.cn/post/6974585048762679310)，由于整个应用的逻辑和 UI 都是完全用 Kotlin 和 Jetpack Compose 实现的，因此很简单地就通过 Compose Multiplatform 将其移植到了 Windows 平台：[compose_tetris](https://github.com/leavesCZY/compose_tetris)
+既然 Compose Multiplatform 发布了正式版，我也想着来做一次实践，之前我曾经用 Jetpack Compose 写了一个 **俄罗斯方块** 小游戏：[学不动也要学，Jetpack Compose 玩一把俄罗斯方块](https://juejin.cn/post/6974585048762679310)，由于整个应用的逻辑和 UI 都是完全用 Kotlin 和 Jetpack Compose 实现的，因此很简单地就通过 Compose Multiplatform 将其移植到了 Windows 平台：[compose_tetris](https://github.com/leavesczy/compose_tetris)
 
 整个移除过程十分顺利，移植成本不高，最终效果看着也不错，此文章就来简单讲讲 Compose Multiplatform 的一些小细节，希望对你有所帮助 ~
 
@@ -157,7 +157,6 @@ fun MainScreen(modifier: Modifier, tetrisLogic: ITetrisLogic) {
     }
 }
 ```
-
 `androidMain` 模块的 AndroidMainScreen 通过 accompanist 来控制状态栏，再通过 LifecycleObserver 来判断 Activity 是否处于前台 
 
 ```kotlin
@@ -195,7 +194,6 @@ fun AndroidMainScreen() {
     }
 }
 ```
-
 `desktopMain` 模块的 DesktopMainScreen 则通过 onKeyEvent 回调来监听键盘的点击事件
 
 ```kotlin
@@ -246,7 +244,6 @@ fun DesktopMainScreen() {
     )
 }
 ```
-
 # 复用业务逻辑
 
 实现跨端复用业务逻辑的思路可以参考一位开发者在 GitHub 上和 JetBrains 官方的讨论：[Useful reading about porting Android apps to Desktop](https://github.com/JetBrains/compose-jb/discussions/1587)
@@ -260,11 +257,6 @@ fun DesktopMainScreen() {
 以 compose_tetris 为例，俄罗斯方块的操作逻辑是完全适用于任何平台的，如果我们专注的仅是 Android 平台的话，这部分逻辑自然可以直接在 ViewModel 中实现。而为了实现跨端复用，此时就需要将该业务逻辑抽取为一个独立的个体了，对应 TetrisLogicImpl 这个纯 Kotlin 类，保存在 `commonMain` 模块中
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github: https://github.com/leavesCZY
- * @Desc:
- */
 interface ITetrisLogic {
 
     val tetrisStateFlow: StateFlow<TetrisState>
@@ -293,7 +285,6 @@ class TetrisLogicImpl : ITetrisLogic {
 
 }
 ```
-
 在 Android 平台中，将 TetrisLogicImpl 注入到 ViewModel 中，此时 ViewModel 就单纯作为业务逻辑的承载体了，不包含具体的实现逻辑，通过代理的方式来间接实现 ITetrisLogic 接口，将所有需要触发的操作均转交给 TetrisLogicImpl 即可。AndroidTetrisViewModel 保存在 `androidMain` 模块中
 
 ```kotlin
@@ -305,7 +296,6 @@ class AndroidTetrisViewModel(delegate: TetrisLogicImpl) : ViewModel(), ITetrisLo
 
 }
 ```
-
 Desktop 平台也通过相同方式来实现，将 DesktopTetrisViewModel 保存在 `desktopMain` 模块中
 
 ```kotlin
@@ -317,12 +307,11 @@ class DesktopTetrisViewModel(delegate: TetrisLogicImpl) : ITetrisLogic by delega
 
 }
 ```
-
 由于 Android 平台存在页面生命周期的概念，因此 AndroidTetrisViewModel 向 TetrisLogicImpl 注入的协程作用域是 viewModelScope；而在 Desktop 平台，当关闭游戏时整个进程也就结束了，因此注入的是 GlobalScope
 
 # 结尾
 
-详细的源码看这里：[compose_tetris](https://github.com/leavesCZY/compose_tetris)
+详细的源码看这里：[compose_tetris](https://github.com/leavesczy/compose_tetris)
 
 从 Jetpack Compose 发布正式版那段时间起，我先后写了几篇关于 Jetpack Compose 的文章，可以帮助读者更快入门，希望对你有所帮助 ~
 

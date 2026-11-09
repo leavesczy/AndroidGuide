@@ -398,4 +398,4 @@ Column(
 
 # 五、结尾
 
-最后当然也少不了 WaveLoading 的完整示例代码了，有需要的同学点击这里下载：[ComposeWaveLoading](https://github.com/leavesCZY/ComposeWaveLoading)
+最后当然也少不了 WaveLoading 的完整示例代码了，有需要的同学点击这里下载：[ComposeWaveLoading](https://github.com/leavesczy/ComposeWaveLoading)

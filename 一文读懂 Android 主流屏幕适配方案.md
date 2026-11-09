@@ -270,4 +270,4 @@ smallestWidth 方案和宽高限定符方案最大的差别就在于容错率，
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d3fa751bcad6489d8f76bb701ab9edc4~tplv-k3u1fbpfcp-zoom-1.image)
 
-有需要的同学自取：[SmallestWidthGenerator](https://github.com/leavesCZY/SmallestWidthGenerator)
+有需要的同学自取：[SmallestWidthGenerator](https://github.com/leavesczy/SmallestWidthGenerator)

@@ -36,7 +36,6 @@
         return intercepted;
     }
 ```
-
 - 根据实际的业务需求，判断是否需要处理 ACTION_MOVE 事件，如果父 View 需要处理则返回 true，否则返回 false 并交由子 View 去处理
 - ACTION_DOWN 事件需要返回 false，父容器不能进行拦截，否则根据 View 的事件分发机制，后续的 ACTION_MOVE 与 ACTION_UP 事件都将默认交由父容器进行处理
 - 原则上 ACTION_UP 事件也需要返回 false，如果返回 true，那么子 View 将接收不到 ACTION_UP 事件，子 View 的onClick 事件也无法触发
@@ -75,7 +74,6 @@
         return super.dispatchTouchEvent(event);
     }
 ```
-
 父容器修改其 `onInterceptTouchEvent` 方法
 
 ```java
@@ -88,7 +86,6 @@
         }
     }
 ```
-
 - 内部拦截法要求父容器不能拦截 ACTION_DOWN 事件，否则一旦父容器拦截 ACTION_DOWN 事件，那么后续的触摸事件都不会传递给子View
 - 滑动策略的逻辑放在子 View 的 `dispatchTouchEvent` 方法的 ACTION_MOVE 事件中，如果父容器需要处理事件则调用 `parent.requestDisallowInterceptTouchEvent(false)` 方法让父容器去拦截事件
 
@@ -99,10 +96,6 @@
 为了使 ViewPager 不处理滑动冲突，这里来重写其 `onInterceptTouchEvent()` 方法
 
 ```java
-/**
- * @Author: leavesCZY
- * @Date: 2018/7/15 10:26
- */
 public class MyViewPager extends ViewPager {
 
     public MyViewPager(@NonNull Context context) {
@@ -120,7 +113,6 @@ public class MyViewPager extends ViewPager {
 
 }
 ```
-
 这里用一个布尔变量来控制 ViewPager 中每一个页面包含的是 ListView 还是 TextView
 
 ```java
@@ -162,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
 }
 ```
-
 当子 View 为 TextView 时
 ![](https://upload-images.jianshu.io/upload_images/2552605-58f98e519deee3a9.gif?imageMogr2/auto-orient/strip)
 
@@ -180,10 +171,6 @@ public class MainActivity extends AppCompatActivity {
 外部拦截法仅需要修改父容器的 `onInterceptTouchEvent()` 方法即可，通过滑动时横向滑动距离与竖向滑动距离之间的大小，判断是否在进行左右滑动，如果判断出当前是滑动操作，则使 ViewPager 消费该事件
 
 ```java
-/**
- * @Author: leavesCZY
- * @Date: 2018/7/15 10:26
- */
 public class MyViewPager extends ViewPager {
 
     public MyViewPager(@NonNull Context context) {
@@ -234,16 +221,11 @@ public class MyViewPager extends ViewPager {
 
 }
 ```
-
 ### 五、通过内部拦截法解决滑动冲突
 
 内部拦截法需要重写 ListView 的 `dispatchTouchEvent` 方法
 
 ```java
-/**
- * @Author: leavesCZY
- * @Date: 2018/7/15 12:40
- */
 public class MyListView extends ListView {
 
     public MyListView(Context context) {
@@ -290,14 +272,9 @@ public class MyListView extends ListView {
 
 }
 ```
-
 同时也需要修改 MyViewPager 的 `onInterceptTouchEvent` 方法
 
 ```java
-/**
- * @Author: leavesCZY
- * @Date: 2018/7/15 10:26
- */
 public class MyViewPager extends ViewPager {
 
     public MyViewPager(@NonNull Context context) {

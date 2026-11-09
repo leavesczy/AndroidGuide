@@ -10,11 +10,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 
-/**
- * @Author: leavesCZY
- * @Date: 2018/6/22 13:39
- * @Github：https://github.com/leavesCZY
- */
 public abstract class IntentService extends Service {
 
     private volatile Looper mServiceLooper;

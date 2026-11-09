@@ -38,7 +38,6 @@
                                                      @@:
                                                      @@:
 ```
-
 > 对于 Android Developer 来说，很多开源库都是属于**开发必备**的知识点，从使用方式到实现原理再到源码解析，这些都需要我们有一定程度的了解和运用能力。所以我打算来写一系列关于开源库**源码解析**和**实战演练**的文章，初定的目标是 **EventBus、ARouter、LeakCanary、Retrofit、Glide、OkHttp、Coil** 等七个知名开源库，希望对你有所帮助 🤣🤣🤣
 
 本文基于 OkHttp 的以下版本进行讲解。值得一提的是，OkHttp 和 OkIO 目前已经被官方用 Kotlin 语言重写了一遍，所以还没学 Kotlin 的同学可能连源码都比较难看懂了，Kotlin 入门可以看我的这篇文章：[两万六千字带你 Kotlin 入门](https://juejin.im/post/6880602489297895438)
@@ -48,14 +47,9 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
 }
 ```
-
 先来看一个小例子，后面的讲解都会基于这个例子涉及到的模块来展开
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 const val URL = "https://publicobject.com/helloworld.txt"
 
 fun main() {
@@ -71,7 +65,6 @@ fun main() {
     println(response.body?.string())
 }
 ```
-
 以上代码就完成了一次 Get 请求，其包含的操作有：
 
 1. 通过 Builder 模式得到 OkHttpClient，OkHttpClient 包含了对网络请求的全局配置信息，包括 **链接超时时间、读写超时时间、链接失败重试** 等各种配置
@@ -141,7 +134,6 @@ class Builder constructor() {
     internal var routeDatabase: RouteDatabase? = null
 }
 ```
-
 # 二、Request 
 
 Request 包含了网络请求时的所有请求参数，一共包含以下五个：
@@ -160,7 +152,6 @@ internal var body: RequestBody? = null
 /** A mutable map of tags, or an immutable empty map if we don't have any. */
 internal var tags: MutableMap<Class<*>, Any> = mutableMapOf()
 ```
-
 # 三、Call 
 
 当调用 `okHttClient.newCall(request)`时就会得到一个 Call 对象
@@ -169,7 +160,6 @@ internal var tags: MutableMap<Class<*>, Any> = mutableMapOf()
 /** Prepares the [request] to be executed at some point in the future. */
 override fun newCall(request: Request): Call = RealCall(this, request, forWebSocket = false)
 ```
-
 Call 是一个接口，我们可以将其看做是网络请求的启动器，可用于发起同步请求或异步请求，**但重复发起多次请求的话会抛出异常**
 
 ```kotlin
@@ -205,7 +195,6 @@ interface Call : Cloneable {
   }
 }
 ```
-
 `newCall` 方法返回的实际类型是 RealCall，它是 Call 接口的唯一实现类
 
 当我们调用 `execute` 方法发起同步请求时，其主要逻辑是：
@@ -237,7 +226,6 @@ class RealCall(
   
 }
 ```
-
 # 四、Dispatcher
 
 从上面的分析可以看出来，`getResponseWithInterceptorChain` 方法就是重头戏了，其返回了我们最终得到的 Response。但这里先不介绍该方法，先来看看 Dispatcher 的逻辑
@@ -258,7 +246,6 @@ private val runningAsyncCalls = ArrayDeque<AsyncCall>()
 /** Running synchronous calls. Includes canceled calls that haven't finished yet. */
 private val runningSyncCalls = ArrayDeque<RealCall>()
 ```
-
 - maxRequests。同一时间允许并发执行网络请求的最大线程数
 - maxRequestsPerHost。同一 host 下的最大同时请求数
 - readyAsyncCalls。保存当前等待执行的异步任务
@@ -297,7 +284,6 @@ class RealCall(
     
 }
 ```
-
 Dispatcher 内部也只是相应的将 RealCall 添加到 runningSyncCalls 中或者是将其从 runningSyncCalls 中移除，保存到 runningSyncCalls 的目的是为了方便**统计当前所有正在运行的请求总数**以及**能够取消所有请求**。此外，由于同步请求会直接运行在调用者所在线程上，所以同步请求并不会受 maxRequests 的限制
 
 ```kotlin
@@ -329,7 +315,6 @@ class Dispatcher constructor() {
     
 }
 ```
-
 ## 2、异步请求
 
 RealCall 的 `enqueue`方法会将外部传入的 Callback 包装为一个 AsyncCall 对象后传给 dispatcher
@@ -350,7 +335,6 @@ class RealCall(
     
 }
 ```
-
 由于 `enqueue`对应的是异步请求，所以 OkHttp 内部就需要自己构造一个线程来执行请求，在请求结束后再通过 Callback 来将结果值回调给外部，异步请求逻辑对应的载体就是 AsyncCall 这个类
 
 AsyncCall 是 RealCall 的非静态内部类，所以 AsyncCall 可以访问到 RealCall 的所有变量和方法。此外，AsyncCall 继承了 Runnable 接口，其 `executeOn` 方法就用于传入一个线程池对象来执行`run` 方法。`run` 方法内还是调用了 `getResponseWithInterceptorChain()`方法来获取 response，并通过 Callback 来将执行结果（不管成功还是失败）回调出去，在请求结束后也会将自身从 dispatcher 中移除
@@ -413,7 +397,6 @@ internal inner class AsyncCall(private val responseCallback: Callback) : Runnabl
     }
 }
 ```
-
 Dispatcher 在拿到 AsyncCall 对象后，会先将其存到 readyAsyncCalls 中，然后通过 `findExistingCallWithHost`方法来查找当前是否有指向同一 Host 的异步请求，有的话则交换 callsPerHost 变量，该变量就用于标记当前指向同一 Host 的请求数量，最后调用 `promoteAndExecute` 方法来判断当前是否允许发起请求
 
 ```kotlin
@@ -446,7 +429,6 @@ class Dispatcher constructor() {
     
 }
 ```
-
 由于当前正在执行的网络请求总数可能已经达到限制，或者是指向同一 Host 的请求也达到限制了，所以 `promoteAndExecute()`方法就用于从待执行列表 readyAsyncCalls 中获取当前符合运行条件的所有请求，将请求存到 runningAsyncCalls 中，并调用线程池来执行
 
 ```kotlin
@@ -484,7 +466,6 @@ private fun promoteAndExecute(): Boolean {
     return isRunning
   }
 ```
-
 ## 3、ArrayDeque 
 
 上面有讲到，三种请求的存储容器是 ArrayDeque。ArrayDeque 属于非线程安全的双端队列，所以涉及到多线程操作时都需要外部主动线程同步。那么让我们想一想，OkHttp 选择 ArrayDeque 作为任务容器的理由是什么？以我粗浅的眼光来看，有以下几点：
@@ -511,7 +492,6 @@ get() {
   return executorServiceOrNull!!
 }
 ```
-
 该线程池的参数设置有什么优势呢？以我粗浅的眼光来看，有以下两点：
 
 1. 核心线程数为 0，线程超时时间是 60 秒。说明在没有待执行的任务的时候，如果线程闲置了 60 秒，那么线程就会被回收，这可以避免空闲线程白白浪费系统资源，适合于移动设备资源紧缺的情景
@@ -551,7 +531,6 @@ private fun <T> finished(calls: Deque<T>, call: T) {
 	}
 }
 ```
-
 ## 6、总结
 
 - 如果是同步请求，那么网络请求过程就会直接在调用者所在线程上完成，不受 Dispatcher 的控制
@@ -622,7 +601,6 @@ internal fun getResponseWithInterceptorChain(): Response {
     }
 }  
 ```
-
 **Interceptor 是 OkHttp 里很重要的一环，OkHttp 也是靠此为开发者提供了很高的自由度**。Interceptor 接口本身只包含一个 `intercept` 方法，在此方法内可拿到原始的 Request 对象以及最终的 Response
 
 ```kotlin
@@ -631,7 +609,6 @@ fun interface Interceptor {
    fun intercept(chain: Chain): Response   
 }
 ```
-
 例如，我们可以自定义一个 LogInterceptor 来打印网络请求的请求参数以及最终的返回值
 
 ```kotlin
@@ -647,7 +624,6 @@ class LogInterceptor : Interceptor {
 
 }
 ```
-
 Interceptor 的实现初衷是为了给开发者提供一个可以控制网络请求的**发起过程**及**收尾工作**的入口，例如**添加 header、日志记录、请求拦截、ResponseBody修改 **等，每个 Interceptor 只负责自己关心的操作，那么势必就会有添加多个 Interceptor 的需求
 
 我们知道，只有让每个 Interceptor 都依次处理完 request 之后，OkHttp 才能根据最终的 request 对象去联网请求得到 response，所以每个 Interceptor 需要依次拿到 request 进行自定义处理。请求到 response 后，Interceptor 可能还需要对 response 进行处理，那么就还需要将 response 再依次传递给每个 Interceptor。那么，怎么实现将多个 Interceptor 给串联起来呢？
@@ -728,7 +704,6 @@ fun main() {
     println("main response")
 }
 ```
-
 上面的代码看着思路还可以，可是当运行后就会发现抛出了 IndexOutOfBoundsException，因为代码里并没有对 index 进行越界判断。而且，上面的代码也缺少了一个真正的生成 Response 对象的地方，每个 Interceptor 只是在进行中转调用而已，因此还需要一个来真正地完成网络请求并返回 Response 对象的地方，即 CallServerInterceptor
 
 所以，CallServerInterceptor 的`intercept` 方法就用来真正地执行网络请求并生成 Response 对象，在这里就不能再调用 `proceed` 方法了，且 CallServerInterceptor 需要放在 interceptorList 的最后一位
@@ -755,7 +730,6 @@ fun main() {
     println("main response")
 }
 ```
-
 最终的运行结果如下所示，可以看出来，`intercept` 方法是根据添加顺序来调用，而 response 是按照反方向来传递
 
 ```kotlin
@@ -767,7 +741,6 @@ HeaderInterceptor ---- getResponse
 LogInterceptor ---- getResponse
 main response
 ```
-
 以上代码我简化了 OkHttp 在实现 RealInterceptorChain 时的思路，其本质上就是通过将多个拦截器以责任链的方式来一层层调用，上一个拦截器处理完后将就将结果传给下一个拦截器，直到最后一个拦截器（即 CallServerInterceptor ）处理完后将 Response 再一层层往上传递
 
 ```kotlin
@@ -806,7 +779,6 @@ class RealInterceptorChain(
     
 }
 ```
-
 # 六、Interceptor
 
 我们在构建 OkHttpClient 的时候，添加拦截器的方法分为两类：`addInterceptor`和`addNetworkInterceptor`
@@ -821,7 +793,6 @@ val okHttClient = OkHttpClient.Builder()
     }
     .build()
 ```
-
 Interceptor 和 NetworkInterceptor 分别被称为**应用拦截器**和**网络拦截器**，那么它们有什么区别呢？
 
 前面有讲到，OkHttp 在执行拦截器的时候，是按照如下顺序的，这个顺序就已经决定了不同拦截器的调用时机差异
@@ -838,7 +809,6 @@ if (!forWebSocket) {
 }
 interceptors += CallServerInterceptor(forWebSocket)
 ```
-
 - 由于应用拦截器处于列表头部，所以在整个责任链路中应用拦截器会首先被执行，即使之后在 RetryAndFollowUpInterceptor 中发生了**请求失败重试或者网络重定向**等情况，应用拦截器也只会被触发一次，但网络拦截器会被调用多次
 - 网络拦截器位于 CacheInterceptor 之后，那么当 CacheInterceptor  命中缓存的时候就不会去执行网络请求了，此时网络拦截器就不会被调用，因此网络拦截器是存在短路的可能。此外，网络拦截器位于 ConnectInterceptor 之后，在调用网络拦截器之前就已经准备好网络链接了，说明网络拦截器本身就关联着实际的网络请求逻辑
 - 从单次请求流程上来看，应用拦截器被调用并不意味着真正有发起了网络请求，而网络拦截器被调用就说明的确发起了一次网络请求。因此如果我们希望通过拦截器来记录网络请求详情的话，就需要考虑两者的调用时机差异：应用拦截器无法感知到 OkHttp 自动添加的一些 header，但是网络拦截器可以；应用拦截器除非主动中断请求，否则每次请求一定都会被执行，但网络拦截器可能存在被短路的可能
@@ -852,10 +822,6 @@ interceptors += CallServerInterceptor(forWebSocket)
 实现思路就是对原始的 ResponseBody 进行多一层代理，计算已经从网络中读取到的字节数和资源的 contentLength 之间的百分比，从而得到下载进度。此外，因为该拦截器是和确切的网络请求相关，所以应该要设为网络拦截器才比较合理
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 fun main() {
     run()
 }
@@ -950,7 +916,6 @@ private class ProgressResponseBody constructor(
 
 }
 ```
-
 进度输出就类似于：
 
 ```kotlin
@@ -970,7 +935,6 @@ content-length: 11448857
 100% done
 completed
 ```
-
 # 七、结尾
 
 关于 OkHttp 的源码讲解到这里就结束了，但本文还缺少了对 ConnectInterceptor 和 CallServerInterceptor 的讲解，这两者是 OkHttp 完成实际网络请求的地方，涉及到了 Connection 和 Socket 这些比较底层的领域，我没法讲得多清晰，就直接略过这块内容了~~

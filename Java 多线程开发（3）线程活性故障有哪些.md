@@ -49,7 +49,6 @@ data class Chopstick(val id: Int) {
 
 }
 ```
-
 每位哲学家 Philosopher 均对应一个唯一的标识 id，一根左手边的筷子 left，一根右手边的筷子 right。会不间断地进行“思考”和“吃饭”两种行为，每种行为均包含一段随机的时间间隔（随机的线程休眠）
 
 ```kotlin
@@ -94,14 +93,9 @@ data class Philosopher(val id: Int, val left: Chopstick, val right: Chopstick) :
 
 }
 ```
-
 然后，我们创建五根筷子，并将每根筷子按顺序分配给每位哲学家，然后就启动哲学家的思考和吃饭行为（启动线程）
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 fun main() {
     val philosopherNumber = 5
 
@@ -126,7 +120,6 @@ fun main() {
     }
 }
 ```
-
 最后，运行程序后，只要我们为哲学家设定每次思考和吃饭的耗时时间不要太长，那么应该就能很快看到程序没有继续输出日志了，似乎被卡住了，此时即发生了死锁
 
 ```kotlin
@@ -171,7 +164,6 @@ Philosopher-0 思考中....
 Philosopher-0 拿起了左边的筷子: 0
 Philosopher-4 拿起了左边的筷子: 4
 ```
-
 根据输出日志可以分析出，最后每位哲学家均拿到了其左手边的筷子，且均在等待右手边的筷子被放下，但此时由于筷子是独占资源，所以每位哲学家都只能干瞪着眼无法吃饭，最终导致了死锁
 
 # 二、死锁的产生条件
@@ -232,7 +224,6 @@ data class Philosopher(val id: Int, val left: Chopstick, val right: Chopstick) :
 
 }
 ```
-
 粗锁法的缺点就是它明显降低了并发性并可能导致资源浪费。修改过后的代码，每次只有一位哲学家能够吃饭。如果每位哲学家吃饭的耗时相对其思考的时间要长得多，那么在持有筷子的哲学家吃饭结束前，有可能其他哲学家都已经处于等待筷子的状态了（即锁的争用程度比较高，多个线程由于申请不到锁而被暂停，每次锁的争夺可能会经历多次线程上下文切换）。而如果每位哲学家吃饭的耗时相对其思考的时间要短得多，那么就有可能在非持有筷子的哲学家结束思考前，持有筷子的哲学家就已经吃饭结束了（即锁的争用比较低，每次只有一个线程来申请锁，此时就不会由于申请锁而导致线程上下文切换）
 
 即使锁的争用程度比较低，一位哲学家在吃饭的时候也仅需要占用两根筷子，剩下的三根筷子本来还可以提供给另外一位哲学家使用，此时采用粗锁法就明显导致了资源的浪费。因此，粗锁法的适用范围较为有限
@@ -292,7 +283,6 @@ data class Philosopher(val id: Int, val left: Chopstick, val right: Chopstick) :
 
 }
 ```
-
 ## 3、资源限时申请
 
 避免死锁的另一种方法是在申请资源时设定一个超时时间，避免无限制地等待资源，从而消除“占用并等待资源”这种情况。当等待时间超出既定的限制时，释放已持有的资源（哲学家放下左手边的筷子转而去继续思考）先给其它线程使用，待后续再重新申请资源
@@ -350,7 +340,6 @@ data class Philosopher(val id: Int, val left: Chopstick, val right: Chopstick) :
 
 }
 ```
-
 # 四、死锁的恢复
 
 死锁的恢复有着一定难度，原因主要有以下几点
@@ -364,10 +353,6 @@ data class Philosopher(val id: Int, val left: Chopstick, val right: Chopstick) :
 定义一个死锁检测线程 DeadlockDetector，它会每隔一段时间定时检测当前系统是否发生了死锁，如果发生了的话，则从涉及到死锁的所有线程中选择一个线程向其发送中断请求，被中断的线程内部需要捕获中断异常，然后自动释放其持有的资源，尝试将资源让给其它线程使用，从而打破**占用并等待其它资源**和**资源循环等待**两个条件
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class DeadlockDetector(monitorInterval: Long) : Thread("DeadlockDetector") {
 
     companion object {
@@ -431,7 +416,6 @@ class DeadlockDetector(monitorInterval: Long) : Thread("DeadlockDetector") {
 
 }
 ```
-
 Philosopher 通过 `Lock.lockInterruptibly()` 方法来申请锁，该方法可以响应中断。此时就可以在捕获到中断异常时自动释放已持有的资源
 
 ```kotlin
@@ -503,10 +487,6 @@ data class Philosopher(val id: Int, val left: Chopstick, val right: Chopstick) :
 
 }
 
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 fun main() {
     val philosopherNumber = 5
 
@@ -533,7 +513,6 @@ fun main() {
     DeadlockDetector(2000).start()
 }
 ```
-
 从日志输出可以看出来，**线程 Philosopher-4** 在收到中断请求时释放了其持有的资源，但很快又发生了死锁，因为**线程 Philosopher-4** 释放的资源可以由所有需要的线程进行抢夺，可能在 **线程 Philosopher-4** 刚释放了持有的资源时又马上自己抢占到了该资源。最极端的情况就是：每次收到中断的线程均释放了其持有的资源，但随后又马上自己抢占到了该资源，接着该线程（或者其它线程）又收到中断请求，又释放持有的资源，又自己抢占到该资源……如此循环往复。这种情况下所有线程依然无法获得依赖的目标资源，反而由于反复的锁申请和锁释放操作造成多次的线程上下文切换。且释放锁可能会导致线程之前的任务被无效化。所以说，死锁的恢复实际意义不大
 
 ```kotlin
@@ -648,10 +627,8 @@ Philosopher-4 ====================放下已持有的左边的筷子: 4
 Philosopher-4 思考中....
 Philosopher-4 拿起了左边的筷子: 4
 
-
 ····
 ```
-
 # 五、锁死
 
 等待线程由于唤醒其所需的条件永远无法成立，或者是其它线程无法唤醒这个线程导致其一直处于非运行状态（线程并未终止）从而任务一直取得进展，那么我们称这个线程被锁死
@@ -671,10 +648,6 @@ Philosopher-4 拿起了左边的筷子: 4
 例如，对于以下代码，当 ServiceB 抛出异常时，main 线程就会由于一直无法收到唤醒通知从而一直处于等待状态
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 fun main() {
     val serviceManager = ServicesManager()
     serviceManager.startServices()
@@ -755,7 +728,6 @@ class ServiceB(private val serviceName: String, countDownLatch: CountDownLatch) 
 
 }
 ```
-
 ## 2、嵌套监视器锁死
 
 嵌套监视器锁死是嵌套锁导致等待线程永远无法被唤醒的一种活性故障
@@ -773,7 +745,6 @@ synchronized(monitorX) {
     }
 }
 ```
-
 相应的通知线程其伪代码如下所示。通知线程需要持有了 monitorX 和 monitorY 两个锁才能执行到 `monitorY.notifyAll()` 这行代码来唤醒等待线程。而等待线程执行 `monitorY.wait()` 时仅会释放 monitorY，而不会释放 monitorX。这使得通知线程由于一直获得 monitorX， 从而导致等待线程一直无法被唤醒而一直处于 BLOCKED 状态
 
 ```kotlin
@@ -787,7 +758,6 @@ synchronized(monitorX) {
     }
 }
 ```
-
 这种由于嵌套锁导致通知线程始终无法唤醒等待线程的活性故障就被称为嵌套监视器锁死
 
 # 六、线程饥饿

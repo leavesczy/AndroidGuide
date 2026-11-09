@@ -1,12 +1,12 @@
 > 本系列文章会陆续对 Android 的多线程机制进行整体介绍，帮助读者了解 Android 环境下如何实现多线程编程，也算是对自己所学内容的一个总结归纳
 >
-> 项目主页：https://github.com/leavesCZY/AndroidGuide
+> 项目主页：https://github.com/leavesczy/AndroidGuide
 >
 > 想要了解 IntentService 的工作原理需要先对 Android 系统中以 Handler、Looper、MessageQueue 组成的异步消息处理机制以及 HandlerThread 有所了解，如果你还没有这方面的知识，可以先看我写的另外两篇文章：
 >
-> [Handler、Looper与MessageQueue源码解析](https://github.com/leavesCZY/AndroidGuide/blob/master/android_multithreading/Android多线程之Handler、Looper与MessageQueue源码解析.md)
+> [Handler、Looper与MessageQueue源码解析](https://github.com/leavesczy/AndroidGuide/blob/master/android_multithreading/Android多线程之Handler、Looper与MessageQueue源码解析.md)
 >
-> [Android 多线程之 HandlerThread 源码解析](https://github.com/leavesCZY/AndroidGuide/blob/master/android_multithreading/Android多线程之HandlerThread源码解析.md)
+> [Android 多线程之 HandlerThread 源码解析](https://github.com/leavesczy/AndroidGuide/blob/master/android_multithreading/Android多线程之HandlerThread源码解析.md)
 
 在介绍 Service 时我们经常会说 Service 适合于完成一些在后台工作的任务，例如播放音乐、下载文件等，但 Service 默认是运行于 UI 线程的，如果想要依靠其来完成一些耗时任务，就需要自己来建立子线程，这相对比较繁琐，所以官方也为开发者提供了 IntentService 来解决这一问题
 
@@ -28,7 +28,6 @@ IntentService 类是一个抽象类，包含一个抽象方法需要由子类来
 ```java
 	public abstract class IntentService extends Service
 ```
-
 包含的成员变量
 
 ```java
@@ -43,7 +42,6 @@ IntentService 类是一个抽象类，包含一个抽象方法需要由子类来
     //用于决定 onStartCommand() 方法的返回值
     private boolean mRedelivery;
 ```
-
 构造函数
 
 ```java
@@ -53,7 +51,6 @@ IntentService 类是一个抽象类，包含一个抽象方法需要由子类来
         mName = name;
     }
 ```
-
 当 IntentService 第一次被启动时，`onCreate()` 方法就会调用
 
 就如同我们在 **Activity** 中使用 **HandlerThread** 来完成耗时任务一样，在 **IntentService** 内部一样是将 **HandlerThread** 作为工作线程，因为 **mServiceHandler** 持有了 **HandlerThread** 的 **Looper** 对象，因此 **mServiceHandler** 就作为 **IntentService** 向 **HandlerThread** 发送 **Message** 的桥梁
@@ -70,7 +67,6 @@ IntentService 类是一个抽象类，包含一个抽象方法需要由子类来
         mServiceHandler = new ServiceHandler(mServiceLooper);
     }
 ```
-
 这里再看下 ServiceHandler 的类声明
 
 当中，消息队列中的 Message 依次被传递给 `handleMessage(Message)` 方法进行处理，该方法是运行于子线程的，而耗时任务就交由抽象方法 `onHandleIntent(Intent)` 来完成，该方法需要交由子类来实现，并在该方法返回后调用 `stopSelf(Int)` 来停止 IntentService 
@@ -99,7 +95,6 @@ IntentService 类是一个抽象类，包含一个抽象方法需要由子类来
         }
     }
 ```
-
 每次启动 IntentService 时，`onStartCommand()` 方法就会被调用，最后是通过 `onStart()` 方法向 **mServiceHandler** 发送 包含此次任务详情的 **Message** 对象
 
 需要特别注意的是 **startId** 这个参数。每次回调 `onStartCommand()` 方法时，参数 startId 的值都是自动递增的，startId 用于唯一标识每次对 IntentService 发起的处理请求。如果 IntentService 同时处理多个 `onStartCommand()` 请求，则不应在处理完一个启动请求之后立即销毁 IntentService 。因为此时可能已经收到了新的启动请求，在第一个请求结束时停止服务会导致第二个请求被终止。为了避免这一问题，可以使用 `stopSelf(int)` 确保 IntentService 停止请求始终是基于最新一次的启动请求。也就是说，如果调用 `stopSelf(int)` 方法的参数值与 `onStartCommand()` 接受到的最新的 startId 值不相符的话，`stopSelf(int)` 方法就会失效，从而避免终止尚未处理的请求
@@ -124,7 +119,6 @@ IntentService 类是一个抽象类，包含一个抽象方法需要由子类来
         return mRedelivery ? START_REDELIVER_INTENT : START_NOT_STICKY;
     }
 ```
-
 当中，`onStartCommand()` 方法的返回值可能由 `setIntentRedelivery(boolean)` 方法来决定
 
 ```java
@@ -139,7 +133,6 @@ IntentService 类是一个抽象类，包含一个抽象方法需要由子类来
         mRedelivery = enabled;
     }
 ```
-
 还有其它几个相关方法
 
 ```java
@@ -160,7 +153,6 @@ IntentService 类是一个抽象类，包含一个抽象方法需要由子类来
     @WorkerThread
     protected abstract void onHandleIntent(@Nullable Intent intent);
 ```
-
 IntentService 的源码理解起来不算难，不过这是建立在对 Android 系统中以 Handler、Looper、MessageQueue 组成的异步消息处理机制以及 HandlerThread 有所了解的基础上的，最后就再贴上对 IntentService 的全部源码注释
 
 ```java
@@ -175,11 +167,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 
-/**
- * @Author: leavesCZY
- * @Date: 2018/6/22 13:39
- * @Github：https://github.com/leavesCZY
- */
 public abstract class IntentService extends Service {
 
     private volatile Looper mServiceLooper;
@@ -276,5 +263,3 @@ public abstract class IntentService extends Service {
 
 }
 ```
-
-

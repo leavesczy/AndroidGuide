@@ -9,7 +9,6 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:2.0.4"
 }
 ```
-
 # 一、相对定位
 
 ConstraintLayout 最基本的属性包含以下几个，即 `layout_constraintXXX_toYYYOf` 格式的属性，用于将 ViewA 的 XXX 方向和 ViewB 的 YYY 方向进行约束。当中，ViewB 也可以是父容器 ConstraintLayout，用 parent 来表示。这些属性都是用于为控件添加垂直和水平方向的约束力，根据约束力的 “有无” 或者 “强弱”，控件会处于不同的位置
@@ -92,7 +91,6 @@ ConstraintLayout 最基本的属性包含以下几个，即 `layout_constraintXX
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d0a8e2a7fdc14e73b9229a5bfb76f2d4~tplv-k3u1fbpfcp-zoom-1.image)
 
 # 二、约束力的强度
@@ -129,7 +127,7 @@ ConstraintLayout 最基本的属性包含以下几个，即 `layout_constraintXX
         android:layout_height="200dp"
         android:background="#2196F3"
         android:gravity="center"
-        android:text="https://github.com/leavesCZY"
+        android:text="https://github.com/leavesczy"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -153,7 +151,6 @@ ConstraintLayout 最基本的属性包含以下几个，即 `layout_constraintXX
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f59660e7f97c43e69bc53757eee93819~tplv-k3u1fbpfcp-zoom-1.image)
 
 # 三、宽高比
@@ -199,7 +196,6 @@ ConstraintLayout 最基本的属性包含以下几个，即 `layout_constraintXX
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d6a42850140f424283c51fbfdf48481b~tplv-k3u1fbpfcp-zoom-1.image)
 
 # 四、控件之间的宽高占比
@@ -281,7 +277,6 @@ ConstraintLayout 也可以像 LinearLayout 一样为子控件设置 `layout_weig
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c84f96f08de24153a344fd376525a6c4~tplv-k3u1fbpfcp-zoom-1.image)
 
 # 五、Dimensions
@@ -325,7 +320,6 @@ ConstraintLayout 也可以像 LinearLayout 一样为子控件设置 `layout_weig
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/12db0e5e023a422ba2caa3c98f8c4836~tplv-k3u1fbpfcp-zoom-1.image)
 
 # 六、Visibility
@@ -369,7 +363,6 @@ ConstraintLayout 也可以像 LinearLayout 一样为子控件设置 `layout_weig
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/664894bb01c7434abcc7e06a52948630~tplv-k3u1fbpfcp-zoom-1.image)
 
 而如果将黄色方块的 visibility 属性设置为 gone，那么红色方块的位置会发生变化。可以理解为黄色方块缩小为一个不可见的小点，位于其原先位置的中间，而红色方块则改为依照该点来进行定位
@@ -434,7 +427,6 @@ ConstraintLayout 也可以像 LinearLayout 一样为子控件设置 `layout_weig
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4a457c3aae054a2a8b080bb7ec75688d~tplv-k3u1fbpfcp-zoom-1.image)
 
 # 八、Guideline
@@ -483,7 +475,6 @@ ConstraintLayout 也可以像 LinearLayout 一样为子控件设置 `layout_weig
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 设置横向指示线距离顶部 100dp，黄色方块根据该指示线来设定顶部位置。竖向指示线设置其横向距离百分比为 0.5，所以黄色方块的左侧会位于屏幕的中间位置
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1f0c0ee3e75c4bf5a6455d2b2e2d8e78~tplv-k3u1fbpfcp-zoom-1.image)
@@ -552,7 +543,6 @@ Barrier 可以使用的属性有：
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c698f1adf0644004b72b044cc0812beb~tplv-k3u1fbpfcp-zoom-1.image)
 
 布局文件中约束了红色方块必须是一直处于**蓝色方块+绿色方块**这个整体的右侧，此时还看不出来 Barrier 的作用，但当文本内容增多时，就可以看出来了。不管是蓝色方块还是绿色方块的宽度变大，红色方块都会自动向右侧移动
@@ -601,7 +591,6 @@ Group 用于控制多个控件的可见性，先依靠 `constraint_referenced_id
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 # 十一、Placeholder
 
 Placeholder （占位符）用于和一个视图关联起来，通过 `setContentId()` 方法将占位符转换为指定的视图，即视图将在占位符所在位置上显示，如果此时布局中已包含该视图，则视图将从原有位置消失
@@ -646,12 +635,10 @@ Placeholder （占位符）用于和一个视图关联起来，通过 `setConten
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 ```kotlin
         val placeholder = findViewById<Placeholder>(R.id.placeholder)
         placeholder.setContentId(R.id.iv_target)
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a1f97f54c0b1437b8d05ed83059fbaf6~tplv-k3u1fbpfcp-zoom-1.image)
 
 # 十二、Chains
@@ -705,7 +692,6 @@ Chain 比较难描述，它是一种特殊的约束形式，多个控件通过�
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8ee9dab7873f4ff896678bea2ae4257a~tplv-k3u1fbpfcp-zoom-1.image)
 
 链条分为**水平链条**和**竖直链条**两种，分别用 `layout_constraintHorizontal_chainStyle` 和 `layout_constraintVertical_chainStyle` 两个属性来设置，属性值有以下三种：
@@ -724,7 +710,6 @@ Chain 比较难描述，它是一种特殊的约束形式，多个控件通过�
  android:layout_width="wrap_content"
  app:layout_constraintHorizontal_chainStyle="spread"
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ad5562837e0a4551972de1a94034c151~tplv-k3u1fbpfcp-zoom-1.image)
 
 当参数值为 spread 以及控件宽度为 0dp 时
@@ -733,7 +718,6 @@ Chain 比较难描述，它是一种特殊的约束形式，多个控件通过�
  android:layout_width="0dp"
  app:layout_constraintHorizontal_chainStyle="spread"
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ea70fe30e32b4728858ada8a0725b8fd~tplv-k3u1fbpfcp-zoom-1.image)
 
 当参数值为 spread_inside 以及控件宽度为 wrap_content 时
@@ -742,7 +726,6 @@ Chain 比较难描述，它是一种特殊的约束形式，多个控件通过�
  android:layout_width="wrap_content"
  app:layout_constraintHorizontal_chainStyle="spread_inside"
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a8bd8c54ed434caf98a239e6edf58b9d~tplv-k3u1fbpfcp-zoom-1.image)
 
 当参数值为 packed 以及控件宽度为 wrap_content 时
@@ -751,7 +734,6 @@ Chain 比较难描述，它是一种特殊的约束形式，多个控件通过�
  android:layout_width="wrap_content"
  app:layout_constraintHorizontal_chainStyle="packed"
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b481a25ccdae4ee2837e3aea61ea5d0a~tplv-k3u1fbpfcp-zoom-1.image)
 
 # 十三、Flow
@@ -759,8 +741,6 @@ Chain 比较难描述，它是一种特殊的约束形式，多个控件通过�
 [Flow](https://developer.android.google.cn/reference/androidx/constraintlayout/helper/widget/Flow?hl=en) 是一种新的虚拟布局，它专门用来构建链式排版效果，当出现空间不足的情况时能够自动换行，甚至是自动延展到屏幕的另一区域。当需要对多个元素进行链式布局，但不确定在运行时布局空间的实际大小是多少时 Flow 对你来说就非常有用。你可以使用 Flow 来实现让布局随着应用屏幕尺寸的变化 (比如设备发生旋转后出现的屏幕宽度变化) 而动态地进行自适应。此外，Flow 是一种虚拟布局，并不会作为视图添加到视图层级结构中，而是仅仅引用其它视图来辅助它们在布局系统中完成各自的布局功能
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0dbd005661204baab6d67d9a37679e7d~tplv-k3u1fbpfcp-zoom-1.image)
-
-
 
 Flow 中最重要的一个配置选项是 `wrapMode`，它可以决定在内容溢出 (或出现换行) 时的布局行为，一共有三种模式：
 
@@ -815,7 +795,6 @@ Flow 中最重要的一个配置选项是 `wrapMode`，它可以决定在内容�
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 ## none
 
 此模式下控件不会自动换行，且由于屏幕宽度无法完整展示，所以只会展示一部分内容
@@ -866,7 +845,6 @@ Flow 中最重要的一个配置选项是 `wrapMode`，它可以决定在内容�
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
 ```
-
 由于 `flow_firstHorizontalStyle` 值为 `spread_inside`，所以首行会往两侧靠边。由于 `flow_lastHorizontalBias`值为 1，所以最后一行也会直接往右靠拢
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3273a92cf6ba43b896a030914cc9fa48~tplv-k3u1fbpfcp-zoom-1.image)
@@ -941,15 +919,9 @@ Flow 中最重要的一个配置选项是 `wrapMode`，它可以决定在内容�
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 然后在代码中直接对 Layer 进行动画操作，这样其引用到的所有 View 都会进行整体动画
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 class LayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -975,7 +947,6 @@ class LayerActivity : AppCompatActivity() {
 
 }
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6db7a6d8cdb648028b3178a21b57e833~tplv-k3u1fbpfcp-zoom-1.image)
 
 此外，Layer 比较有用的一个点就是可以用于设置背景色，以前如果我们想要对某块区域设置一个背景色的话往往需要多嵌套一层，而如果使用 Layer 的话则可以直接设置，不需要进行嵌套
@@ -989,11 +960,6 @@ ConstraintSet 可以理解为 ConstraintLayout 对其所有子控件的约束规
 例如，我们需要在不同的场景下使用两种不同的布局形式，先定义好这两种布局文件，其中子 View 的 Id 必须保持一致，View 的约束条件则可以随意设置。然后在代码中通过 ConstraintSet 来加载这两个布局文件的约束规则，apply 给 ConstraintLayout 后即可平滑地切换两种布局效果
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 class ConstraintSetActivity : AppCompatActivity() {
 
     companion object {
@@ -1046,7 +1012,6 @@ class ConstraintSetActivity : AppCompatActivity() {
 
 }
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/df94a80a045747569cd1ac8a75ec0a33~tplv-k3u1fbpfcp-zoom-1.image)
 
 # 十六、ConstraintHelper
@@ -1060,11 +1025,6 @@ Flow 和 Layer 都是 ConstraintHelper 的子类，这两者都属于辅助布�
 继承 ConstraintHelper，在 `updatePostLayout`方法中遍历其引用的所有控件，然后对每个控件应用 CircularReveal 动画。`updatePostLayout`方法会在执行 onLayout 之前被调用
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 class CircularRevealHelper @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : ConstraintHelper(context, attrs, defStyleAttr) {
@@ -1085,7 +1045,6 @@ class CircularRevealHelper @JvmOverloads constructor(
 
 }
 ```
-
 在布局文件中引用需要执行动画的 View 即可
 
 ```kotlin
@@ -1115,7 +1074,6 @@ class CircularRevealHelper @JvmOverloads constructor(
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 # 十七、ImageFilterView
 
 ImageFilterView 是放在 ConstraintLayout 的 `utils.widget`包下的一个 View，从包名可以猜测 ImageFilterView 只是 Google 官方提供的一个额外的工具属性的类，和 ConstraintLayout 本身并没有啥关联
@@ -1169,15 +1127,9 @@ ImageFilterView 直接继承于 AppCompatImageView，在其基础上扩展了很
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
-
 在代码中来调整以上属性值
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @Github：https://github.com/leavesCZY
- */
 class ImageFilterViewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -1213,12 +1165,11 @@ class ImageFilterViewActivity : AppCompatActivity() {
 
 }
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4d118fd497624c29913dd0905b2e1e3d~tplv-k3u1fbpfcp-zoom-1.image)
 
 # 十八、Demo 下载
 
-示例代码我均已放到 Github，请查收：[AndroidOpenSourceDemo](https://github.com/leavesCZY/AndroidOpenSourceDemo)
+示例代码我均已放到 Github，请查收：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)
 
 # 十九、参考资料
 

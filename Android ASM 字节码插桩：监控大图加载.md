@@ -141,7 +141,7 @@ class LegalBitmapTransform(private val config: LegalBitmapConfig) : BaseTransfor
 }
 ```
 
-最后也给出完整的源码：[asm-samples](https://github.com/leavesCZY/asm-samples)
+最后也给出完整的源码：[asm-samples](https://github.com/leavesczy/asm-samples)
 
 字节码插桩的更多实践场景看这里：
 

@@ -46,11 +46,6 @@
 最终预加载 WebView 的大致逻辑就如下所示。我们可以在 PageFinished 或者退出 WebViewActivity 的时候就主动调用 `prepareWebView()` 方法来进行预加载，需要用到的时候就从缓存池中取出来动态添加到布局文件中
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @公众号：字节数组
- */
 object WebViewCacheHolder {
 
     private val webViewCacheStack = Stack<RobustWebView>()
@@ -92,7 +87,6 @@ object WebViewCacheHolder {
 
 }
 ```
-
 此方案虽然无法缩减创建 WebView 所需的时间，但可以缩短完成首屏页面的时间。需要注意，对 WebView 进行缓存采取的是用空间换时间的做法，需要考虑低端机型运存较小的情况
 
 # 三、渲染优化
@@ -166,7 +160,6 @@ fun setDrawDuringWindowsAnimating(view: View) {
     }
 }
 ```
-
 优化后的效果
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/41981339d0134c0781fdf34863b98088~tplv-k3u1fbpfcp-zoom-1.image)
@@ -236,11 +229,6 @@ Cache-Control 避免了 WebView 在有效期内去重复请求资源，有效期
 大致实现就如下所示，这里我通过 OkHttp 来代理实现网络请求
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- * @公众号：字节数组
- */
 object WebViewInterceptRequestProxy {
 
     private lateinit var application: Application
@@ -373,7 +361,6 @@ object WebViewInterceptRequestProxy {
 
 }
 ```
-
 采用此方案的好处有：
 
 - 通过 OkHttp 本身的 Cache 功能来实现资源缓存，并不局限于特定的文件类型，可以用于图片、HTML、JS、CSS 等多种类型
@@ -412,6 +399,4 @@ CDN 的全称是 Content Delivery Network，即内容分发网络。CDN 是构�
 - [今日头条品质优化 - 图文详情页秒开实践 ](https://juejin.cn/post/6876011410061852680)
 - [阿里巴巴淘系技术 - 前端性能优化](https://www.zhihu.com/question/385397882/answer/1594966805)
 
-
-
-最后也当然少不了本文的示例代码了：[RobustWebView](https://github.com/leavesCZY/RobustWebView)
+最后也当然少不了本文的示例代码了：[RobustWebView](https://github.com/leavesczy/RobustWebView)

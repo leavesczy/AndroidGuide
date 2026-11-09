@@ -160,14 +160,9 @@ private void init(ThreadGroup g, Runnable target, String name,
 
 }
 ```
-
 Java 虚拟机在创建 main 线程（所有线程的父线程）的时候会为其自动指定一个线程组，因此任何一个线程都有一个线程组与之相关联。且一个线程组的父线程组默认是在声明该线程组时所在线程的线程组，但并非所有线程组均有父线程组，最顶层线程组就不包含父线程组
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 fun main() {
     val mainThreadGroup = Thread.currentThread().threadGroup
     println(mainThreadGroup)
@@ -184,7 +179,6 @@ fun main() {
 //    java.lang.ThreadGroup[name=otherThreadGroup,maxpri=10]
 }
 ```
-
 ThreadGroup 本身存在设计缺陷问题，目前的使用场景有限，日常开发中可以无需理会
 
 ## 5、线程异常捕获
@@ -194,10 +188,6 @@ ThreadGroup 本身存在设计缺陷问题，目前的使用场景有限，日�
 通过该方法我们可以在异常发生时且线程被停止前获取到相应的 Thread 对象和 Throwable 实例
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 fun main() {
     val runnable = Runnable {
         for (i in 4 downTo 0) {
@@ -213,7 +203,6 @@ fun main() {
     thread.start()
 }
 ```
-
 ```kotlin
 0
 1
@@ -228,7 +217,6 @@ fun main() {
 threadName: otherName
 exc: java.lang.ArithmeticException: / by zero
 ```
-
 ThreadGroup 本身也实现了 UncaughtExceptionHandler 接口，所以如果 Thread 对象不包含关联的 UncaughtExceptionHandler 实例的话，则会将异常交由 ThreadGroup 来进行处理
 
 从 Thread 类的以下逻辑就可以看出来
@@ -251,7 +239,6 @@ public class Thread implements Runnable {
     
 }
 ```
-
 ThreadGroup 默认情况下会将异常交由其父线程组进行处理，而对于不包含父线程组的线程组对象（顶层线程组），则会将异常交由 Thread 类的 `defaultUncaughtExceptionHandler` 进行处理。所以，我们可以通过 Thread 的静态方法 `setDefaultUncaughtExceptionHandler` 方法来为程序设置一个全局的默认异常处理器
 
 ```java
@@ -299,7 +286,6 @@ public class Thread implements Runnable {
     
 }
 ```
-
 所以，当线程由于异常而终止时，UncaughtExceptionHandler 实例的选择优先级从高到低分别是：
 
 1. Thread.uncaughtExceptionHandler
@@ -317,7 +303,6 @@ public interface ThreadFactory {
     
 }
 ```
-
 ThreadFactory 提供了将要执行的任务 Runnable 与要创建的 Thread 相关联的方法，即我们可以通过 ThreadFactory 来标明 Thread 要执行的具体任务、为 Thread 设置一个有具体含义的名字、设置 Thread 的运行优先级等
 
 例如，Executors 内部就包含了一个 `DefaultThreadFactory`，通过 `threadNumber` 自增的方式为每一个创建的线程设置了特定的线程名、确保线程是用户线程、确保线程的优先级为正常级别
@@ -350,7 +335,6 @@ static class DefaultThreadFactory implements ThreadFactory {
     }
 }
 ```
-
 而对于我们项目自己定义的线程池，使用 ThreadFactory 的一个比较有意义的用处是：为线程设置关联的 UncaughtExceptionHandler，这在提高系统的健壮性方面是很有好处的
 
 ## 7、线程的执行时机
@@ -370,10 +354,6 @@ static class DefaultThreadFactory implements ThreadFactory {
 可是，运行以下代码后你会发现实际数量大概率是会少于四十
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class Shop(var goodsCount: Int) {
 
     fun produce() {
@@ -410,7 +390,6 @@ fun main() {
     println("shop.goodsCount: " + shop.goodsCount)
 }
 ```
-
 以上代码就使用到了多个线程，单个 Producer 线程的行为逻辑是独立的，而多个 Producer 线程的行为逻辑对于 Shop 来说是互相交错且先后顺序不确定的，这就有可能导致一种情况：两个 Producer 同时判断到当前商品数量是十，然后同时为商店生产第十一件商品（**shop.goodsCount++**），最终就导致某个 Producer 生产的第十一号商品被另一个 Producer 覆盖了，两个 Producer 只生产了一件商品，即数据**更新无效/更新丢失**
 
 `shop.goodsCount++` 这条语句虽然看起来像是一个不可分割的操作（原子操作），但它实际上相当于如下伪代码所表示的三个指令的组合：
@@ -420,7 +399,6 @@ load(shop.goodsCount , r1) //指令1，将变量 shop.goodsCount 的值从内存
 increment(r1) //指令2，将寄存器 r1 的值加1
 store(shop.goodsCount , r1) //指令3，将寄存器 r1 的内容写入变量 shop.goodsCount 所对应的内存空间
 ```
-
 多个 Producer 线程可能会同时各自执行上述指令。例如，假设当前 goodsCount 是十，Producer1 和 Producer2 同时执行到指令1，两个线程将 goodsCount 读到各自处理器的寄存器上，即每个线程会各自拥有一份副本数据，然后对各自寄存器的值进行自增加一的操作，当执行到指令三时，由于 goodsCount  所在的内存空间是特定的，所以两个 Producer 线程对内存空间上 goodsCount 的值的回传会存在相互覆盖的情况。即原本最终结果应该是**递增加二**的行为最终却只有**递增加一**
 
 以上是多线程编程中经常会遇到的一个现象，即竞态。竞态是指计算的正确性依赖于相对时间顺序或者线程的交错。竞态并不一定就会导致计算结果不正确，它只是不排除计算结果时而正确时而错误的可能
@@ -436,7 +414,6 @@ load(shop.goodsCount , r1) //指令1，将变量 shop.goodsCount 的值从内存
 increment(r1) //指令2，将寄存器 r1 的值加1
 store(shop.goodsCount , r1) //指令3，将寄存器 r1 的内容写入变量 shop.goodsCount 所对应的内存空间
 ```
-
 线程 A 在执行完指令1，开始执行或者正在执行指令2时，线程 B 可能已经执行完了指令3，这使得线程 A 当前持有的共享变量 shop.goodsCount 是旧值，当线程 A 执行完指令3时，这就使得线程 B 对共享变量的更新被覆盖了，即造成了更新丢失
 
 ---
@@ -448,7 +425,6 @@ if (shop.goodsCount < 40) { //操作1
     shop.produce() //操作2
 }
 ```
-
 线程 A 在执行完操作1，开始执行操作2之前，线程 B 可能已经更新了共享变量 `shop.goodsCount` 的值导致 if 语句中的条件变为不成立，可此时线程 A 依然会执行操作2，这是因为线程 A 此时并不知道共享变量已经被更新且导致运行条件不成立了
 
 > 从上述分析中我们可以总结出竞态产生的一般条件。设 Q1 和 Q2 是并发访问共享变量 V 的两个操作，这两个操作并非都是读操作。如果一个线程在执行 Q1 期间另外一个线程同时执行 Q2，那么无论 Q2 是读操作还是写操作都会导致竞态。从这个角度来看，竞态可以看做是由于访问（读取、更新）同一组共享变量的多个线程所执行的操作被相互交错而导致的。而上述代码中遇到的**更新丢失**和**读到脏数据**问题就是由于竞态的存在而导致的
@@ -479,7 +455,6 @@ class Shop(var goodsCount: Int, var clerk: Int) {
 
 }
 ```
-
 理解原子操作这个概念还需要注意以下两点：
 
 - 原子操作是针对共享变量的操作而言的，仅涉及局部变量访问的操作无所谓是否是原子性，或者可以直接将其看作成原子操作
@@ -527,10 +502,6 @@ Java 语言规范规定了：**在 Java 语言中，64 位以外的任何类型�
 所以说，线程安全类可能只是保障了其自身单次操作行为的线程安全性，使得我们在调用的时候不需要进行额外的同步保障。但对于使用方的一些特定顺序的连续调用，就还是需要在外部实现额外的同步手段来保证调用的正确性，否则就有可能用线程安全类写出不安全的代码
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 private val vector = Vector<Int>()
 
 private val threadNum = 5
@@ -572,7 +543,6 @@ fun main() {
     }
 }
 ```
-
 ## 4、上下文切换
 
 并发的实现和是否拥有多个处理器无关，即使只有单个处理器也能够通过处理器**时间片分配**技术来实现并发。操作系统通过给每个线程分配一小段占有处理器使用权的时间来供其运行，然后在每个线程的运行时间结束后又快速切换到下一个线程来运行，多个线程以这种断断续续的方式来实现并发并完成各自的任务。一个线程被剥夺处理器的使用权并暂停运行的过程就被称为切出，被线程调度器选中来占用处理器并运行的过程就被称为切入

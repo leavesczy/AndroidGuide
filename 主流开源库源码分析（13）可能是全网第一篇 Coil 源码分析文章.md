@@ -35,7 +35,6 @@ kotlinOptions {
     jvmTarget = "1.8"
 }
 ```
-
 Gradle Kotlin DSL (`.gradle.kts`)：
 
 ```groovy
@@ -48,7 +47,6 @@ kotlinOptions {
     jvmTarget = "1.8"
 }
 ```
-
 Coil 一共包含五个组件，可以在 `mavenCentral()`上获取到
 
 - `io.coil-kt:coil-base`。基础组件，提供了基本的图片请求、图片解码、图片缓存、Bitmap 复用等功能
@@ -62,7 +60,6 @@ Coil 一共包含五个组件，可以在 `mavenCentral()`上获取到
 ```kotlin
 implementation("io.coil-kt:coil:1.0.0")
 ```
-
 如果想要显示 **Gif、SVG、视频帧**等类型的图片，则需要额外引入对应的支持库：
 
 ```kotlin
@@ -70,7 +67,6 @@ implementation("io.coil-kt:coil-gif:1.0.0")
 implementation("io.coil-kt:coil-svg:1.0.0")
 implementation("io.coil-kt:coil-video:1.0.0")
 ```
-
 # 三、快速入门
 
 ## 1、load
@@ -89,7 +85,6 @@ imageView.load(File("/path/to/image.jpg"))
 
 // And more...
 ```
-
 使用可选的 lambda 块来添加配置项
 
 ```kotlin
@@ -99,7 +94,6 @@ imageView.load("https://www.example.com/image.jpg") {
     transformations(CircleCropTransformation()) //图片变换，将图片转为圆形
 }
 ```
-
 ## 2、ImageRequest
 
 如果要将图片加载到自定义的 target 中，可以通过 ImageRequest.Builder 来构建 ImageRequest 实例，并将请求提交给 ImageLoader
@@ -113,7 +107,6 @@ val request = ImageRequest.Builder(context)
     .build()
 context.imageLoader.enqueue(request)
 ```
-
 ## 3、ImageLoader
 
 `imageView.load`使用单例对象 imageLoader 来执行 ImageRequest，可以使用 Context 的扩展函数来访问 ImageLoader
@@ -121,7 +114,6 @@ context.imageLoader.enqueue(request)
 ```kotlin
 val imageLoader = context.imageLoader
 ```
-
 可选地，你也可以构建自己的 ImageLoader 实例，并赋值给 Coil 来实现全局使用
 
 ```kotlin
@@ -132,7 +124,6 @@ Coil.setImageLoader(
         .build()
 )
 ```
-
 ## 4、execute
 
 如果想直接拿到目标图片，可以调用 ImageLoader 的`execute`方法来实现
@@ -143,7 +134,6 @@ val request = ImageRequest.Builder(context)
     .build()
 val drawable = imageLoader.execute(request).drawable
 ```
-
 ## 5、R8 / Proguard
 
 Coil 开箱即用，与 R8 完全兼容，不需要添加任何额外规则
@@ -165,7 +155,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
-
 # 四、大体框架
 
 Coil 在我看来是一个比较“**激进**”的开源库，热衷于使用当前最为流行的技术，包括 Coroutines、OkHttp、Okio，以及 Google 官方的 Jetpack Lifecycles、AndroidX 等，代码不仅完全由 Kotlin 语言来实现，连 gradle 脚本也是全部使用 kts，而且 gradle 版本也升级得很快，我一开始由于使用的 Android Studio 不是 4.x 版本，连 Coil 代码都跑不起来 =_=
@@ -221,7 +210,6 @@ imageView.load(imageUrl) {
     )
 }
 ```
-
 Coil 为 ImageView 声明了多个用于加载图片的扩展函数，均命名为 `load`，默认情况下我们只需要传一个图片来源地址即可，支持 **String、HttpUrl、Uri、File、Int、Drawable、Bitmap** 等多种入参类型
 
 ```kotlin
@@ -233,7 +221,6 @@ inline fun ImageView.load(
     builder: ImageRequest.Builder.() -> Unit = {}
 ): Disposable = loadAny(uri, imageLoader, builder)
 ```
-
 不管传入的是什么类型的参数，最终都会中转调用到 `loadAny` 方法，通过 Builder 模式构建出本次的请求参数 ImageRequest，然后将 ImageRequest 提交给 ImageLoader，由其来完成图片的加载，最终返回一个 Disposable 对象
 
 ```kotlin
@@ -251,7 +238,6 @@ inline fun ImageView.loadAny(
     return imageLoader.enqueue(request)
 }
 ```
-
 所以，一个简单的 `load` 方法就已经使用到了以下几个类：
 
 1. ImageRequest。图片的请求参数
@@ -301,7 +287,6 @@ private var resolvedLifecycle: Lifecycle?
 private var resolvedSizeResolver: SizeResolver?
 private var resolvedScale: Scale?
 ```
-
 ## 1、Target
 
 Target 即最终图片的接收载体，ImageRequest 提供了 `target` 方法用于把 ImageView 包装为 Target 。如果最终图片的接收载体不是 ImageView 的话，就需要开发者自己来实现 Target 接口
@@ -314,7 +299,6 @@ fun target(target: Target?) = apply {
 	resetResolvedValues()
 }
 ```
-
 Target 接口提供了**图片开始加载、图片加载失败、图片加载成功**的事件回调，主要是为了显示**占位图、错误图、目标图**等几个
 
 ```kotlin
@@ -338,7 +322,6 @@ interface Target {
     fun onSuccess(result: Drawable) {}
 }
 ```
-
 ImageViewTarget 就是通过调用 `setImageDrawable` 来显式各个状态的图片，同时也实现了 DefaultLifecycleObserver 接口，意味着 ImageViewTarget 本身就**具备了监听生命周期事件的能力**
 
 ```kotlin
@@ -367,7 +350,6 @@ open class ImageViewTarget(
 	···
 }
 ```
-
 ## 2、Lifecycle
 
 每个 ImageRequest 都会关联一个 Context 对象，如果外部传入的是 ImageView，则会取 ImageView 内部的 Context。Coil 会判断 Context 是否属于 LifecycleOwner 类型，是的话则可以拿到**和 Activity 或者 Fragment 关联的 Lifecycle**，否则最终取 **GlobalLifecycle**
@@ -404,7 +386,6 @@ internal object GlobalLifecycle : Lifecycle() {
     override fun toString() = "coil.request.GlobalLifecycle"
 }
 ```
-
 ## 3、CachePolicy
 
 和 Glide 一样，Coil 也具备了多级缓存的能力，即**内存缓存 memoryCachePolicy、磁盘缓存 diskCachePolicy、网络缓存 networkCachePolicy**。这些缓存功能是否开启都是通过 CachePolicy 来定义，默认三级缓存全部可读可写
@@ -420,7 +401,6 @@ enum class CachePolicy(
     DISABLED(false, false) //不可读不可写，即禁用
 }
 ```
-
 ## 4、Fetcher
 
 Fetcher 是**根据图片来源地址转换为目标数据类型**的转换器。例如，我们传入了 Int 类型的 drawableResId，想要以此拿到 Drawable，那么这里的 `Class<*>` 即 `Class<Int>` ，`Fetcher<*>` 即 `Fetcher<Drawable>`
@@ -429,7 +409,6 @@ Fetcher 是**根据图片来源地址转换为目标数据类型**的转换器�
 /** @see Builder.fetcher */
 val fetcher: Pair<Fetcher<*>, Class<*>>?,
 ```
-
 Fetcher 接口包含三个方法
 
 ```kotlin
@@ -458,7 +437,6 @@ interface Fetcher<T : Any> {
     ): FetchResult
 }
 ```
-
 Coil 默认提供了以下八种类型的 Fetcher，分别用于处理 **HttpUriUri、HttpUriUrl、File、Asset、ContentUri、Resource、Drawable、Bitmap** 等类型的图片来源地址
 
 ```kotlin
@@ -476,7 +454,6 @@ private val registry = componentRegistry.newBuilder()
     ···
     .build()
 ```
-
 ## 5、Decoder
 
 Decoder 接口用于提供将 BufferedSource 转码为 Drawable 的能力，BufferedSource 就对应着不同类型的图片资源
@@ -501,7 +478,6 @@ interface Decoder {
     ): DecodeResult
 }
 ```
-
 # 六、Disposable
 
 Disposable 是我们调用 `load` 方法后的返回值，为外部提供用于**取消图片加载**或者**等待图片加载完成**的方法
@@ -519,7 +495,6 @@ interface Disposable {
     suspend fun await()
 }
 ```
-
 由于 Coil 是使用协程来加载图片，所以每个任务都会对应一个 Job
 
 如果 ImageRequest 包含的 Target 对应着某个 View（即属于 ViewTarget 类型），那么返回的 Disposable 即 ViewTargetDisposable。而 View 可能需要先后请求多张图片（例如 RecyclerView 的每个 Item 都是 ImageView），那么当启动新任务后旧任务就应该被取消，所以 ViewTargetDisposable 就包含了一个 UUID 来唯一标识每个请求。其它情况就都是返回 BaseTargetDisposable
@@ -562,7 +537,6 @@ internal class ViewTargetDisposable(
     }
 }
 ```
-
 # 七、ImageLoader
 
 上面有说过，`loadAny`方法最终是会通过调用 `imageLoader.enqueue(request)`来发起一个图片加载请求的，那么重点就是要来看 ImageLoader 是如何实现的
@@ -582,7 +556,6 @@ inline fun ImageView.loadAny(
     return imageLoader.enqueue(request)
 }
 ```
-
 ImageLoader 是一个接口，是承载了所有图片加载任务和实现缓存复用的加载器
 
 ```kotlin
@@ -601,7 +574,6 @@ interface ImageLoader {
     fun shutdown()
 }
 ```
-
 ImageLoader 的唯一实现类是 RealImageLoader，其`enqueue`方法会启动一个协程，在 job 里执行 `executeMain` 方法得到 ImageResult，ImageResult 就包含了最终得到的图片。同时，job 会被包含在返回的 Disposable 对象里，这样外部才能**取消图片加载**或者**等待图片加载完成**
 
 ```kotlin
@@ -621,7 +593,6 @@ override fun enqueue(request: ImageRequest): Disposable {
     }
 }
 ```
-
 executeMain 方法的逻辑也比较简单，可以概括为：
 
 1. 为 target 和 request 创建一个代理类，用于支持 Bitmap 缓存和 Lifecycle 监听
@@ -692,7 +663,6 @@ private suspend fun executeMain(initialRequest: ImageRequest, type: Int): ImageR
     }
 }
 ```
-
 `executeChain`方法就比较有意思了，有看过 OkHttp 源码的同学应该会对 RealInterceptorChain 有点印象，OkHttp 的拦截器就是通过该同名类来实现的，很显然 Coil 借鉴了 OkHttp 的实现思路，极大方便了后续功能扩展，也给了外部控制整个图片加载流程的入口，可扩展性 +100
 
 > 不了解 OkHttp 的 RealInterceptorChain 实现思路的可以看我的这篇文章，这里不再赘述：[三方库源码笔记（11）-OkHttp 源码详解](https://juejin.cn/post/6895369745445748749)
@@ -718,7 +688,6 @@ private suspend inline fun executeChain(
     }
 }
 ```
-
 所以说，重点就还是要来看 EngineInterceptor 的 `intercept` 方法，其逻辑可以概括为：
 
 1. 找到能处理本次请求的 fetcher，执行下一步
@@ -900,7 +869,6 @@ internal class EngineInterceptor(
     
 }
 ```
-
 Fetcher 是**根据图片来源地址转换为目标数据类型**的转换器。Coil 默认提供了以下八种类型的 Fetcher，分别用于处理 **HttpUri、HttpUrl、File、Asset、ContentUri、Resource、Drawable、Bitmap** 等类型的图片来源地址
 
 ```kotlin
@@ -918,7 +886,6 @@ private val registry = componentRegistry.newBuilder()
     ···
     .build()
 ```
-
 所以，如果我们外部要加载的是一张网络图片，且传入的是 String 类型的 ImageUrl，那么最终对应上的就是 HttpUriFetcher，其父类 HttpFetcher 就会通过 OkHttp 来进行网络请求了。至此，整个图片加载流程就结束了
 
 ```kotlin
@@ -981,7 +948,6 @@ internal abstract class HttpFetcher<T : Any>(private val callFactory: Call.Facto
     
 }
 ```
-
 # 八、缓存机制
 
 Glide 的缓存机制是分为**内存缓存**和**磁盘缓存**两层，Coil 在这两个的基础上还增加了**网络缓存**这一层，这可以从 ImageRequest 的参数看出来，默认情况下，这三层缓存机制是全部启用的，即全部可读可写
@@ -994,7 +960,6 @@ val diskCachePolicy: CachePolicy,
 //网络缓存
 val networkCachePolicy: CachePolicy,
 ```
-
 ```kotlin
 enum class CachePolicy(
     val readEnabled: Boolean,
@@ -1006,7 +971,6 @@ enum class CachePolicy(
     DISABLED(false, false)
 }
 ```
-
 在请求图片的时候，我们可以在 lambda 块中配置本次请求的缓存策略
 
 ```kotlin
@@ -1016,7 +980,6 @@ imageView.load(imageUrl) {
     networkCachePolicy(CachePolicy.ENABLED)
 }
 ```
-
 下面来看看 Coil 的缓存机制具体是如何定义和实现的
 
 ## 1、内存缓存
@@ -1079,7 +1042,6 @@ internal class EngineInterceptor(
     
 }
 ```
-
 MemoryCacheService 相当于一个工具类，会先后尝试从 StrongMemoryCache 和 WeakMemoryCache 取值，取得到的话会同时通过 BitmapReferenceCounter 将其引用计数 +1
 
 ```kotlin
@@ -1097,7 +1059,6 @@ internal class MemoryCacheService(
     }
 }
 ```
-
 Coil 的内存缓存机制实际上是分为两级：
 
 1. WeakMemoryCache
@@ -1127,7 +1088,6 @@ private fun buildDefaultCallFactory() = lazyCallFactory {
         .build()
 }
 ```
-
 而且，Coil 的磁盘缓存和网络缓存这两个配置也只会在 HttpFetcher 这里读取，即只在进行网络请求的时候生效，所以说，Coil **只会磁盘缓存通过网络请求得到的原始图片，而不缓存其它尺寸大小的图片**
 
 HttpFetcher 的网络缓存和磁盘缓存策略是通过修改 Request 的 **cacheControl** 来实现的，每种缓存策略可以分别配置是否可读可写，一共有以下几种可能：
@@ -1200,7 +1160,6 @@ internal abstract class HttpFetcher<T : Any>(private val callFactory: Call.Facto
     ···
 }
 ```
-
 从以上逻辑也可以看出，networkCachePolicy 的 writeEnabled 属性并没有被用到，因为网络请求本身只有**发起**和**不发起**两种选择，用 readEnabled 就足够表示了，所以 writeEnabled 对于 networkCachePolicy 来说没有意义
 
 此外，为了在无网络信号的时候可以快速结束整个流程，避免无意义的网络请求，RequestService 会在当前处于离线的时候（即 isOnline 为 false），将 networkCachePolicy 修改为完全禁用状态（CachePolicy.DISABLED）
@@ -1237,7 +1196,6 @@ internal class RequestService(private val logger: Logger?) {
     
 }
 ```
-
 # 九、生命周期监听
 
 前文有提到，每个 ImageRequest 都会关联一个 Context 对象，如果外部传入的是 ImageView，则会自动取 ImageView 内部的 Context。Coil 会判断 Context 是否属于 LifecycleOwner 类型，是的话则可以拿到**和 Activity 或者 Fragment 关联的 Lifecycle**，否则最终取 **GlobalLifecycle**
@@ -1279,7 +1237,6 @@ private suspend fun executeMain(initialRequest: ImageRequest, type: Int): ImageR
     }
 }
 ```
-
 `createRequestDelegate` 方法的逻辑可以总结为：
 
 1. 如果 target 对象属于 ViewTarget 类型，那么说明其包含特定 View
@@ -1328,7 +1285,6 @@ fun createRequestDelegate(
     return delegate
 }
 ```
-
 # 十、Transformation
 
 图片变换是基本所有的图片加载库都会支持的功能，Coil 对这个概念的抽象即 Transformation 接口
@@ -1355,7 +1311,6 @@ interface Transformation {
     suspend fun transform(pool: BitmapPool, input: Bitmap, size: Size): Bitmap
 }
 ```
-
 Coil 默认提供了以下几个 Transformation 实现类
 
 - BlurTransformation。用于实现高斯模糊
@@ -1370,11 +1325,6 @@ Coil 默认提供了以下几个 Transformation 实现类
 为图片添加水印的思路也很简单，只需要对 canvas 稍微坐下旋转，然后绘制文本即可
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- * @Desc: 为图片添加水印
- */
 class WatermarkTransformation(
     private val watermark: String,
     @ColorInt private val textColor: Int,
@@ -1411,7 +1361,6 @@ class WatermarkTransformation(
 
 }
 ```
-
 ```kotlin
 imageView.load(imageUrl) {
     transformations(
@@ -1419,7 +1368,6 @@ imageView.load(imageUrl) {
     )
 }
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0342c509ce3340a5b82a6e342c1b8916~tplv-k3u1fbpfcp-zoom-1.image)
 
 ## 2、为图片添加蒙层
@@ -1427,11 +1375,6 @@ imageView.load(imageUrl) {
 Android 的 Paint 原生就支持为 Bitmap 添加一个蒙层，只需要使用其 `colorFilter`方法即可
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- * @Desc: 添加蒙层
- */
 class ColorFilterTransformation(
     @ColorInt private val color: Int
 ) : Transformation {
@@ -1454,7 +1397,6 @@ class ColorFilterTransformation(
     }
 }
 ```
-
 ```kotlin
 imageView.load(imageUrl) {
     transformations(
@@ -1463,7 +1405,6 @@ imageView.load(imageUrl) {
     )
 }
 ```
-
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e4417b3a98bc44258e0fe9395e73dc4e~tplv-k3u1fbpfcp-zoom-1.image)
 
 更多 Transformation 效果看这里：[coil-transformations](https://github.com/Commit451/coil-transformations)
@@ -1490,7 +1431,6 @@ internal class RealImageLoader(
     val logger: Logger?
 ) 
 ```
-
 RealImageLoader 的单例对象就保存在另一个单例对象 Coil 中，Coil 以两种方式来完成 RealImageLoader 的初始化
 
 - 如果项目中的 Application 继承了 ImageLoaderFactory 接口，那么就通过该接口来完成初始化
@@ -1530,15 +1470,9 @@ object Coil {
     
 }
 ```
-
 为了设定默认配置，我们就需要**在应用启动之后，开始图片加载之前**向 Coil 注入自己的 ImageLoader 实例
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- * @Desc:
- */
 object CoilHolder {
 
     fun init(application: Application) {
@@ -1569,7 +1503,6 @@ object CoilHolder {
 
 }
 ```
-
 # 十二、自定义网络请求
 
 在讲 Coil 的**磁盘缓存**和**网络缓存**这一节内容的时候有提到，Coil 的网络请求是由 HttpFetcher 来完成的，那么我们是否有办法来替换该组件，自己来实现网络请求呢？先来看下 Coil 是如何实现将外部传入的图片地址和特定的 Fetcher 对应上的
@@ -1613,7 +1546,6 @@ internal class RealImageLoader(
     
 }
 ```
-
 外部在调用 `load` 方法时，传入的 String 参数可能是完全不同的含义，既可能是指向本地资源文件，也可能是指向远程的网络图片，Coil 就依靠 Mapper 和 Fetcher 来区分资源类型
 
 ```kotlin
@@ -1621,7 +1553,6 @@ imageView.load("android.resource://example.package.name/drawable/image")
 
 imageView.load("https://www.example.com/image.jpg")
 ```
-
 StringMapper 首先会将 String 类型转换为 Uri
 
 ```kotlin
@@ -1630,7 +1561,6 @@ internal class StringMapper : Mapper<String, Uri> {
     override fun map(data: String) = data.toUri()
 }
 ```
-
 ResourceUriFetcher 会拿到 Uri，然后判断 Uri 的 `scheme` 是否是 `android.resource`，是的话就知道其指向的是本地的资源文件。HttpUriFetcher 则是判断 Uri 的 `scheme` 是否是`http`或者`https`，是的话就知道其指向的是远程网络图片
 
 ```kotlin
@@ -1643,7 +1573,6 @@ internal class ResourceUriFetcher(
     
 }
 
-
 internal class HttpUriFetcher(callFactory: Call.Factory) : HttpFetcher<Uri>(callFactory) {
 
     override fun handles(data: Uri) = data.scheme == "http" || data.scheme == "https"
@@ -1654,7 +1583,6 @@ internal class HttpUriFetcher(callFactory: Call.Factory) : HttpFetcher<Uri>(call
     
 }
 ```
-
 以上这个**转换+判断+加载**的过程就发生在 EngineInterceptor 中
 
 ```kotlin
@@ -1683,15 +1611,9 @@ internal class EngineInterceptor(
     
 }
 ```
-
 所以，要自定义网络请求组件，我们就需要向 ComponentRegistry 添加自己的 HttpFetcher 实现，在拿到 Uri 类型的网络地址后发起网络请求。这里我来写一个通过 Volley 来完成网络图片加载的 VolleyFetcher。**需要注意的是，我写的 VolleyFetcher 并不可靠，因为我也只是想写个 Demo 而已，正常来说还是应该使用 OkHttp**
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- * @Desc:
- */
 class VolleyFetcher(private val application: Application) : Fetcher<Uri> {
 
     override fun handles(data: Uri) = data.scheme == "http" || data.scheme == "https"
@@ -1738,7 +1660,6 @@ class VolleyFetcher(private val application: Application) : Fetcher<Uri> {
 
 }
 ```
-
 然后为 ImageLoader 注册该 Fetcher 即可
 
 ```kotlin
@@ -1759,7 +1680,6 @@ fun init(application: Application) {
     )
 }
 ```
-
 # 十三、GitHub
 
-上述的所有示例代码我都放到 GitHub 了，欢迎 star：[AndroidOpenSourceDemo](https://github.com/leavesCZY/AndroidOpenSourceDemo)
+上述的所有示例代码我都放到 GitHub 了，欢迎 star：[AndroidOpenSourceDemo](https://github.com/leavesczy/AndroidOpenSourceDemo)

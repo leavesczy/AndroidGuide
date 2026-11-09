@@ -42,7 +42,6 @@ dependencies {
     kapt 'com.alibaba:arouter-compiler:1.2.2'
 }
 ```
-
 # 二、前言
 
 假设存在一个包含多个 module 的项目，在名为 **user** 的 module 中存在一个 `UserHomeActivity`，其对应的**路由路径**是 `/account/userHome`。那么，当我们要从其它 module 跳转到该页面时，只需要指定 path 来跳转即可
@@ -50,10 +49,6 @@ dependencies {
 ```java
 package github.leavesc.user
 
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 @Route(path = RoutePath.USER_HOME)
 class UserHomeActivity : AppCompatActivity() {
 
@@ -67,7 +62,6 @@ class UserHomeActivity : AppCompatActivity() {
 //其它页面使用如下代码来跳转到 UserHomeActivity
 ARouter.getInstance().build(RoutePath.USER_HOME).navigation()
 ```
-
 只根据一个 path，ARouter 是如何定位到特定的 Activity 的呢？这就需要通过在**编译阶段**生成辅助代码来实现了。我们知道，想要跳转到某个 Activity，那么就需要拿到该 Activity 的 Class 对象才行。在编译阶段，ARouter 会根据我们设定的路由跳转规则来自动生成映射文件，映射文件中就包含了 path 和 ActivityClass 之间的对应关系
 
 例如，对于 `UserHomeActivity`，在编译阶段就会自动生成以下辅助文件。可以看到，`ARouter$$Group$$account` 类中就将 path 和 ActivityClass 作为键值对保存到了 Map 中。ARouter 就是依靠此来进行跳转的
@@ -84,7 +78,6 @@ public class ARouter$$Group$$account implements IRouteGroup {
   }
 }
 ```
-
 还有一个重点需要注意，就是这类自动生成的文件的包名路径都是 `com.alibaba.android.arouter.routes`，且类名前缀也是有特定规则的。虽然 `ARouter$$Group$$account` 类实现了将对应关系保存到 Map 的逻辑，但是 `loadInto` 方法还是需要由 ARouter 在运行时来调用，那么 ARouter 就需要拿到 `ARouter$$Group$$account` 这个类才行，而 ARouter 就是通过扫描 `com.alibaba.android.arouter.routes`这个包名路径来获取所有辅助文件的
 
 ARouter 的基本实现思路就是：
@@ -98,10 +91,6 @@ ARouter 的基本实现思路就是：
 ARouter 一般是通过在 Application 中调用 `init` 方法来完成初始化的，这里先来看下其初始化流程
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class MyApp : Application() {
 
     override fun onCreate() {
@@ -115,7 +104,6 @@ class MyApp : Application() {
 
 }
 ```
-
 ARouter 类使用了单例模式，ARouter 类只是负责对外暴露可以由外部调用的 API，大部分的实现逻辑还是转交由 `_ARouter` 类来完成
 
 ```java
@@ -165,7 +153,6 @@ public final class ARouter {
     
 }
 ```
-
 `_ARouter` 类是**包私有权限**，也使用了单例模式，其 `init(Application)` 方法的重点就在于 `LogisticsCenter.init(mContext, executor)`
 
 ```java
@@ -205,7 +192,6 @@ final class _ARouter {
     
 }
 ```
-
 `LogisticsCenter` 就实现了前文说的**扫描特定包名路径拿到所有自动生成的辅助文件**的逻辑，即在进行初始化的时候，我们就需要加载到当前项目一共包含的所有 group，以及每个 group 对应的路由信息表，其主要逻辑是：
 
 1. 如果当前开启了 debug 模式或者通过本地 SP 缓存判断出 app 的版本前后发生了变化，那么就重新获取全局路由信息，否则就还是使用之前缓存到 SP 中的数据
@@ -281,7 +267,6 @@ public class LogisticsCenter {
     
 }
 ```
-
 对于第三步，可以举个例子来加强理解
 
 对于上文所讲的 UserHomeActivity，放在名为 `user` 的 module 中，按照 ARouter 的要求，在 gradle 文件中为该 module 声明了以下配置，将 projectName 作为参数值。UserHomeActivity 对应的 path 是 `/account/userHome`，ARouter 默认会将 path 的第一个单词即 `account` 作为其 `group`
@@ -295,7 +280,6 @@ javaCompileOptions {
     }
 }
 ```
-
 ARouter 在通过注解处理器生成辅助文件的时候，类名就会根据以上信息来生成，所以最终就会生成以下两个文件：
 
 ```java
@@ -321,7 +305,6 @@ public class ARouter$$Group$$account implements IRouteGroup {
   }
 }
 ```
-
 LogisticsCenter 的 `init` 方法就会根据文件名的固定前缀 `ARouter$$Root$$` 扫描到 `ARouter$$Root$$user` 这个类，然后通过反射构建出该对象，然后通过调用其 `loadInto` 方法将键值对保存到 `Warehouse.groupsIndex` 中。等到后续需要跳转到 `group` 为 `account` 的页面时，就会再来反射调用 `ARouter$$Group$$account` 的 `loadInto` 方法，即按需加载，等到需要用到的时候再来获取详细的路由对应信息
 
 因为对于一个大型的 App 来说，可能包含几十甚至几百个页面，如果一次性将所有路由信息都加载到内存中，对于内存的压力是比较大的，而用户每次使用可能也只会打开十几个页面，所以这是就实现了按需加载
@@ -335,7 +318,6 @@ LogisticsCenter 的 `init` 方法就会根据文件名的固定前缀 `ARouter$$
 ```kotlin
 ARouter.getInstance().build(RoutePath.USER_HOME).navigation()
 ```
-
 `build()` 方法会通过 `ARouter` 中转调用到 `_ARouter` 的 `build()` 方法，最终返回一个 Postcard 对象
 
 ```java
@@ -373,7 +355,6 @@ protected Postcard build(String path, String group) {
     }
 }
 ```
-
 返回的 Postcard 对象可以用于传入一些跳转配置参数，例如：携带参数 `mBundle`、开启绿色通道 `greenChannel` 、跳转动画 `optionsCompat` 等
 
 ```java
@@ -390,7 +371,6 @@ public final class Postcard extends RouteMeta {
     
 }
 ```
-
 Postcard 的 `navigation()` 方法又会调用到 `_ARouter` 的以下方法来完成 Activity 的跳转。该方法逻辑上并不复杂，注释也写得很清楚了
 
 ```java
@@ -528,7 +508,6 @@ final class _ARouter {
 
 }
 ```
-
 `navigation` 方法的重点在于 `LogisticsCenter.completion(postcard)` 这一句代码。在讲 ARouter 初始化流程的时候有讲到：等到后续需要跳转到 `group` 为 `account` 的页面时，就会再来反射调用 `ARouter$$Group$$account` 的 `loadInto` 方法，即按需加载，等到需要的时候再来获取详细的路由对应信息
 
 `completion` 方法就是用来获取详细的路由对应信息的。该方法会通过 `postcard` 携带的 path 和 group 信息从 `Warehouse` 取值，如果值不为 null 的话就将信息保存到 `postcard` 中，如果值为 null 的话就抛出 `NoRouteFoundException`
@@ -587,7 +566,6 @@ public synchronized static void completion(Postcard postcard) {
     }
 }
 ```
-
 # 五、跳转到 Activity 并注入参数
 
 ARouter 也支持在跳转到 Activity 的同时向目标页面自动注入参数
@@ -597,7 +575,7 @@ ARouter 也支持在跳转到 Activity 的同时向目标页面自动注入参�
 ```kotlin
 ARouter.getInstance().build(RoutePath.USER_HOME)
         .withLong(RoutePath.USER_HOME_PARAMETER_ID, 20)
-        .withString(RoutePath.USER_HOME_PARAMETER_NAME, "leavesC")
+        .withString(RoutePath.USER_HOME_PARAMETER_NAME, "leavesczy")
         .navigation()
 
 object RoutePath {
@@ -610,7 +588,6 @@ object RoutePath {
 
 }
 ```
-
 在目标页面通过 `@Autowired` 注解修饰变量。注解可以同时声明其 `name` 参数，用于和传递的键值对中的 key 对应上，这样 ARouter 才知道应该向哪个变量赋值。如果没有声明 `name` 参数，那么 `name` 参数就默认和**变量名**相等
 
 这样，在我们调用 `ARouter.getInstance().inject(this)` 后，ARouter 就会自动完成参数的赋值
@@ -618,10 +595,6 @@ object RoutePath {
 ```kotlin
 package github.leavesc.user
 
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 @Route(path = RoutePath.USER_HOME)
 class UserHomeActivity : AppCompatActivity() {
 
@@ -642,7 +615,6 @@ class UserHomeActivity : AppCompatActivity() {
 
 }
 ```
-
 ARouter 实现参数自动注入也需要依靠注解处理器生成的辅助文件来实现，即会生成以下的辅助代码：
 
 ```java
@@ -665,7 +637,6 @@ public class UserHomeActivity$$ARouter$$Autowired implements ISyringe {
 }
 
 ```
-
 因为在跳转到 Activity 时携带的参数也是需要放到 Intent 里的，所以 `inject` 方法也只是帮我们实现了从 Intent 取值然后向变量赋值的逻辑而已，这就要求相应的变量必须是 `public` 的，这就是在 Kotlin 代码中需要同时向变量加上 `@JvmField`注解的原因
 
 现在来看下 ARouter 是如何实现**参数自动注入**的，其起始方法就是：`ARouter.getInstance().inject(this)`，其最终会调用到以下方法
@@ -682,7 +653,6 @@ final class _ARouter {
     
 }
 ```
-
 ARouter 通过控制反转的方式拿到 AutowiredService 对应的实现类 AutowiredServiceImpl 的实例对象，然后调用其 `autowire` 方法完成参数注入
 
 由于生成的**参数注入辅助类**的类名具有**固定的包名和类名**，即包名和目标类所在包名一致，类名是**目标类类名**+ `$$ARouter$$Autowired`，所以在 AutowiredServiceImpl 中就可以根据传入的 `instance` 参数和反射来生成辅助类对象，最终调用其 `inject` 方法完成参数注入
@@ -721,7 +691,6 @@ public class AutowiredServiceImpl implements AutowiredService {
     }
 }
 ```
-
 # 六、控制反转
 
 上一节所讲的**跳转到 Activity 并自动注入参数**属于**依赖注入**的一种，ARouter 同时也支持**控制反转**：通过接口来获取其实现类实例
@@ -729,10 +698,6 @@ public class AutowiredServiceImpl implements AutowiredService {
 例如，假设存在一个 ISayHelloService 接口，我们需要拿到其实现类实例，但是不希望在使用的时候和特定的实现类 SayHelloService 绑定在一起从而造成强耦合，此时就可以使用 ARouter 的控制反转功能，但这也要求 ISayHelloService 接口继承了 `IProvider` 接口才行
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 interface ISayHelloService : IProvider {
 
     fun sayHello()
@@ -752,13 +717,11 @@ class SayHelloService : ISayHelloService {
 
 }
 ```
-
 在使用的时候直接传递 ISayHelloService 的 Class 对象即可，ARouter 会将 SayHelloService 以单例模式的形式返回，无需开发者手动去构建 SayHelloService 对象，从而达到解耦的目的
 
 ```kotlin
 ARouter.getInstance().navigation(ISayHelloService::class.java).sayHello()
 ```
-
 和实现 Activity 跳转的时候一样，ARouter 也会自动生成以下几个文件，包含了路由表的映射关系
 
 ```java
@@ -791,7 +754,6 @@ public class ARouter$$Root$$user implements IRouteRoot {
   }
 }
 ```
-
 这里再来看下其具体的实现原理
 
 在讲初始化流程的时候有讲到，LogisticsCenter 实现了**扫描特定包名路径拿到所有自动生成的辅助文件**的逻辑。所以，最终 Warehouse 中就会在初始化的时候拿到以下数据
@@ -831,7 +793,6 @@ protected <T> T navigation(Class<? extends T> service) {
     }
 }
 ```
-
 `LogisticsCenter.completion(postcard)` 方法的流程和之前讲解的差不多，只是在获取对象实例的时候同时将实例缓存起来，留待之后复用，至此就完成了控制反转的流程了
 
 ```java
@@ -877,7 +838,6 @@ public synchronized static void completion(Postcard postcard) {
 
 }
 ```
-
 # 七、拦截器
 
 ARouter 的拦截器对于某些需要控制页面跳转流程的业务逻辑来说是十分有用的功能。例如，用户如果要跳转到个人资料页面时，我们就可以通过拦截器来判断用户是否处于已登录状态，还未登录的话就可以拦截该请求，然后自动为用户打开登录页面
@@ -885,10 +845,6 @@ ARouter 的拦截器对于某些需要控制页面跳转流程的业务逻辑来
 我们可以同时设定多个拦截器，每个拦截器设定不同的优先级
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 @Interceptor(priority = 100, name = "啥也不做的拦截器")
 class NothingInterceptor : IInterceptor {
 
@@ -924,7 +880,6 @@ class LoginInterceptor : IInterceptor {
 
 }
 ```
-
 这样，当我们执行 `ARouter.getInstance().build(RoutePath.USER_HOME).navigation()` 想要跳转的时候，就会发现打开的其实是登录页 `RoutePath.USER_LOGIN`
 
 来看下拦截器是如何实现的
@@ -944,7 +899,6 @@ public class ARouter$$Interceptors$$user implements IInterceptorGroup {
   }
 }
 ```
-
 而这些拦截器一样是会在初始化的时候，通过`LogisticsCenter.init`方法存到 `Warehouse.interceptorsIndex`中
 
 ```java
@@ -973,7 +927,6 @@ public synchronized static void init(Context context, ThreadPoolExecutor tpe) th
 
 }
 ```
-
 然后，在 `_ARouter` 的 `navigation` 方法中，如何判断到此次路由请求没有开启绿色通道模式的话，那么就会将此次请求转交给 `interceptorService`，让其去遍历每个拦截器
 
 ```java
@@ -1028,7 +981,6 @@ final class _ARouter {
     
 }
 ```
-
 `interceptorService` 变量属于 `InterceptorService` 接口类型，该接口的实现类是 `InterceptorServiceImpl`，ARouter内部在初始化的过程中也是根据控制反转的方式来拿到 `interceptorService` 这个实例的
 
 `InterceptorServiceImpl` 的主要逻辑是：
@@ -1073,7 +1025,6 @@ public class InterceptorServiceImpl implements InterceptorService {
             }
         });
     }
-
 
     @Override
     public void doInterceptions(final Postcard postcard, final InterceptorCallback callback) {
@@ -1161,7 +1112,6 @@ public class InterceptorServiceImpl implements InterceptorService {
     
 }
 ```
-
 # 八、注解处理器
 
 通篇读下来，读者应该能够感受到注解处理器在 ARouter 中起到了很大的作用，依靠注解处理器生成的辅助文件，ARouter 才能完成**参数自动注入**等功能。这里就再来介绍下 ARouter 关于注解处理器的实现原理
@@ -1182,10 +1132,6 @@ ARouter 源码中和注解处理器相关的 module 有两个：
 ```kotlin
 package github.leavesc.user
 
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 @Interceptor(priority = 100, name = "啥也不做的拦截器")
 class NothingInterceptor : IInterceptor {
 
@@ -1200,7 +1146,6 @@ class NothingInterceptor : IInterceptor {
 
 }
 ```
-
 生成的辅助文件：
 
 ```java
@@ -1223,7 +1168,6 @@ public class ARouter$$Interceptors$$user implements IInterceptorGroup {
   }
 }
 ```
-
 那么，生成的辅助文件我们就要包含以下几个元素：
 
 1. 包名
@@ -1388,7 +1332,6 @@ public class InterceptorProcessor extends BaseProcessor {
     }
 }
 ```
-
 # 九、结尾
 
 ARouter 的实现原理和源码解析都讲得差不多了，自认还是讲得挺全面的，那么下一篇就再来进入实战篇吧，自己来动手实现一个简易版本的 ARouter 😂😂

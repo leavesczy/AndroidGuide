@@ -2,7 +2,7 @@
 
 在使用 OkHttp 或者 Retrofit 的时候，我觉得大部分开发者做得最多的自定义实现就是**拦截器**了。因为 OkHttp 的拦截器真的是太有用了，我们的很多需求：**添加 Header、计算并添加签名信息、网络请求记录** 等都可以通过拦截器来自动完成，只要定义好规则，就可以覆盖到全局的 OkHttp 网络请求
 
-按照我写 **[Android 主流开源库源码分析]** 这系列文章的习惯，我每写一篇关于源码讲解的文章，就会接着写一篇关于该三方库的自定义实现或者是扩展阅读。所以，承接上一篇文章：[Android 主流开源库源码分析（十一）- OkHttp 源码详解](https://juejin.im/post/6895369745445748749)  ，本篇文章就来写关于 OkHttp 的实战内容，来实现一个移动端的可视化抓包工具：[Monitor](https://github.com/leavesCZY/Monitor)
+按照我写 **[Android 主流开源库源码分析]** 这系列文章的习惯，我每写一篇关于源码讲解的文章，就会接着写一篇关于该三方库的自定义实现或者是扩展阅读。所以，承接上一篇文章：[Android 主流开源库源码分析（十一）- OkHttp 源码详解](https://juejin.im/post/6895369745445748749)  ，本篇文章就来写关于 OkHttp 的实战内容，来实现一个移动端的可视化抓包工具：[Monitor](https://github.com/leavesczy/Monitor)
 
 # 一、Monitor 
 
@@ -21,10 +21,6 @@ Monitor 适用于使用了 OkHttp / Retrofit 作为网络请求框架的项目�
 debug 版本的 MonitorInterceptor 的大体框架如下所示。HttpInformation 是对 request 和 response 的一个实体封装，也是最终会存到数据库中的实体类。通过 chain 拿到 request，先对本地数据库进行预先占位，在 proceed 后拿到 response，对本次请求结果进行解析，所有信息都存到 HttpInformation 中再来更新数据库，同时弹出 Notification
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class MonitorInterceptor(context: Context) : Interceptor {
 
     @Throws(IOException::class)
@@ -61,7 +57,6 @@ class MonitorInterceptor(context: Context) : Interceptor {
 
 }
 ```
-
 release 版本的 MonitorInterceptor 则不会做任何操作，只是单纯将请求转发出去而已，不会造成多余的性能消耗和引用
 
 ```kotlin
@@ -75,7 +70,6 @@ class MonitorInterceptor(context: Context) : Interceptor {
 
 }
 ```
-
 HttpInformation 包含了单次网络请求下所有关于 request 和 response 的请求参数和返回值信息，responseBody 只会保存文本类型的返回值（例如 Json 和 XML），图片这类二进制文件则不会进行保存
 
 ```kotlin
@@ -112,14 +106,9 @@ class HttpInformation {
     
 }
 ```
-
 HttpInformation 则是用 Room 数据库来持久化保存，不得不说的是，Jetpack 中的 Room 和 LiveData 来搭配使用还是很爽的，将 LiveData 作为数据库的返回值，可以很方便地以观察者模式来实时监听数据库中的数据变化
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Desc:
- */
 @Dao
 interface MonitorHttpInformationDao {
 
@@ -134,7 +123,6 @@ interface MonitorHttpInformationDao {
     
 }
 ```
-
 UI 层则不用自己去考虑线程切换和内存泄露这类问题，直接进行 observe 即可
 
 ```kotlin
@@ -146,7 +134,6 @@ private val monitorViewModel by lazy {
     }
 }
 ```
-
 # 三、远程引用
 
 代码我已经发布到了 jitpack，方便大家直接远程依赖使用
@@ -161,11 +148,10 @@ allprojects {
 }
 
 dependencies {
-    debugImplementation 'com.github.leavesCZY.Monitor:monitor:1.1.5'
-    releaseImplementation 'com.github.leavesCZY.Monitor:monitor-no-op:1.1.5'
+    debugImplementation 'com.github.leavesczy.Monitor:monitor:1.1.5'
+    releaseImplementation 'com.github.leavesczy.Monitor:monitor-no-op:1.1.5'
 }
 ```
-
 只要向 OkHttpClient 添加了 MonitorInterceptor，之后的操作就都会自动完成
 
 ```kotlin
@@ -173,7 +159,6 @@ val okHttpClient = OkHttpClient.Builder()
     .addInterceptor(MonitorInterceptor(context = application))
     .build()
 ```
-
 # 四、Github
 
-GitHub 链接点击这里：[Monitor](https://github.com/leavesCZY/Monitor)
+GitHub 链接点击这里：[Monitor](https://github.com/leavesczy/Monitor)

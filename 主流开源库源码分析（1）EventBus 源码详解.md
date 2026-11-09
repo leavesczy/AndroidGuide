@@ -10,7 +10,6 @@
 ```groovy
 implementation "org.greenrobot:eventbus:3.2.0"
 ```
-
 # 一、注册
 
 EventBus 通过 `EventBus.register(Object)`方法来进行注册的。该方法会对 subscriber 进行解析，通过 SubscriberMethodFinder 的 `findSubscriberMethods` 方法将 subscriber 包含的所有声明了`@Subscribe`注解的方法的签名信息保存到内存中，当有消息被 Post 时就可以直接在内存中查找到目标方法了
@@ -26,7 +25,6 @@ public void register(Object subscriber) {
     }
 }
 ```
-
 从 SubscriberMethod 包含的所有参数可以看出来，它包含了 `@Subscribe` 的参数信息以及对应的方法签名信息
 
 ```java
@@ -46,7 +44,6 @@ public class SubscriberMethod {
 
 }
 ```
-
 SubscriberMethodFinder 会将每次的查找结果缓存到 `METHOD_CACHE`中，这对某些会先后经历**多次注册和反注册**操作的 subscriber 来说比较有用，因为每次查找可能需要依靠多次循环遍历和反射操作，会稍微有点消耗性能，但缓存也会占用一部分内存空间
 
 ```java
@@ -73,7 +70,6 @@ List<SubscriberMethod> findSubscriberMethods(Class<?> subscriberClass) {
     }
 }
 ```
-
 因为`ignoreGeneratedIndex`默认是 false，所以这里直接看 `findUsingInfo(subscriberClass)` 方法
 
 其主要逻辑是：
@@ -139,7 +135,6 @@ private FindState prepareFindState() {
     return new FindState();
 }
 ```
-
 这里来主要看下 `findUsingReflectionInSingleClass` 方法是如何完成反射操作的。如果解析到的方法签名不符合要求，则在开启了**严格检查**的情况下直接抛出异常；如果方法签名符合要求，则会将方法签名保存到`subscriberMethods`中
 
 ```java
@@ -198,7 +193,6 @@ private void findUsingReflectionInSingleClass(FindState findState) {
     }
 }
 ```
-
 `findUsingReflectionInSingleClass`方法的一个重点是 `findState.checkAdd`方法。如果往简单了想，只要把 subscriber 每个声明了 Subscribe 注解的方法都给保存起来就可以了，可是还需要考虑一些特殊情况：
 
 1. Java 中的类是具有继承关系的，如果父类声明了 Subscribe 方法，那么就相当于子类也持有了该监听方法，那么子类在 register 后就需要拿到父类的所有 Subscribe 方法
@@ -267,7 +261,6 @@ private boolean checkAddWithMethodSignature(Method method, Class<?> eventType) {
     }
 }
 ```
-
 进行上述操作后，就找到了 subscriber 包含的所有监听方法了，这些方法都会保存到 `List<SubscriberMethod>` 中。拿到所有方法后，`register` 方法就需要对 subscriber 及其所有监听方法进行归类了
 
 归类的目的是既是为了方便后续操作也是为了提高效率。 因为可能同时存在多个 subscriber 声明了多个对同种类型消息的监听方法，那么就需要将每种消息类型和其当前的所有监听方法对应起来，提高消息的发送效率。而且在 subscriber 解除注册时，也需要将 subscriber 包含的所有监听方法都给移除掉，那么也需要预先进行归类。监听方法也可以设定自己对消息处理的优先级顺序，所以需要预先对监听方法进行排序
@@ -344,7 +337,6 @@ private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
     }
 }
 ```
-
 # 二、消息
 
 ## 1、消息的执行策略
@@ -397,7 +389,6 @@ private void postToSubscription(Subscription subscription, Object event, boolean
     }
 }
 ```
-
 例如，对于 AsyncPoster 来说，其每接收到一个消息，都会直接在 `enqueue` 方法中将自己（Runnable）提交给线程池进行处理，而使用的线程池默认是 `Executors.newCachedThreadPool()`，该线程池每接收到一个任务都会马上交由线程进行处理，所以 AsyncPoster 并不保证消息处理的有序性，但在消息处理的及时性方面会比较高，且每次提交给 AsyncPoster 的消息可能都是由不同的线程来处理
 
 ```java
@@ -428,7 +419,6 @@ class AsyncPoster implements Runnable, Poster {
 
 }
 ```
-
 而 BackgroundPoster 会将任务依次缓存到 PendingPostQueue 中，每次只取出一个任务交由线程池来执行，所以 BackgroundPoster 会保证消息队列在处理时的有序性，但在消息处理的及时性方面相比 AsyncPoster 要低一些
 
 ```java
@@ -458,7 +448,6 @@ final class BackgroundPoster implements Runnable, Poster {
     ···
 }
 ```
-
 而不管是使用什么消息处理策略，最终都是通过调用以下方法来反射调用监听方法
 
 ```java
@@ -481,7 +470,6 @@ void invokeSubscriber(Subscription subscription, Object event) {
     }
 }
 ```
-
 ## 2、发送非黏性消息
 
 `EventBus.getDefault().post(Any)`方法用于发送非黏性消息。EventBus 会通过 ThreadLocal 为每个发送消息的线程维护一个 PostingThreadState 对象，用于为每个线程维护一个消息队列及其它辅助参数
@@ -535,7 +523,6 @@ public void post(Object event) {
 }
 
 ```
-
 每次 post 进来的消息都会先存到消息队列 `eventQueue`中，然后通过 while 循环进行处理，消息处理逻辑是通过 `postSingleEvent`方法来完成的
 
 其主要逻辑是：
@@ -607,7 +594,6 @@ private boolean postSingleEventForEventType(Object event, PostingThreadState pos
 }
 
 ```
-
 ## 3、发送黏性消息
 
 黏性消息的意义是为了使得在消息发出来后，即使是后续再进行 `register` 的 subscriber 也可以收到之前发送的消息，这需要将 `@Subscribe` 注解的 `sticky` 属性设为 true，即表明消息接收方希望接收黏性消息
@@ -629,7 +615,6 @@ public void postSticky(Object event) {
     post(event);
 }
 ```
-
 对于一个黏性消息，会有两种不同的时机被 subscriber 接收到
 
 1. 调用 postSticky 方法时，被其现有的 subscriber 直接接收到，这种方式通过在 postSticky 方法里调用 post 方法来实现
@@ -675,7 +660,6 @@ private void checkPostStickyEventToSubscription(Subscription newSubscription, Ob
     }
 }
 ```
-
 ## 4、移除黏性事件
 
 移除指定的黏性事件可以通过以下方法来实现，都是用于将指定事件从 `stickyEvents` 中移除
@@ -711,7 +695,6 @@ public boolean removeStickyEvent(Object event) {
 }
 
 ```
-
 # 三、解除注册
 
 解除注册的目的是为了避免内存泄露，EventBus 使用了单例模式，如果不主动解除注册的话，EventBus 就会一直持有 subscriber。解除注册是通过 `unregister`方法来实现的，该方法逻辑也比较简单，只是将 subscriber 以及其关联的所有 method 对象从集合中移除而已
@@ -753,7 +736,6 @@ private void unsubscribeByEventType(Object subscriber, Class<?> eventType) {
     }
 }
 ```
-
 # 四、注解处理器
 
 使用注解处理器（Annotation Processing Tool）可以避免 subscriber 进行注册时的多次循环反射操作，极大提升了 EventBus 的运行效率。注解处理器是一种注解处理工具，用来在编译期扫描和处理注解，通过注解来生成 Java 文件。即以注解作为桥梁，通过预先规定好的代码生成规则来自动生成 Java 文件。此类注解框架的代表有 ButterKnife、Dragger2、EventBus 等
@@ -778,16 +760,11 @@ dependencies {
     kapt "org.greenrobot:eventbus-annotation-processor:3.2.0"
 }
 ```
-
 当中，MyEventBusIndex 就是在编译阶段将生成的辅助文件，`github.leavesc.demo.MyEventBusIndex` 就是生成的辅助文件的包名路径，可以由我们自己定义
 
 原始文件：
 
 ```kotlin
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -807,7 +784,6 @@ class MainActivity : AppCompatActivity() {
 
 }
 ```
-
 编译过后生成的辅助文件如下所示。可以看出，MyEventBusIndex 文件中封装了 subscriber 和其所有监听方法的签名信息，这样我们就无需在运行时再来进行解析了，而是直接在编译阶段就生成好了
 
 ```java
@@ -840,13 +816,11 @@ public class MyEventBusIndex implements SubscriberInfoIndex {
     }
 }
 ```
-
 需要注意的是，在生成了辅助文件后，还需要通过这些类文件来初始化 EventBus
 
 ```kotlin
 EventBus.builder().addIndex(MyEventBusIndex()).installDefaultEventBus()
 ```
-
 注入的辅助文件会被保存到 SubscriberMethodFinder 类的成员变量 `subscriberInfoIndexes` 中，`findUsingInfo` 方法会先尝试从辅助文件中获取 SubscriberMethod，只有在获取不到的时候才会通过性能较低的反射操作来完成
 
 ```java
@@ -894,7 +868,6 @@ private SubscriberInfo getSubscriberInfo(FindState findState) {
     return null;
 }
 ```
-
 使用了注解处理器后也有一定的弊端。由于 MyEventBusIndex 是通过静态常量类型的 Map 来保存所有的方法签名信息，当在初始化 EventBus 时该 Map 就同时被初始化了，这就相当于在一开始就进行了全量加载，而某些 subscriber 我们可能不会使用到，这就造成了内存浪费。而如果是通过反射来获取，那就相当于在按需加载，只有 subscriber 进行注册了才会去缓存 subscriber 带有的监听方法
 
 # 五、一些坑
@@ -904,10 +877,6 @@ private SubscriberInfo getSubscriberInfo(FindState findState) {
 上文有介绍到，子类可以继承父类的 Subscribe 方法。但有一个比较奇怪的地方是：如果子类重写了父类多个 Subscribe 方法的话，就会抛出 IllegalStateException。例如，在下面的例子中。父类 BaseActivity 声明了两个 Subscribe 方法，子类 MainActivity 重写了这两个方法，此时运行后就会抛出 IllegalStateException。而如果 MainActivity 不重写或者只重写一个方法的话，就可以正常运行
 
 ```java
-/**
- * @Author: leavesCZY
- * @Github：https://github.com/leavesCZY
- */
 open class BaseActivity : AppCompatActivity() {
 
     @Subscribe
@@ -947,7 +916,6 @@ class MainActivity : BaseActivity() {
 
 }
 ```
-
 按道理来说，如果子类重写了父类一个 Subscribe 方法都可以正常使用的话，那么重写两个也应该可以正常使用才对。可是上述例子就表现得 EventBus 好像有 bug 似的。通过定位堆栈信息，可以发现是在 `FindState` 的 `checkAdd` 方法抛出了异常
 
 其抛出异常的步骤是这样的：
@@ -976,7 +944,6 @@ boolean checkAdd(Method method, Class<?> eventType) {
     }
 }
 ```
-
 EventBus 有一个 issues 也反馈了这个问题：[issues](https://github.com/greenrobot/EventBus/issues/539)，该问题在 2018 年时就已经存在了，EeventBus 的作者也只是回复说：**只在子类进行方法监听**
 
 ## 2、移除黏性消息
@@ -996,7 +963,6 @@ fun fun2(msg: String) {
 
 }
 ```
-
 而如果 EventBus 中已经存储了黏性事件，那么在上述两个方法刚 register 时，`fun1` 方法就可以拦截住消息使 `fun2` 方法接收不到消息。这是因为 `register` 方法是在 for 循环中遍历 method，如果之前的方法已经移除了黏性消息的话，那么后续方法就没有黏性消息需要处理了
 
 ```java
@@ -1011,7 +977,6 @@ public void register(Object subscriber) {
     }
 }
 ```
-
 # 六、总结
 
 EventBus 的源码解析到这里就结束了，本文所讲的内容应该也已经涵盖了大部分内容了。这里再来为 EventBus 的实现流程做一个总结

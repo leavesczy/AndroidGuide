@@ -1,4 +1,4 @@
-我在 Github 上有一个开源库，一个适用于 Android 的字节码插桩库：[Track](https://github.com/leavesCZY/Track)，提供了一些方便实用的字节码插桩功能，引用方可以直接开箱即用
+我在 Github 上有一个开源库，一个适用于 Android 的字节码插桩库：[Track](https://github.com/leavesczy/Track)，提供了一些方便实用的字节码插桩功能，引用方可以直接开箱即用
 
 Track 在 v1.0.0 版本包含以下四个功能点：
 
@@ -7,7 +7,7 @@ Track 在 v1.0.0 版本包含以下四个功能点：
 - toastTrack：收拢应用内所有的 Toast.show 方法，可用于解决在 Android 7.1 系统上 Toast 由于 WindowToken 失效从而导致应用崩溃的问题
 - replaceClassTrack：修改指定类的继承关系，将指定父类替换为另一个类
 
-最近有位同学向 Track 提了一个 [issues](https://github.com/leavesCZY/Track/issues/6)，说希望我为 Track 添加一个代码替换功能，其本意是 **想要将项目中所有获取 Android ID 的方法指向到其它自定义的方法**
+最近有位同学向 Track 提了一个 [issues](https://github.com/leavesczy/Track/issues/6)，说希望我为 Track 添加一个代码替换功能，其本意是 **想要将项目中所有获取 Android ID 的方法指向到其它自定义的方法**
 
 这个需求也许是来源于当前国内严格的隐私安全合规要求：在用户同意隐私协议之前，应用不能有收集用户隐私数据（Android ID、Device ID、MAC）的行为。这就和我以前写过的一篇文章有点关系了：[ASM 字节码插桩：助力隐私合规](https://juejin.cn/post/7046207125785149448)
 
@@ -360,6 +360,6 @@ internal object OptimizedExecutors {
 
 ## Github
 
-对 Track 有兴趣的同学，可以到 Github 查看：[Track](https://github.com/leavesCZY/Track)
+对 Track 有兴趣的同学，可以到 Github 查看：[Track](https://github.com/leavesczy/Track)
 
 有发现问题的话也欢迎反馈
