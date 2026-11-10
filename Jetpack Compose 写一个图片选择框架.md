@@ -270,7 +270,7 @@ object NothingCaptureStrategy : CaptureStrategy {
 
 顾名思义，此策略通过 FileProvider 来生成所需要的 imageUri
 
-从 Android 7.0 开始，系统禁止应用通过  `file://URI` 来访问其他应用的私有目录文件，要在应用间共享私有文件，必须通过 `content://URI` 并授予 URI 临时访问权限来实现，否则将直接抛出异常。而将 File 转换为 `content://URI` 的操作就需要依靠 FileProvider 来实现了。Matisse 传递给系统相机的 imageUri 也需要满足此要求
+从 Android 7.0 开始，系统禁止应用通过 `file://URI` 来访问其他应用的私有目录文件，要在应用间共享私有文件，必须通过 `content://URI` 并授予 URI 临时访问权限来实现，否则将直接抛出异常。而将 File 转换为 `content://URI` 的操作就需要依靠 FileProvider 来实现了。Matisse 传递给系统相机的 imageUri 也需要满足此要求
 
 FileProviderCaptureStrategy 采用的策略就是：
 
@@ -494,7 +494,7 @@ class SmartCaptureStrategy(private val authority: String) : CaptureStrategy {
 
 | 拍照策略 | 需要的权限 | 配置项 | 图片对用户是否可见 |
 | --- | --- | --- | --- |
-| NothingCaptureStrategy |  |  |  |
+| NothingCaptureStrategy | | | |
 | FileProviderCaptureStrategy | 无 | 需要配置 FileProvider | 否，图片存储在应用私有目录内，对用户不可见 |
 | MediaStoreCaptureStrategy | Android 10 之前需要 WRITE_EXTERNAL_STORAGE 权限，Android 10 开始不需要权限 | 无 | 是，图片存储在系统相册内，对用户可见 |
 | SmartCaptureStrategy | 无 | 需要配置 FileProvider | 在 Android 10 之前的系统版本不可见，和 FileProviderCaptureStrategy 一样。在 Android 10 开始之后的系统版本可见，和 MediaStoreCaptureStrategy 一样 |

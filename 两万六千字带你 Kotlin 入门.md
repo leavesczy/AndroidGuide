@@ -192,7 +192,7 @@ println(intValue_2 == intValue_3)
 //=== 比较的是引用是否相等，因此结果是 false
 println(intValue_2 === intValue_3)
 ```
-> 如果 intValue_1 的值是100，就会发现 intValue_2 === intValue_3 的比较结果是 true，这就涉及到 Java 对包装类对象的复用问题了
+> 如果 intValue_1 的值是 100，就会发现 intValue_2 === intValue_3 的比较结果是 true，这就涉及到 Java 对包装类对象的复用问题了
 
 ## 2、字符串
 
@@ -896,12 +896,12 @@ private 修饰符是限制级最高的修饰符，kotlin 允许在顶层声明�
 
 ## 6、总结
 
-| 修饰符         | 类成员       | 顶层声明     |
+| 修饰符 | 类成员 | 顶层声明 |
 | -------------- | ------------ | ------------ |
 | public（默认） | 所有地方可见 | 所有地方可见 |
-| internal       | 模块中可见   | 模块中可见   |
-| protected      | 子类中可见   |              |
-| private        | 类中可见     | 文件中可见   |
+| internal | 模块中可见 | 模块中可见 |
+| protected | 子类中可见 | |
+| private | 类中可见 | 文件中可见 |
 
 # 八、空安全
 
@@ -1028,7 +1028,7 @@ public inline fun CharSequence?.isNullOrEmpty(): Boolean {
 ```
 ## 7、平台类型
 
-平台类型是 kotlin 对 java 所作的一种平衡性设计。kotlin 将对象的类型分为了可空类型和不可空类型两种，但 java 平台的一切对象类型均为可空的，当在 kotlin 中引用 java 变量时，如果将所有变量均归为可空类型，最终将多出许多 null 检查；如果均看成不可空类型，那么就很容易就写出忽略了NPE 风险的代码。为了平衡两者，kotlin 引入了平台类型，即当在 kotlin 中引用 java 变量值时，既可以将之看成可空类型，也可以将之看成不可空类型，由开发者自己来决定是否进行 null 检查
+平台类型是 kotlin 对 java 所作的一种平衡性设计。kotlin 将对象的类型分为了可空类型和不可空类型两种，但 java 平台的一切对象类型均为可空的，当在 kotlin 中引用 java 变量时，如果将所有变量均归为可空类型，最终将多出许多 null 检查；如果均看成不可空类型，那么就很容易就写出忽略了 NPE 风险的代码。为了平衡两者，kotlin 引入了平台类型，即当在 kotlin 中引用 java 变量值时，既可以将之看成可空类型，也可以将之看成不可空类型，由开发者自己来决定是否进行 null 检查
 
 # 九、类型的检查与转换
 
@@ -1687,10 +1687,10 @@ public final class MainkotlinKt {
    }
 }
 ```
-| 类A在类B中声明               | 在Java中       | 在kotlin中    |
+| 类 A 在类 B 中声明 | 在 Java 中 | 在 kotlin 中 |
 | ---------------------------- | -------------- | ------------- |
-| 嵌套类（不存储外部类的引用） | static class A | class A       |
-| 内部类（存储外部类的引用）   | class A        | inner class A |
+| 嵌套类（不存储外部类的引用） | static class A | class A |
+| 内部类（存储外部类的引用） | class A | inner class A |
 
 ## 7、匿名内部类
 
@@ -2149,11 +2149,11 @@ kotlin 的集合设计和 Java 不同的另一项特性是：kotlin 把访问数
 
 以下是用来创建不同类型集合的函数
 
-| 集合元素 | 只读   | 可变                                              |
+| 集合元素 | 只读 | 可变 |
 | -------- | ------ | ------------------------------------------------- |
-| List     | listOf | mutableListOf、arrayListOf                        |
-| Set      | setOf  | mutableSetOf、hashSetOf、linkedSetOf、sortedSetOf |
-| Map      | mapOf  | mutableMapOf、hashMapOf、linkedMapOf、sortedMapOf |
+| List | listOf | mutableListOf、arrayListOf |
+| Set | setOf | mutableSetOf、hashSetOf、linkedSetOf、sortedSetOf |
+| Map | mapOf | mutableMapOf、hashMapOf、linkedMapOf、sortedMapOf |
 
 ```kotlin
 val list = listOf(10, 20, 30, 40)
@@ -2613,7 +2613,7 @@ public inline fun <T> T.apply(block: T.() -> Unit): T {
     return this
 }
 ```
-所以apply 函数和 with 函数的唯一区别在于：apply 函数始终会返回作为实参传递给它的对象
+所以 apply 函数和 with 函数的唯一区别在于：apply 函数始终会返回作为实参传递给它的对象
 
 ```kotlin
 val result = StringBuilder().apply {
@@ -2810,7 +2810,7 @@ list.forEachIndexed { index, value -> println("$index value is $value") }
 ```
 ### 8、max
 
-返回最大的一项，如果没有则返回null
+返回最大的一项，如果没有则返回 null
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9)
@@ -2826,7 +2826,7 @@ println(list.maxBy { -it }) //1
 ```
 ### 10、min
 
-返回最小的一项，如果没有则返回null
+返回最小的一项，如果没有则返回 null
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9)
@@ -2834,7 +2834,7 @@ println(list.min()) //1
 ```
 ### 11、minBy
 
-根据给定的函数返回最小的一项，如果没有则返回null
+根据给定的函数返回最小的一项，如果没有则返回 null
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9)
@@ -2842,7 +2842,7 @@ println(list.minBy { -it }) //9
 ```
 ### 12、none
 
-如果没有任何元素与给定的函数匹配，则返回true
+如果没有任何元素与给定的函数匹配，则返回 true
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9)
@@ -2893,7 +2893,7 @@ println(list.sumBy { it + 1 }) //30
 
 ### 1、drop
 
-返回包含去掉前n个元素的所有元素的列表
+返回包含去掉前 n 个元素的所有元素的列表
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9)
@@ -2933,7 +2933,7 @@ println(list.filterNot { it < 4 }) //[5, 7, 9]
 ```
 ### 6、filterNotNull
 
-过滤所有元素中不是null的元素
+过滤所有元素中不是 null 的元素
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9, 2, null)
@@ -2941,7 +2941,7 @@ println(list.filterNotNull()) //[1, 3, 5, 7, 9, 2]
 ```
 ### 7、slice
 
-过滤一个list中指定index的元素
+过滤一个 list 中指定 index 的元素
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9, 2, null)
@@ -2949,7 +2949,7 @@ println(list.slice(listOf(0, 3))) //[1, 7]
 ```
 ### 8、take
 
-返回从第一个开始的n个元素
+返回从第一个开始的 n 个元素
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9, 2, null)
@@ -2957,7 +2957,7 @@ println(list.take(2)) //[1, 3]
 ```
 ### 9、takeLast
 
-返回从最后一个开始的n个元素
+返回从最后一个开始的 n 个元素
 
 ```kotlin
 val list = listOf(1, 3, 5, 7, 9, 2, null)
@@ -2984,7 +2984,7 @@ println(list.flatMap { listOf(it, it + 1) }) //[1, 2, 3, 4, 5, 6, -1, 0, 7, 8, 9
 ```
 ### 2、groupBy
 
-返回一个根据给定函数分组后的map
+返回一个根据给定函数分组后的 map
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, 2)
@@ -2993,7 +2993,7 @@ println(list.groupBy { listOf(it, it + 1) }) //{[1, 2]=[1], [3, 4]=[3], [5, 6]=[
 ```
 ### 3、map
 
-返回一个每一个元素根据给定的函数转换所组成的List。
+返回一个每一个元素根据给定的函数转换所组成的 List。
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, 2)
@@ -3002,7 +3002,7 @@ println(list.map { listOf(it, it + 1) }) //[[1, 2], [3, 4], [5, 6], [-1, 0], [7,
 ```
 ### 4、mapIndexed
 
-返回一个每一个元素根据给定的包含元素index的函数转换所组成的List
+返回一个每一个元素根据给定的包含元素 index 的函数转换所组成的 List
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, 2)
@@ -3011,7 +3011,7 @@ println(list.mapIndexed { index, value -> index * value }) //[0, 3, 10, -3, 28, 
 ```
 ### 5、mapNotNull
 
-返回一个每一个非null元素根据给定的函数转换所组成的List
+返回一个每一个非 null 元素根据给定的函数转换所组成的 List
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, null, 2)
@@ -3021,7 +3021,7 @@ println(list.mapNotNull { it }) //[1, 3, 5, -1, 7, 9, 2]
 
 ### 1、contains
 
-如果指定元素可以在集合中找到，则返回true
+如果指定元素可以在集合中找到，则返回 true
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, null, 2)
@@ -3030,7 +3030,7 @@ println(list.contains(13)) //false
 ```
 ### 2、elementAt
 
-返回给定index对应的元素，如果index数组越界则会抛出 IndexOutOfBoundsException
+返回给定 index 对应的元素，如果 index 数组越界则会抛出 IndexOutOfBoundsException
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, null, 2)
@@ -3039,7 +3039,7 @@ println(list.elementAt(6)) //null
 ```
 ### 3、elementAtOrElse
 
-返回给定index对应的元素，如果index数组越界则会根据给定函数返回默认值
+返回给定 index 对应的元素，如果 index 数组越界则会根据给定函数返回默认值
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, null, 2)
@@ -3048,7 +3048,7 @@ println(list.elementAtOrElse(16, { it * 2 })) //32
 ```
 ### 4、elementAtOrNull
 
-返回给定index对应的元素，如果index数组越界则会返回null
+返回给定 index 对应的元素，如果 index 数组越界则会返回 null
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, null, 2)
@@ -3065,7 +3065,7 @@ println(list.first { it % 3 == 0 })  //3
 ```
 ### 6、firstOrNull
 
-返回符合给定函数条件的第一个元素，如果没有符合则返回null
+返回符合给定函数条件的第一个元素，如果没有符合则返回 null
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, 2)
@@ -3074,7 +3074,7 @@ println(list.firstOrNull { it % 8 == 0 })  //null
 ```
 ### 7、indexOf
 
-返回指定元素的第一个index，如果不存在，则返回 -1
+返回指定元素的第一个 index，如果不存在，则返回 -1
 
 ```kotlin
 val list = listOf(1, 3, 5, -1, 7, 9, 2)
@@ -3083,7 +3083,7 @@ println(list.indexOf(12)) //-1
 ```
 ### 8、indexOfFirst
 
-返回第一个符合给定函数条件的元素的index，如果没有符合则返回 -1
+返回第一个符合给定函数条件的元素的 index，如果没有符合则返回 -1
 
 ```kotlin
 val list = listOf(1, 3, 5, 1, 7, 9, 2)
@@ -3092,7 +3092,7 @@ println(list.indexOfFirst { it % 12 == 0 })  //-1
 ```
 ### 9、indexOfLast
 
-返回最后一个符合给定函数条件的元素的index，如果没有符合则返回 -1
+返回最后一个符合给定函数条件的元素的 index，如果没有符合则返回 -1
 
 ```kotlin
 val list = listOf(1, 3, 5, 6, 7, 9, 2)
@@ -3110,7 +3110,7 @@ println(list.last { it % 3 == 0 })   //9
 ```
 ### 11、lastIndexOf
 
-返回指定元素的最后一个index，如果不存在，则返回 -1
+返回指定元素的最后一个 index，如果不存在，则返回 -1
 
 ```kotlin
 val list = listOf(1, 3, 2, 6, 7, 9, 2)
@@ -3119,7 +3119,7 @@ println(list.lastIndexOf(12))   //-1
 ```
 ### 12、lastOrNull
 
-返回符合给定函数条件的最后一个元素，如果没有符合则返回null
+返回符合给定函数条件的最后一个元素，如果没有符合则返回 null
 
 ```kotlin
 val list = listOf(1, 3, 2, 6, 7, 9, 2)
@@ -3137,7 +3137,7 @@ println(list.single { it == 2 })      //IllegalArgumentException
 ```
 ### 14、singleOrNull
 
-返回符合给定函数的单个元素，如果没有符合或者超过一个，则返回null
+返回符合给定函数的单个元素，如果没有符合或者超过一个，则返回 null
 
 ```kotlin
 val list = listOf(1, 9, 2, 6, 7, 9, 2)
@@ -3168,7 +3168,7 @@ println(list1 + list2)  //[1, 9, 2, 6, 7, 9, 2, 1, 2, 4, 6, 8, 10]
 ```
 ### 3、zip
 
-返回由 pair 组成的List，每个 pair 由两个集合中相同index的元素组成。这个返回的List的大小由最小的那个集合决定
+返回由 pair 组成的 List，每个 pair 由两个集合中相同 index 的元素组成。这个返回的 List 的大小由最小的那个集合决定
 
 ```kotlin
 val list1 = listOf(1, 9, 2, 6, 7, 9, 2)
@@ -3192,7 +3192,7 @@ class kotlin.Pair
 ```
 ### 4、unzip
 
-从包含pair的List中生成包含List的Pair
+从包含 pair 的 List 中生成包含 List 的 Pair
 
 ```kotlin
 val list1 = listOf(Pair("leavesczy", 1), Pair("leavesczy_2", 2), Pair("leavesczy_3", 3))
@@ -3210,7 +3210,7 @@ class kotlin.Pair
 
 ### 1、reverse
 
-返回一个与指定list相反顺序的list
+返回一个与指定 list 相反顺序的 list
 
 ```kotlin
 val list1 = listOf(Pair("leavesczy", 1), Pair("leavesczy_2", 2), Pair("leavesczy_3", 3))
@@ -3219,7 +3219,7 @@ println(list2)      //[(leavesczy_3, 3), (leavesczy_2, 2), (leavesczy, 1)]
 ```
 ### 2、sort
 
-返回一个自然排序后的list
+返回一个自然排序后的 list
 
 ```kotlin
 val list1 = listOf(2, 4, 1, 9, 5, 10)
@@ -3232,7 +3232,7 @@ println(list4) //[a, ab, b, c, cda, cdd]
 ```
 ### 3、sortBy
 
-返回一个根据指定函数排序后的list
+返回一个根据指定函数排序后的 list
 
 ```kotlin
 val list1 = listOf(2, 4, 1, 9, 5, 10)
@@ -3241,7 +3241,7 @@ println(list2) //[1, 2, 4, 5, 9, 10]
 ```
 ### 4、sortDescending
 
-返回一个降序排序后的List
+返回一个降序排序后的 List
 
 ```kotlin
 val list1 = listOf(2, 4, 1, 9, 5, 10)
@@ -3250,7 +3250,7 @@ println(list2) //[10, 9, 5, 4, 2, 1]
 ```
 ### 5、sortDescendingBy
 
-返回一个根据指定函数降序排序后的list
+返回一个根据指定函数降序排序后的 list
 
 ```kotlin
 val list1 = listOf(2, 4, 1, 9, 5, 10)
@@ -3320,48 +3320,48 @@ kotlin 允许为类型提供预定义的操作符实现，这些操作符具有�
 
 ## 1、一元操作符
 
-| 操作符 |      函数      |
+| 操作符 | 函数 |
 | ------ | :------------: |
-| +a     | a.unaryPlus()  |
-| -a     | a.unaryMinus() |
-| !a     |    a.not()     |
-| a++    |    a.inc()     |
-| a--    |    a.dec()     |
+| +a | a.unaryPlus() |
+| -a | a.unaryMinus() |
+| !a | a.not() |
+| a++ | a.inc() |
+| a-- | a.dec() |
 
 ## 2、二元操作符
 
-| 操作符  |       函数       |
+| 操作符 | 函数 |
 | ------- | :--------------: |
-| a + b   |    a.plus(b)     |
-| a - b   |    a.minus(b)    |
-| a * b   |    a.times(b)    |
-| a / b   |     a.div(b)     |
-| a % b   |     a.rem(b)     |
-| a..b    |   a.rangeTo(b)   |
-| a in b  |  b.contains(a)   |
-| a !in b |  !b.contains(a)  |
-| a += b  | a.plusAssign(b)  |
-| a -= b  | a.minusAssign(b) |
-| a *= b  | a.timesAssign(b) |
-| a /= b  |  a.divAssign(b)  |
-| a %= b  |  a.remAssign(b)  |
+| a + b | a.plus(b) |
+| a - b | a.minus(b) |
+| a * b | a.times(b) |
+| a / b | a.div(b) |
+| a % b | a.rem(b) |
+| a..b | a.rangeTo(b) |
+| a in b | b.contains(a) |
+| a !in b | !b.contains(a) |
+| a += b | a.plusAssign(b) |
+| a -= b | a.minusAssign(b) |
+| a *= b | a.timesAssign(b) |
+| a /= b | a.divAssign(b) |
+| a %= b | a.remAssign(b) |
 
 ## 3、数组操作符
 
-| 操作符               |          函数           |
+| 操作符 | 函数 |
 | -------------------- | :---------------------: |
-| a[i]                 |        a.get(i)         |
-| a[i, j]              |       a.get(i, j)       |
-| a[i_1, ..., i_n]     |  a.get(i_1, ..., i_n)   |
-| a[i] = b             |       a.set(i, b)       |
-| a[i, j] = b          |     a.set(i, j, b)      |
+| a[i] | a.get(i) |
+| a[i, j] | a.get(i, j) |
+| a[i_1, ..., i_n] | a.get(i_1, ..., i_n) |
+| a[i] = b | a.set(i, b) |
+| a[i, j] = b | a.set(i, j, b) |
 | a[i_1, ..., i_n] = b | a.set(i_1, ..., i_n, b) |
 
 ## 4、等于操作符
 
-| 操作符 |             函数              |
+| 操作符 | 函数 |
 | ------ | :---------------------------: |
-| a == b |  a?.equals(b) ?: b === null   |
+| a == b | a?.equals(b) ?: b === null |
 | a != b | !(a?.equals(b) ?: b === null) |
 
 相等操作符有一点不同，为了达到正确合适的相等检查做了更复杂的转换，因为要得到一个确切的函数结构比较，不仅仅是指定的名称
@@ -3375,10 +3375,10 @@ operator fun equals(other: Any?): Boolean
 
 ## 5、比较操作符
 
-| 操作符 |        函数         |
+| 操作符 | 函数 |
 | ------ | :-----------------: |
-| a > b  | a.compareTo(b) > 0  |
-| a < b  | a.compareTo(b) < 0  |
+| a > b | a.compareTo(b) > 0 |
+| a < b | a.compareTo(b) < 0 |
 | a >= b | a.compareTo(b) >= 0 |
 | a <= b | a.compareTo(b) <= 0 |
 
@@ -3386,11 +3386,11 @@ operator fun equals(other: Any?): Boolean
 
 ## 6、函数调用
 
-| 方法             |          调用           |
+| 方法 | 调用 |
 | ---------------- | :---------------------: |
-| a()              |       a.invoke()        |
-| a(i)             |       a.invoke(i)       |
-| a(i, j)          |     a.invoke(i, j)      |
+| a() | a.invoke() |
+| a(i) | a.invoke(i) |
+| a(i, j) | a.invoke(i, j) |
 | a(i_1, ..., i_n) | a.invoke(i_1, ..., i_n) |
 
 ## 7、例子

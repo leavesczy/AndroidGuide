@@ -115,7 +115,7 @@ String getName(boolValue) {
 
 ## 1、num
 
-dart 的数字类型有 int 和 double 两种，这两种都是 num 类的子类。int 类型根据平台的不同，整数值不大于64位。在 Dart VM 上，值可以从 **-2<sup>63</sup> 到 2<sup>63</sup>-1**，编译成 JavaScript 的 Dart 使用JavaScript 代码，允许值从 **-2<sup>53</sup> 到 2<sup>53</sup> - 1**。double 类型即**64位双精度浮点数**，由 IEEE 754 标准指定
+dart 的数字类型有 int 和 double 两种，这两种都是 num 类的子类。int 类型根据平台的不同，整数值不大于 64 位。在 Dart VM 上，值可以从 **-2<sup>63</sup> 到 2<sup>63</sup>-1**，编译成 JavaScript 的 Dart 使用 JavaScript 代码，允许值从 **-2<sup>53</sup> 到 2<sup>53</sup> - 1**。double 类型即**64 位双精度浮点数**，由 IEEE 754 标准指定
 
 ```dart
 void main() {
@@ -161,7 +161,7 @@ var stringValue = '''\n 换行符
   ''';
 ```
 
-也可以用 **r前缀** 创建一个原始字符串，包含的转义字符将会失效
+也可以用 **r 前缀** 创建一个原始字符串，包含的转义字符将会失效
 
 ```dart
 var stringValue = r'''
@@ -616,7 +616,7 @@ void throwException() {
 }
 ```
 
-也可以使用两个参数的写法，第二个参数代表堆栈跟踪(StackTrace对象)
+也可以使用两个参数的写法，第二个参数代表堆栈跟踪(StackTrace 对象)
 
 ```dart
 void throwException() {

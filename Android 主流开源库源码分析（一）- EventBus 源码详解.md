@@ -345,13 +345,13 @@ private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
 
 在介绍消息的具体发送步骤前，先来了解下 EventBus 几种不同的消息执行策略。执行策略由枚举 ThreadMode 来定义，在 `@Subscribe` 注解中进行声明。执行策略决定了消息接收方是在哪一个线程接收到消息的
 
-| ThreadMode   | 执行线程                 |                                                              |
+| ThreadMode | 执行线程 | |
 | ------------ | ------------------------ | ------------------------------------------------------------ |
-| POSTING      | 在发送事件的线程中执行   | 直接调用消息接收方                                           |
-| MAIN         | 在主线程中执行           | 如果事件就是在主线程发送的，则直接调用消息接收方，否则通过 mainThreadPoster 进行处理 |
-| MAIN_ORDERED | 在主线程中按顺序执行     | 通过 mainThreadPoster 进行处理，以此保证消息处理的有序性     |
-| BACKGROUND   | 在后台线程中按顺序执行   | 如果事件是在主线程发送的，则提交给 backgroundPoster 处理，否则直接调用消息接收方 |
-| ASYNC        | 提交给空闲的后台线程执行 | 将消息提交到 asyncPoster 进行处理                            |
+| POSTING | 在发送事件的线程中执行 | 直接调用消息接收方 |
+| MAIN | 在主线程中执行 | 如果事件就是在主线程发送的，则直接调用消息接收方，否则通过 mainThreadPoster 进行处理 |
+| MAIN_ORDERED | 在主线程中按顺序执行 | 通过 mainThreadPoster 进行处理，以此保证消息处理的有序性 |
+| BACKGROUND | 在后台线程中按顺序执行 | 如果事件是在主线程发送的，则提交给 backgroundPoster 处理，否则直接调用消息接收方 |
+| ASYNC | 提交给空闲的后台线程执行 | 将消息提交到 asyncPoster 进行处理 |
 
 执行策略的具体细分逻辑是在 EventBus 类的 `postToSubscription` 方法完成的
 
@@ -926,7 +926,7 @@ class MainActivity : BaseActivity() {
 其抛出异常的步骤是这样的：
 
 1. EventBus 对 Subscribe 方法的解析方向是子类向父类进行的，同个类下的 Subscribe 方法按照声明顺序进行解析
-2. 当 `checkAdd` 方法开始解析 `BaseActivity` 的 `fun2` 方法时，`existing` 对象就是 `BaseActivity.fun1`，此时就会执行到操作1，而由于子类已经重写了 `fun1` 方法，此时 `checkAddWithMethodSignature` 方法就会返回 false，最终导致抛出异常
+2. 当 `checkAdd` 方法开始解析 `BaseActivity` 的 `fun2` 方法时，`existing` 对象就是 `BaseActivity.fun1`，此时就会执行到操作 1，而由于子类已经重写了 `fun1` 方法，此时 `checkAddWithMethodSignature` 方法就会返回 false，最终导致抛出异常
 
 ```java
 boolean checkAdd(Method method, Class<?> eventType) {

@@ -1,4 +1,4 @@
-> 最近一直在了解关于 **Kotlin协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
+> 最近一直在了解关于 **Kotlin 协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
 >
 > 协程官方文档：[coroutines-guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/coroutines-guide.md)
 
@@ -61,7 +61,7 @@ Completed in 2007 ms
 
 如果 doSomethingUsefulOne() 和 doSomethingUsefulTwo() 这两个函数之间没有依赖关系，并且我们希望通过同时执行这两个操作（并发）以便更快地得到答案，此时就需要用到 ```async``` 了
 
-从概念上讲，async 就类似于 launch。async 启动一个单独的协程，这是一个与所有其它协程同时工作的轻量级协程。不同之处在于，launch 返回 Job 对象并且不携带任何运行结果值。而 async 返回一个轻量级非阻塞的 ```Deferred``` 对象，可用于在之后取出返回值，可以通过调用 Deferred 的 ```await()``` 方法来获取最终结果。此外，Deferred 也实现了 Job 接口，所以也可以根据需要来取消它
+从概念上讲，async 就类似于 launch。async 启动一个单独的协程，这是一个与所有其它协程同时工作的轻量级协程。不同之处在于，launch 返回 Job 对象并且不携带任何运行结果值。而 async 返回一个轻量级非阻塞的 ```Deferred```对象，可用于在之后取出返回值，可以通过调用 Deferred 的```await()``` 方法来获取最终结果。此外，Deferred 也实现了 Job 接口，所以也可以根据需要来取消它
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -100,7 +100,7 @@ Completed in 1014 ms
 
 # 三、惰性启动 async
 
-可选的，可以将 async 的 ```start``` 参数设置为 ```CoroutineStart.lazy``` 使其变为懒加载模式。在这种模式下，只有在主动调用 Deferred 的 ```await()``` 或者 ```start()``` 方法时才会启动协程。运行以下示例：
+可选的，可以将 async 的 ```start```参数设置为```CoroutineStart.lazy```使其变为懒加载模式。在这种模式下，只有在主动调用 Deferred 的```await()```或者```start()``` 方法时才会启动协程。运行以下示例：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -140,11 +140,11 @@ Completed in 1016 ms
 
 以上定义了两个协程，但没有像前面的例子那样直接执行，而是将控制权交给了开发者，由开发者通过调用 ```start()``` 函数来确切地开始执行。首先启动了协程 one，然后启动了协程 two，然后再等待协程运行结束
 
-注意，如果只是在 ```println``` 中调用了 ```await()``` 而不首先调用 ```start()``` ,这将形成顺序行为，因为 ```await()``` 会启动协程并等待其完成，这不是 lazy 模式的预期结果。```async(start=CoroutineStart.LAZY)``` 的用例是标准标准库中的 lazy 函数的替代品，用于在值的计算涉及挂起函数的情况下
+注意，如果只是在 ```println```中调用了```await()```而不首先调用```start()```,这将形成顺序行为，因为```await()```会启动协程并等待其完成，这不是 lazy 模式的预期结果。```async(start=CoroutineStart.LAZY)``` 的用例是标准标准库中的 lazy 函数的替代品，用于在值的计算涉及挂起函数的情况下
 
 # 四、异步风格的函数
 
-我们可以定义异步风格的函数，使用带有显式 GlobalScope 引用的异步协程生成器来调用 ```doSomethingUsefulOne``` 和 ```doSomethingUsefulTwo``` 函数。用 “…Async” 后缀来命名这些函数，以此来强调它们用来启动异步计算，并且需要通过其返回的延迟值来获取结果
+我们可以定义异步风格的函数，使用带有显式 GlobalScope 引用的异步协程生成器来调用 ```doSomethingUsefulOne```和```doSomethingUsefulTwo``` 函数。用 “…Async” 后缀来命名这些函数，以此来强调它们用来启动异步计算，并且需要通过其返回的延迟值来获取结果
 
 ```kotlin
 // The result type of somethingUsefulOneAsync is Deferred<Int>
@@ -204,11 +204,11 @@ suspend fun doSomethingUsefulTwo(): Int {
 
 > 这里展示的带有异步函数的编程样式仅供说明，因为它是其它编程语言中的流行样式。强烈建议不要将此样式与 kotlin 协程一起使用，因为如下所述
 
-想象一下，如果在 ```val one = somethingUsefulOneAsync()``` 和 ```one.await()``` 这两行代码之间存在逻辑错误，导致程序抛出异常，正在执行的操作也被中止，此时会发生什么情况？通常，全局的错误处理者可以捕获此异常，为开发人员记录并报告错误，但是程序可以继续执行其它操作。但是这里 ```somethingUsefulOneAsync()``` 函数仍然还在后台运行（因为其协程作用域是 GlobalScope），即使其启动者已经被中止了。这个问题不会在结构化并发中出现，如下一节所示
+想象一下，如果在 ```val one = somethingUsefulOneAsync()```和```one.await()```这两行代码之间存在逻辑错误，导致程序抛出异常，正在执行的操作也被中止，此时会发生什么情况？通常，全局的错误处理者可以捕获此异常，为开发人员记录并报告错误，但是程序可以继续执行其它操作。但是这里```somethingUsefulOneAsync()``` 函数仍然还在后台运行（因为其协程作用域是 GlobalScope），即使其启动者已经被中止了。这个问题不会在结构化并发中出现，如下一节所示
 
 # 五、使用 async 的结构化并发
 
-让我们以 ```Concurrent using async``` 章节为例，提取一个同时执行 ```doSomethingUsefulOne()``` 和 ```doSomethingUsefulTwo()``` 并返回其结果之和的函数。因为 async 函数被定义为 CoroutineScope 上的一个扩展函数，所以我们需要将它放在 CoroutineScope 中，这就是 coroutineScope 函数提供的功能：
+让我们以 ```Concurrent using async```章节为例，提取一个同时执行```doSomethingUsefulOne()```和```doSomethingUsefulTwo()``` 并返回其结果之和的函数。因为 async 函数被定义为 CoroutineScope 上的一个扩展函数，所以我们需要将它放在 CoroutineScope 中，这就是 coroutineScope 函数提供的功能：
 
 ```kotlin
 suspend fun concurrentSum(): Int = coroutineScope {

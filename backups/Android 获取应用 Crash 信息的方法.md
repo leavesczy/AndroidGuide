@@ -181,4 +181,4 @@ android:name=".MyApplication"
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-b8bc98f98ad5c67c?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-这要，就获取到了异常信息，这里只是将信息保存到了SD卡上，在实际开发中再添加上传到服务器的操作即可
+这要，就获取到了异常信息，这里只是将信息保存到了 SD 卡上，在实际开发中再添加上传到服务器的操作即可

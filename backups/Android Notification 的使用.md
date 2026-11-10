@@ -1,4 +1,4 @@
-Notification（通知）是可以在应用的常规 UI 外部向用户显示的消息。当App告知系统发出通知时，它将先以图标的形式显示在通知区域中。用户可以打开抽屉式通知栏查看通知的详细信息
+Notification（通知）是可以在应用的常规 UI 外部向用户显示的消息。当 App 告知系统发出通知时，它将先以图标的形式显示在通知区域中。用户可以打开抽屉式通知栏查看通知的详细信息
 
 ## **一、创建通知**
 
@@ -9,9 +9,9 @@ Notification（通知）是可以在应用的常规 UI 外部向用户显示的�
 
 Notification 对象必须包含以下内容：
 
- - 小图标，由 setSmallIcon() 设置
- - 标题，由 setContentTitle() 设置
- - 详细文本，由 setContentText() 设置
+- 小图标，由 setSmallIcon() 设置
+- 标题，由 setContentTitle() 设置
+- 详细文本，由 setContentText() 设置
 
 其他通知设置和内容都是可选的
 
@@ -26,35 +26,35 @@ Notification 对象必须包含以下内容：
 
 ## **五、PendingIntent**
 
-PendingIntent类封装了一个Intent和一个动作，当调用该类的send方法的时候，将会执行该动作。由于PendingIntent类是一个待处理的意图，这个动作通常是在将来的某个时刻要调用的一个操作，很可能是系统要调用的。例如，一个PendingIntent类可以用于构造一个Notification，以便当用户触碰该通知的时候，能够触发某些动作
-PendingIntent类中的动作是Context类中的几个方法之一，例如**startActivity，startService，sendBroadcast**
+PendingIntent 类封装了一个 Intent 和一个动作，当调用该类的 send 方法的时候，将会执行该动作。由于 PendingIntent 类是一个待处理的意图，这个动作通常是在将来的某个时刻要调用的一个操作，很可能是系统要调用的。例如，一个 PendingIntent 类可以用于构造一个 Notification，以便当用户触碰该通知的时候，能够触发某些动作
+PendingIntent 类中的动作是 Context 类中的几个方法之一，例如**startActivity，startService，sendBroadcast**
 
-使用PendingIntent来启动一个Activity
+使用 PendingIntent 来启动一个 Activity
 
 ```java
    PendingIntent pi = PendingIntent.getActivity(Context context, int requestCode,Intent intent, int flags);
 ```
 
-静态方法getActivity是返回PendingIntent类的一个实例的几个方法之一，其他的方法还有**getActivities、getService和getBroadcast**
+静态方法 getActivity 是返回 PendingIntent 类的一个实例的几个方法之一，其他的方法还有**getActivities、getService 和 getBroadcast**
 
-这些方法决定了最终PendingIntent所能执行的动作，可以用来启动Activity，启动Service，发送广播等
+这些方法决定了最终 PendingIntent 所能执行的动作，可以用来启动 Activity，启动 Service，发送广播等
 
 ## **六、NotificationManager**
 
-要发布一个通知，可以使用NotificationManager，这是Android系统中的内建服务之一，是一个已有的系统服务，可以通过如下代码来获取它
+要发布一个通知，可以使用 NotificationManager，这是 Android 系统中的内建服务之一，是一个已有的系统服务，可以通过如下代码来获取它
 
 ```java
 NotificationManager mNotificationManager =
         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 ```
 
-然后，在该NotificationManager上调用notify方法来发布一个通知，需要传入唯一的ID和Notification对象
+然后，在该 NotificationManager 上调用 notify 方法来发布一个通知，需要传入唯一的 ID 和 Notification 对象
 
 ```java
 mNotificationManager.notify(int id, notification);
 ```
 
-通知ID用于标识该通知，在想要取消特定Notification的时候，就需要使用到它
+通知 ID 用于标识该通知，在想要取消特定 Notification 的时候，就需要使用到它
 
 ```java
 mNotificationManager.cancel(int id);
@@ -62,10 +62,10 @@ mNotificationManager.cancel(int id);
 
 此外，除非发生以下情况之一，否则通知会一直可见：
 
- - 用户单独或通过使用“全部清除”清除了该通知（如果通知可以清除）
- - 用户点击通知，且在创建通知时调用了 **setAutoCancel(true)**
- - 针对特定的通知 ID 调用了 **cancel(int id)**
- - 调用了 **cancelAll()** 方法，该方法将删除之前发出的所有通知
+- 用户单独或通过使用“全部清除”清除了该通知（如果通知可以清除）
+- 用户点击通知，且在创建通知时调用了 **setAutoCancel(true)**
+- 针对特定的通知 ID 调用了 **cancel(int id)**
+- 调用了 **cancelAll()** 方法，该方法将删除之前发出的所有通知
 
 ## **七、创建简单通知**
 
@@ -271,19 +271,19 @@ public void notification(View view) {
 
 ## **十二、启动 Activity 时保留返回栈**
 
-默认情况下，从应用外点击通知启动一个Activity后，按返回键会回到主屏幕。但某些时候需要按返回键后仍然留在当前应用的需求，这就要用到TaskStackBuilder了
+默认情况下，从应用外点击通知启动一个 Activity 后，按返回键会回到主屏幕。但某些时候需要按返回键后仍然留在当前应用的需求，这就要用到 TaskStackBuilder 了
 执行以下步骤：
 
 ### **1. 在清单文件中定义应用的 Activity 层次结构**
 
- - 添加对 Android 4.0.3 及更低版本的支持。为此，需要通过添加 **< meta-data >** 元素作为**< activity >**的子项来指定通过点击通知启动后的Activity的父项
+- 添加对 Android 4.0.3 及更低版本的支持。为此，需要通过添加 **< meta-data >** 元素作为**< activity >**的子项来指定通过点击通知启动后的 Activity 的父项
   对于此元素，设置
 
 ```java
  android:name="android.support.PARENT_ACTIVITY"
  android:value="<parent_activity_name>"
 ```
-其中，**< parent_activity_name >** 是父Activity元素的**android:name**值
+其中，**< parent_activity_name >** 是父 Activity 元素的**android:name**值
 
 - 同样添加对 Android 4.1 及更高版本的支持。为此，将 **android:parentActivityName** 属性添加到启动的 Activity 的 < activity > 元素中
 
@@ -308,13 +308,13 @@ public void notification(View view) {
 
 ### **2. 根据可启动 Activity 的 Intent 创建返回栈：**
 
- - 创建 Intent设置目标Activity
- - 通过调用 **TaskStackBuilder.create()** 创建堆栈生成器
- - 通过调用 **addParentStack()** 将返回栈添加到堆栈生成器。 对于在清单文件中所定义层次结构内的每个 Activity，返回栈均包含可启动 Activity 的 Intent 对象。此方法还会添加一些可在全新任务中启动堆栈的标志
- - 尽管 **addParentStack()** 的参数是对已启动 Activity 的引用，但是方法调用不会添加可启动 Activity 的 Intent，而是留待下一步进行处理
- - 通过调用 **addNextIntent()**，添加可从通知中启动 Activity 的 Intent。 将在第一步中创建的 Intent 作为 **addNextIntent()** 的参数传递
- - 如需，请通过调用 **TaskStackBuilder.editIntentAt()** 向堆栈中的 Intent 对象添加参数。有时，需要确保目标 Activity 在用户使用“返回”导航回它时会显示有意义的数据
- - 通过调用 **getPendingIntent()** 获得此返回栈的 PendingIntent。 然后，可以使用此 PendingIntent 作为 **setContentIntent()** 的参数
+- 创建 Intent 设置目标 Activity
+- 通过调用 **TaskStackBuilder.create()** 创建堆栈生成器
+- 通过调用 **addParentStack()** 将返回栈添加到堆栈生成器。 对于在清单文件中所定义层次结构内的每个 Activity，返回栈均包含可启动 Activity 的 Intent 对象。此方法还会添加一些可在全新任务中启动堆栈的标志
+- 尽管 **addParentStack()** 的参数是对已启动 Activity 的引用，但是方法调用不会添加可启动 Activity 的 Intent，而是留待下一步进行处理
+- 通过调用 **addNextIntent()**，添加可从通知中启动 Activity 的 Intent。 将在第一步中创建的 Intent 作为 **addNextIntent()** 的参数传递
+- 如需，请通过调用 **TaskStackBuilder.editIntentAt()** 向堆栈中的 Intent 对象添加参数。有时，需要确保目标 Activity 在用户使用“返回”导航回它时会显示有意义的数据
+- 通过调用 **getPendingIntent()** 获得此返回栈的 PendingIntent。 然后，可以使用此 PendingIntent 作为 **setContentIntent()** 的参数
 
 示例代码：
 
@@ -351,11 +351,11 @@ public void notification(View view) {
 
 ## **十三、不保留返回栈**
 
-默认情况下，从通知启动的Activity会在近期任务列表里出现。如果不需要在近期任务里显示，就不必在清单文件中定义其 Activity 层次结构，也不必调用 addParentStack() 来构建返回栈
+默认情况下，从通知启动的 Activity 会在近期任务列表里出现。如果不需要在近期任务里显示，就不必在清单文件中定义其 Activity 层次结构，也不必调用 addParentStack() 来构建返回栈
 
 取而代之的是，可使用清单文件设置 Activity 任务选项，并通过调用 getActivity() 创建 PendingIntent：
 
- - 在清单文件中，将以下属性添加到 Activity 的 < activity > 元素
+- 在清单文件中，将以下属性添加到 Activity 的 < activity > 元素
   android:name = "activityclass" （Activity 的完全限定类名）
   android:taskAffinity = "" （与在代码中设置的 FLAG_ACTIVITY_NEW_TASK 标志相结合，这可确保此 Activity 不会进入应用的默认任务。任何具有应用默认关联的现有任务均不受影响）
   android:excludeFromRecents = "true" （将新任务从“最新动态”中排除，这样用户就不会在无意中导航回它）
@@ -367,8 +367,8 @@ public void notification(View view) {
             android:launchMode="singleTask"
             android:taskAffinity="" />
 ```
- - 构建并发出通知：
-     - 创建 Intent设置目标Activity
+- 构建并发出通知：
+     - 创建 Intent 设置目标 Activity
      - 通过使用 **FLAG_ACTIVITY_NEW_TASK** 和 **FLAG_ACTIVITY_CLEAR_TASK** 标志调用 **setFlags()**，将 Activity 设置为在新的空任务中启动
      - 为 Intent 设置所需的任何其他选项
      - 通过调用 **getActivity()** 从 Intent 中创建 PendingIntent。 然后，使用此 PendingIntent 作为 **setContentIntent()** 的参数
@@ -495,7 +495,7 @@ public void notification(View view) {
 
 注意：使用自定义通知布局时，要特别注意确保自定义布局适用于不同的设备方向和分辨率。 尽管这条建议适用于所有“视图”布局，但对通知尤为重要，因为抽屉式通知栏中的空间非常有限。 不要让自定义布局过于复杂，同时确保在各种配置中对其进行测试
 
-这里新建一个message.xml文件，用于自定义通知布局
+这里新建一个 message.xml 文件，用于自定义通知布局
 
 ```java
 <?xml version="1.0" encoding="utf-8"?>

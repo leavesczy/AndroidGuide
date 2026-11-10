@@ -273,7 +273,7 @@ Exception in thread "main" java.lang.NullPointerException: Gson().fromJson(json,
 ```
 以上三个例子会有不同区别的原因是什么呢？
 
-这就要牵扯到 Kotlin 的平台类型了。Kotlin 的一大特色就可以和 Java 实现百分百互通，平台类型是 Kotlin 对 Java 所作的一种平衡性设计。Kotlin 将对象的类型分为了可空类型和不可空类型两种，但 Java 平台的一切对象类型均为可空的，当在 Kotlin 中引用 Java 变量时，如果将所有变量均归为可空类型，最终将多出许多 null 检查；如果均看成不可空类型，那么就很容易就写出忽略了NPE 风险的代码。为了平衡两者，Kotlin 引入了平台类型，即当在 Kotlin 中引用 Java 变量值时，既可以将之看成可空类型，也可以将之看成不可空类型，由开发者自己来决定是否进行 null 检查
+这就要牵扯到 Kotlin 的平台类型了。Kotlin 的一大特色就可以和 Java 实现百分百互通，平台类型是 Kotlin 对 Java 所作的一种平衡性设计。Kotlin 将对象的类型分为了可空类型和不可空类型两种，但 Java 平台的一切对象类型均为可空的，当在 Kotlin 中引用 Java 变量时，如果将所有变量均归为可空类型，最终将多出许多 null 检查；如果均看成不可空类型，那么就很容易就写出忽略了 NPE 风险的代码。为了平衡两者，Kotlin 引入了平台类型，即当在 Kotlin 中引用 Java 变量值时，既可以将之看成可空类型，也可以将之看成不可空类型，由开发者自己来决定是否进行 null 检查
 
 因此，当我们从 Kotlin 承接 Gson 这个 Java 类返回的变量时，既可以将其当做 UserBean 类型，也可以当做 UserBean? 类型。而如果我们直接显式声明为 UserBean 类型，就说明我们确信返回的是非空类型，当返回的是 null 时就会触发 Kotlin 的 null 检查，导致直接抛出 NullPointerException
 

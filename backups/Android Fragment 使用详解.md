@@ -7,27 +7,27 @@ Android 3.0（API 11）添加了一个强大的功能就是 Fragment （片段�
 
 为了有效地创建片段，需要了解片段的生命周期
 
- - onAttach
+- onAttach
   在片段与 Activity 关联之后调用
- - onCreate
+- onCreate
   在创建片段的时候调用
- - onCreateView
+- onCreateView
   当为片段创建布局的时间调用，必须返回片段的根布局。如果片段未提供 UI，可以返回 null
- - onActivityCreate
+- onActivityCreate
   告诉片段 Activity 的 onCreate() 方法已经完成
- - onStart
+- onStart
   当片段的视图对用户可见时调用
- - onResume
+- onResume
   当 Activity 进入到 Resumed 状态的时候，也就意味着活动开始运行了，此时调用本方法
- - onPause
+- onPause
   当 Activity 暂停的时候，调用该方法。系统将此方法作为用户离开片段的第一个信号（但并不总是意味着此片段会被销毁）进行调用。 通常应该在此方法内确认在当前用户会话结束后仍然有效的任何更改（因为用户可能不会返回）
- - onStop
+- onStop
   当 Activity 停止的时候调用
- - onDestoryView
+- onDestoryView
   调用本方法以允许片段释放用于视图的资源
- - onDestory
+- onDestory
   在片段销毁之前调用，以允许片段进行最好的清理工作
- - onDetach
+- onDetach
   当片段与 Activity 解除关联的时候调用
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-82215f275d6a1794?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -46,9 +46,9 @@ Android 3.0（API 11）添加了一个强大的功能就是 Fragment （片段�
 ```
 inflate() 方法带有三个参数：
 
- - 想要扩展的布局的资源 ID
- - 将作为扩展布局父项的 ViewGroup
- - 指示是否应该在扩展期间将扩展布局附加至 root 的布尔值（在下面的实例代码中使用的是 false，因为系统已经将扩展布局插入 ViewGroup ，传递 true 值会在最终布局中创建一个多余的视图组）
+- 想要扩展的布局的资源 ID
+- 将作为扩展布局父项的 ViewGroup
+- 指示是否应该在扩展期间将扩展布局附加至 root 的布尔值（在下面的实例代码中使用的是 false，因为系统已经将扩展布局插入 ViewGroup ，传递 true 值会在最终布局中创建一个多余的视图组）
 
 需要注意的是，片段不应了解其视图或其他片段的任何事情。如果想要监听一个片段所发生的事件，而它有可能影响到活动或视图或其他片段，那么，不要在片段类中编写监听器。相反，可以选择触发一个新的事件作为对片段事件的响应，并且让活动来处理它
 
@@ -57,9 +57,9 @@ inflate() 方法带有三个参数：
 
 每个片段都需要一个唯一的标识符，重启 Activity 时，系统可以使用该标识符来恢复片段，也可以使用该标识符来捕获片段以执行某些事务。 可以通过三种方式为片段提供 ID：
 
- - 为 android:id 属性提供唯一 ID
- - 为 android:tag 属性提供唯一字符串
- - 如果未给以上的两个属性提供值，系统会使用容器视图的 ID
+- 为 android:id 属性提供唯一 ID
+- 为 android:tag 属性提供唯一字符串
+- 如果未给以上的两个属性提供值，系统会使用容器视图的 ID
 
 ```java
     <fragment
@@ -125,11 +125,11 @@ containerViewId 参数用于指定要添加的视图的 ID，tag 参数是自定
 ## **三、管理片段的生命周期**
 管理片段生命周期与管理 Activity 生命周期很相似。和 Activity 一样，片段也以三种状态存在：
 
- - 运行中
+- 运行中
   片段在运行状态下的 Activity 中可见
- - 暂停
+- 暂停
   另一个 Activity 位于前台并具有焦点，但此片段所在的 Activity 仍然可见（前台 Activity 部分透明或未覆盖整个屏幕）
- - 停止
+- 停止
   此时片段处于不可见状态。宿主 Activity 已停止，或片段已从 Activity 中移除但已添加到返回栈中。 停止的片段仍然处于活动状态，系统会保留所有状态和成员信息。不过，它对用户不再可见，如果 Activity 被终止，它也会被终止
 
 与 Activity 一样，假使 Activity 的进程被终止，如果需要在重建 Activity 时恢复片段状态，开发者也可以使用 Bundle 保留片段的状态。可以在片段的 **onSaveInstanceState()** 回调期间保存状态，并可在 **onCreate()**、**onCreateView()** 或 **onActivityCreated()** 期间恢复状态
@@ -142,15 +142,15 @@ Activity 生命周期与片段生命周期之间的最显著差异在于它们�
 
 不过，片段还有几个额外的生命周期回调，用于处理与 Activity 的唯一交互，以执行构建和销毁片段 UI 等操作。 这些额外的回调方法是：
 
- - onAttach()
+- onAttach()
   在片段已与 Activity 关联时调用（Activity 传递到此方法内）
- - onCreateView()
+- onCreateView()
   调用它可创建与片段关联的视图层次结构
- - onActivityCreated()
+- onActivityCreated()
   在 Activity 的 onCreate() 方法已返回时调用
- - onDestroyView()
+- onDestroyView()
   在移除与片段关联的视图层次结构时调用
- - onDetach()
+- onDetach()
   在取消片段与 Activity 的关联时调用
 
 从下图中可以看到 Activity 的每个连续状态如何决定片段可以收到的回调方法。 例如，当 Activity 收到其 onCreate() 回调时，Activity 中的片段只会收到 onActivityCreated() 回调。一旦 Activity 达到 Resume 状态，就可以随意向 Activity 添加片段和移除其中的片段。 因此，只有当 Activity 处于 Resume 状态时，片段的生命周期才能独立变化。当 Activity 离开 Resume 状态时，片段会在 Activity 的推动下再次经历其生命周期
@@ -279,7 +279,7 @@ public class ResultFragment extends Fragment {
 
 </FrameLayout>
 ```
-然后在 Activity 的布局文件中声明即可。使两个片段的宽度以 1：2.5的方式占据整个屏幕空间
+然后在 Activity 的布局文件中声明即可。使两个片段的宽度以 1：2.5 的方式占据整个屏幕空间
 
 ```java
 <?xml version="1.0" encoding="utf-8"?>

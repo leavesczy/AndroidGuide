@@ -1,10 +1,6 @@
-# <p align="center"> AndroidGuide </p>
-
-<br>
+# AndroidGuide
 
 <p align="center">Android Developer 进阶学习笔记，希望对你有所帮助</p>
-
-<br>
 
 - 个人开源库
   - [Matisse：一个基于 Jetpack Compose 实现的 Android 图片和视频选择框架](https://github.com/leavesczy/Matisse)
@@ -66,8 +62,8 @@
   - [Jetpack Compose 实现完美屏幕适配](<Jetpack Compose 实现完美屏幕适配.md>)
   - [Jetpack Compose 写一个图片选择框架](<Jetpack Compose 写一个图片选择框架.md>)
   - [Jetpack Compose 写一个 BottomSheetDialog](<Jetpack Compose 写一个 BottomSheetDialog.md>)
-  - [学不动也要学，Jetpack Compose 写一个 IM App（一）](<学不动也要学，Jetpack Compose 写一个 IM App（一）.md>)
-  - [学不动也要学，Jetpack Compose 写一个 IM App（二）](<学不动也要学，Jetpack Compose 写一个 IM App（二）.md>)
+  - [学不动也要学，Jetpack Compose 写一个 IM App（一）](<学不动也要学，Jetpack Compose 写一个 IM APP（一）.md>)
+  - [学不动也要学，Jetpack Compose 写一个 IM App（二）](<学不动也要学，Jetpack Compose 写一个 IM APP（二）.md>)
   - [学不动也要学，Jetpack Compose 写一个俄罗斯方块](<学不动也要学，Jetpack Compose 写一个俄罗斯方块.md>)
   - [学不动也要学，Jetpack Compose 实现自定义绘制](<学不动也要学，Jetpack Compose 实现自定义绘制.md>)
 
@@ -77,15 +73,15 @@
   - [一文读懂 Java 和 Kotlin 的泛型难点](<一文读懂 Java 和 Kotlin 的泛型难点.md>)
   - [Gson 和 Kotlin Data Class 的避坑指南](<Gson 和 Kotlin Data Class 的避坑指南.md>)
   - [探究 Kotlin 的隐藏性能开销与避坑指南](<探究 Kotlin 的隐藏性能开销与避坑指南.md>)
-  - [【译】Kotlin 协程官方文档（一）- 协程基础](<【译】Kotlin 协程官方文档（一）- 协程基础.md>)
-  - [【译】Kotlin 协程官方文档（二）- 取消和超时](<【译】Kotlin 协程官方文档（二）- 取消和超时.md>)
-  - [【译】Kotlin 协程官方文档（三）- 组合挂起函数](<【译】Kotlin 协程官方文档（三）- 组合挂起函数.md>)
-  - [【译】Kotlin 协程官方文档（四）- 协程上下文和调度器](<【译】Kotlin 协程官方文档（四）- 协程上下文和调度器.md>)
-  - [【译】Kotlin 协程官方文档（五）- 异步流](<【译】Kotlin 协程官方文档（五）- 异步流.md>)
-  - [【译】Kotlin 协程官方文档（六）- 通道](<【译】Kotlin 协程官方文档（六）- 通道.md>)
-  - [【译】Kotlin 协程官方文档（七）- 异常处理](<【译】Kotlin 协程官方文档（七）- 异常处理.md>)
-  - [【译】Kotlin 协程官方文档（八）- 共享可变状态和并发性](<【译】Kotlin 协程官方文档（八）- 共享可变状态和并发性.md>)
-  - [【译】Kotlin 协程官方文档（九）- 选择表达式](<【译】Kotlin 协程官方文档（九）- 选择表达式.md>)
+  - [【译】Kotlin 协程官方文档（一）- 协程基础](<【译】kotlin 协程官方文档（一）- 协程基础.md>)
+  - [【译】Kotlin 协程官方文档（二）- 取消和超时](<【译】kotlin 协程官方文档（二）- 取消和超时.md>)
+  - [【译】Kotlin 协程官方文档（三）- 组合挂起函数](<【译】kotlin 协程官方文档（三）- 组合挂起函数.md>)
+  - [【译】Kotlin 协程官方文档（四）- 协程上下文和调度器](<【译】kotlin 协程官方文档（四）- 协程上下文和调度器.md>)
+  - [【译】Kotlin 协程官方文档（五）- 异步流](<【译】kotlin 协程官方文档（五）- 异步流.md>)
+  - [【译】Kotlin 协程官方文档（六）- 通道](<【译】kotlin 协程官方文档（六）- 通道.md>)
+  - [【译】Kotlin 协程官方文档（七）- 异常处理](<【译】kotlin 协程官方文档（七）- 异常处理.md>)
+  - [【译】Kotlin 协程官方文档（八）- 共享可变状态和并发性](<【译】kotlin 协程官方文档（八）- 共享可变状态和并发性.md>)
+  - [【译】Kotlin 协程官方文档（九）- 选择表达式](<【译】kotlin 协程官方文档（九）- 选择表达式.md>)
 
 - 开源库源码解析
   - [Android 主流开源库源码分析（一）- EventBus 源码详解](<Android 主流开源库源码分析（一）- EventBus 源码详解.md>)
@@ -123,16 +119,14 @@
   - [Java 多线程编程（四）- 锁的分类有这么多](<Java 多线程编程（四）- 锁的分类有这么多.md>)
   - [Java 多线程编程（五）- 超详细的 ThreadPoolExecutor 源码解析](<Java 多线程编程（五）- 超详细的 ThreadPoolExecutor 源码解析.md>)
 
-<br>
+<div align="center">
 
-<div align=center><img src ="https://github.com/user-attachments/assets/18b8d2f7-d344-4ef5-a65f-7464c1f489e4"/></div>
+![公众号](https://github.com/user-attachments/assets/18b8d2f7-d344-4ef5-a65f-7464c1f489e4)
 
-<p align="center">欢迎关注公众号，第一时间看最新文章</p>
+欢迎关注公众号，第一时间看最新文章
 
-<br>
+![赞赏](https://github.com/user-attachments/assets/bf188a5e-8a9d-4476-9023-efc892adbf56)
 
-<div align=center><img src ="https://github.com/user-attachments/assets/bf188a5e-8a9d-4476-9023-efc892adbf56"/></div>
+原创不易，能请我一杯肥仔水吗
 
-<p align="center">原创不易，能请我一杯肥仔水吗 </p>
-
-<br>
+</div>

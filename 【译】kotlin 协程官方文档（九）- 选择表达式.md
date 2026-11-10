@@ -1,14 +1,14 @@
-> 最近一直在了解关于 **Kotlin协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
+> 最近一直在了解关于 **Kotlin 协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
 >
 > 协程官方文档：[coroutines-guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/coroutines-guide.md)
 
 select 表达式可以同时等待多个挂起函数，并选择第一个可用的函数来执行
 
-> 选择表达式是 ```kotlinx.coroutines``` 的一个实验性的特性，这些 API 预计将在 ```kotlinx.coroutines``` 库的即将到来的更新中衍化，并可能会有突破性的变化
+> 选择表达式是 ```kotlinx.coroutines```的一个实验性的特性，这些 API 预计将在```kotlinx.coroutines``` 库的即将到来的更新中衍化，并可能会有突破性的变化
 
 # 一、Selecting from channels
 
-我们现在有两个字符串生产者：```fizz``` 和 ```buzz``` 。其中 ```fizz``` 每 300 毫秒生成一个字符串 “Fizz”：
+我们现在有两个字符串生产者：```fizz```和```buzz```。其中```fizz``` 每 300 毫秒生成一个字符串 “Fizz”：
 
 ```kotlin
 fun CoroutineScope.fizz() = produce<String> {
@@ -125,7 +125,7 @@ suspend fun selectAorB(a: ReceiveChannel<String>, b: ReceiveChannel<String>): St
 
 注意，onReceiveOrNull 是一个扩展函数，仅可用于具有不可为空元素的通道，这样就不会意外混淆**通道是已关闭**还是**返回了空值**这两种情况
 
-让我们将其与生成四次“Hello”字符串的通道 ```a``` 和生成四次“World”字符串的通道 ```b``` 一起使用：
+让我们将其与生成四次“Hello”字符串的通道 ```a```和生成四次“World”字符串的通道```b``` 一起使用：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -269,7 +269,7 @@ fun CoroutineScope.asyncStringsList(): List<Deferred<String>> {
 }
 ```
 
-现在，main 函数等待它们中的第一个完成，并统计仍处于活动状态的延迟值的数量。注意，我们在这里使用 ```select``` 表达式事实上是一种 Kotlin DSL，因此我们可以使用任意代码为它提供子句。在本例中，我们遍历一个延迟值列表，为每个延迟值提供 ```onAwait``` 子句。
+现在，main 函数等待它们中的第一个完成，并统计仍处于活动状态的延迟值的数量。注意，我们在这里使用 ```select```表达式事实上是一种 Kotlin DSL，因此我们可以使用任意代码为它提供子句。在本例中，我们遍历一个延迟值列表，为每个延迟值提供```onAwait``` 子句。
 
 ```kotlin
 import kotlinx.coroutines.*

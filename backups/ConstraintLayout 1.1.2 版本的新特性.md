@@ -6,7 +6,7 @@ ConstraintLayout 是目前 Android Studio 中项目的默认布局，目前已�
 
 1. app:layout_constraintCircle -目标 View 的 ID
 2. app:layout_constraintCircleAngle -对齐的角度
-3. app:layout_constraintCircleRadius  -与目标 View 之间的距离（顺时针方向，0~360度）
+3. app:layout_constraintCircleRadius  -与目标 View 之间的距离（顺时针方向，0~360 度）
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>

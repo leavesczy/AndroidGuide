@@ -20,7 +20,7 @@ Android 系统会尽量长时间地保持应用进程，但为了新建进程或
   即用户当前操作所必需的进程。如果一个进程满足以下任一条件，即视为前台进程：
 
   - 托管用户正在交互的 Activity（已调用 Activity 的 onResume() 方法）
-  - 托管某个 Service，该Service绑定到用户正在交互的 Activity
+  - 托管某个 Service，该 Service 绑定到用户正在交互的 Activity
   - 托管正在前台运行的 Service（服务已调用 startForeground()）
   - 托管正在执行生命周期回调的 Service（onCreate()、onStart() 或 onDestroy()）
   - 托管正执行其 onReceive() 方法的 BroadcastReceiver
@@ -31,7 +31,7 @@ Android 系统会尽量长时间地保持应用进程，但为了新建进程或
   没有任何前台组件，但仍会影响用户在屏幕上所见内容的进程。 如果一个进程满足以下任一条件，即视为可见进程：
 
   - 托管不在前台、但仍对用户可见的 Activity（已调用其 onPause() 方法）。例如，如果前台 Activity 启动了一个覆盖一部分屏幕的对话框时，就会出现这种情况
-  - 托管绑定到可见或前台Activity 的 Service
+  - 托管绑定到可见或前台 Activity 的 Service
 
  可见进程被视为是极其重要的进程，除非为了维持所有前台进程同时运行而必须终止，否则系统不会终止这些进程
 
@@ -46,7 +46,7 @@ Android 系统会尽量长时间地保持应用进程，但为了新建进程或
 
 根据进程中当前活动组件的重要程度，Android 会将进程评定为它可以达到的最高级别。例如，如果某进程托管着服务和可见 Activity，则会将此进程评定为可见进程。此外，一个进程的级别可能会因其他进程对它的依赖而有所提高，即服务于另一进程的进程其级别永远不会低于其所服务的进程。 例如，如果进程 A 中的内容提供程序为进程 B 中的客户端提供服务，或者如果进程 A 中的服务绑定到进程 B 中的组件，则进程 A 始终被视为至少与进程 B 同样重要。
 
-由于运行Service的进程其级别高于托管后台 Activity 的进程，因此启动长时间运行操作的 Activity 最好为该操作启动Service，而不是简单地创建工作线程，当操作有可能比 Activity 更加持久时尤要如此。例如，正在将图片上传到网站的 Activity 应该启动Service来执行上传操作，这样一来，即使用户退出 Activity，仍可在后台继续执行上传操作。使用Service可以保证，无论 Activity 发生什么情况，该操作至少具备“服务进程”优先级。 同理，广播接收器也应使用Service，而不是简单地将耗时冗长的操作放入线程中
+由于运行 Service 的进程其级别高于托管后台 Activity 的进程，因此启动长时间运行操作的 Activity 最好为该操作启动 Service，而不是简单地创建工作线程，当操作有可能比 Activity 更加持久时尤要如此。例如，正在将图片上传到网站的 Activity 应该启动 Service 来执行上传操作，这样一来，即使用户退出 Activity，仍可在后台继续执行上传操作。使用 Service 可以保证，无论 Activity 发生什么情况，该操作至少具备“服务进程”优先级。 同理，广播接收器也应使用 Service，而不是简单地将耗时冗长的操作放入线程中
 
 ## **三、线程**
 
@@ -60,8 +60,8 @@ Android 系统会尽量长时间地保持应用进程，但为了新建进程或
 
 此外，Android UI 工具包并非线程安全工具包。因此不能通过工作线程操纵 UI，而只能通过 UI 线程操纵用户界面。 因此，Android 的单线程模式必须遵守两条规则：
 
- - 不要阻塞 UI 线程
- - 不要在 UI 线程之外访问 Android UI 工具包
+- 不要阻塞 UI 线程
+- 不要在 UI 线程之外访问 Android UI 工具包
 
 ## **四、工作线程**
 
@@ -85,9 +85,9 @@ public void onClick(View v) {
 
 为解决此问题，Android 提供了几种途径来从其他线程访问 UI 线程：
 
- - Activity.runOnUiThread(Runnable)
- - View.post(Runnable)
- - View.postDelayed(Runnable, long)
+- Activity.runOnUiThread(Runnable)
+- View.post(Runnable)
+- View.postDelayed(Runnable, long)
 
 可以将以上代码修改为
 
@@ -111,9 +111,9 @@ public void onClick(View v) {
 ```
 现在，上述实现属于线程安全型：在单独的线程中完成网络操作，而在 UI 线程中操纵 ImageView
 
-此外，也可以使用AsyncTask来完成任务。AsyncTask 允许对用户界面执行异步操作。它会先阻塞工作线程中的操作，然后在 UI 线程中发布结果
+此外，也可以使用 AsyncTask 来完成任务。AsyncTask 允许对用户界面执行异步操作。它会先阻塞工作线程中的操作，然后在 UI 线程中发布结果
 
-要使用AsyncTask ，必须创建 AsyncTask 的子类并实现 **doInBackground()** 回调方法，该方法将在后台线程池中运行。 要更新 UI，应该实现 **onPostExecute()** 方法以传递 **doInBackground()** 返回的结果并在 UI 线程中运行，以便安全地更新 UI
+要使用 AsyncTask ，必须创建 AsyncTask 的子类并实现 **doInBackground()** 回调方法，该方法将在后台线程池中运行。 要更新 UI，应该实现 **onPostExecute()** 方法以传递 **doInBackground()** 返回的结果并在 UI 线程中运行，以便安全地更新 UI
 
 ```java
 public void onClick(View v) {
@@ -134,9 +134,9 @@ private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
 AsyncTask 工作方法如下所示：
 
- - 使用泛型指定参数类型、进度值和任务最终值
- - doInBackground() 方法会在工作线程上自动执行
- - onPreExecute()、onPostExecute() 和 onProgressUpdate() 均在 UI 线程中调用
- - doInBackground() 返回的值将发送到 onPostExecute()
- - 可以随时在 doInBackground() 中调用publishProgress()方法，以便在 UI 线程中执行 onProgressUpdate()
- - 可以随时取消任何线程中的任务
+- 使用泛型指定参数类型、进度值和任务最终值
+- doInBackground() 方法会在工作线程上自动执行
+- onPreExecute()、onPostExecute() 和 onProgressUpdate() 均在 UI 线程中调用
+- doInBackground() 返回的值将发送到 onPostExecute()
+- 可以随时在 doInBackground() 中调用 publishProgress()方法，以便在 UI 线程中执行 onProgressUpdate()
+- 可以随时取消任何线程中的任务

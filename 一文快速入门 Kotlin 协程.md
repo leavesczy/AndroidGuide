@@ -448,14 +448,14 @@ public fun invokeOnCompletion(handler: CompletionHandler): DisposableHandle
 
 Job 具有以下几种状态值，每种状态对应的属性值各不相同
 
-| **State**                        | [isActive](https://Kotlin.github.io/Kotlinx.coroutines/Kotlinx-coroutines-core/Kotlinx.coroutines/-job/is-active.html) | [isCompleted](https://Kotlin.github.io/Kotlinx.coroutines/Kotlinx-coroutines-core/Kotlinx.coroutines/-job/is-completed.html) | [isCancelled](https://Kotlin.github.io/Kotlinx.coroutines/Kotlinx-coroutines-core/Kotlinx.coroutines/-job/is-cancelled.html) |
+| **State** | [isActive](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/is-active.html) | [isCompleted](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/is-completed.html) | [isCancelled](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/is-cancelled.html) |
 | :------------------------------- | :----------------------------------------------------------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
-| *New* (optional initial state)   | false                                                        | false                                                        | false                                                        |
-| *Active* (default initial state) | true                                                         | false                                                        | false                                                        |
-| *Completing* (transient state)   | true                                                         | false                                                        | false                                                        |
-| *Cancelling* (transient state)   | false                                                        | false                                                        | true                                                         |
-| *Cancelled* (final state)        | false                                                        | true                                                         | true                                                         |
-| *Completed* (final state)        | false                                                        | true                                                         | false                                                        |
+| *New* (optional initial state) | false | false | false |
+| *Active* (default initial state) | true | false | false |
+| *Completing* (transient state) | true | false | false |
+| *Cancelling* (transient state) | false | false | true |
+| *Cancelled* (final state) | false | true | true |
+| *Completed* (final state) | false | true | false |
 
 ```kotlin
 fun main() {

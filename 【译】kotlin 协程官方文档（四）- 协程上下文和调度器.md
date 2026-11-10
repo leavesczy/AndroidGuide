@@ -1,4 +1,4 @@
-> 最近一直在了解关于 **Kotlin协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
+> 最近一直在了解关于 **Kotlin 协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
 >
 > 协程官方文档：[coroutines-guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/coroutines-guide.md)
 
@@ -48,13 +48,13 @@ main runBlocking      : I'm working in thread main
 
 Dispatchers.Unconfined 是一个特殊的调度器，看起来似乎也在主线程中运行，但实际上它是一种不同的机制，稍后将进行解释
 
-在 GlobalScope 中启动协程时默认使用的调度器是 Dispatchers.default，并使用共享的后台线程池，因此 ```launch(Dispatchers.default){...}``` 与 ```GlobalScope.launch{...}``` 是使用相同的调度器
+在 GlobalScope 中启动协程时默认使用的调度器是 Dispatchers.default，并使用共享的后台线程池，因此 ```launch(Dispatchers.default){...}```与```GlobalScope.launch{...}``` 是使用相同的调度器
 
 newSingleThreadContext 用于为协程专门创建一个新的线程来运行。专用线程是非常昂贵的资源。在实际的应用程序中，它必须在不再需要时使用 close 函数释放掉，或者存储在顶级变量中以此实现在整个应用程序中重用
 
 # 二、Unconfined vs confined dispatcher
 
-Dispatchers.Unconfined 调度器在调用者线程中启动一个协程，但它仅仅只是运行到第一个挂起点。在挂起之后，它将恢复线程中的协程，该协程完全由调用的挂起函数决定。Unconfined 调度器适用于既不消耗CPU时间和不更新任何受限于特定线程的共享数据（如UI）的协程
+Dispatchers.Unconfined 调度器在调用者线程中启动一个协程，但它仅仅只是运行到第一个挂起点。在挂起之后，它将恢复线程中的协程，该协程完全由调用的挂起函数决定。Unconfined 调度器适用于既不消耗 CPU 时间和不更新任何受限于特定线程的共享数据（如 UI）的协程
 
 另一方面，调度器是默认继承于外部的协程作用域的。尤其是 runBlocking 启动的协程的调度器只能是调用者所在的线程，因此继承 runBlocking 的结果是在此线程上的调度执行操作是可预测的 FIFO
 
@@ -116,7 +116,7 @@ fun main() = runBlocking<Unit> {
 }
 ```
 
-共有三个协程。runBlocking 中的主协程（#1）和两个计算延迟值a（#2）和b（#3）的协程。它们都在 runBlocking 的上下文中执行，并且仅限于主线程。此代码的输出为：
+共有三个协程。runBlocking 中的主协程（#1）和两个计算延迟值 a（#2）和 b（#3）的协程。它们都在 runBlocking 的上下文中执行，并且仅限于主线程。此代码的输出为：
 
 ```kotlin
 [main @coroutine#2] I'm computing a piece of the answer
@@ -333,7 +333,7 @@ I'm working in thread DefaultDispatcher-worker-1 @test#2
 
 # 十、协程作用域
 
-让我们把关于作用域、子元素和 Job 的知识点放在一起。假设我们的应用程序有一个具有生命周期的对象，但该对象不是协程。例如，我们正在编写一个Android应用程序，并在Android Activity中启动各种协程，以执行异步操作来获取和更新数据、指定动画等。当 Activity 销毁时，必须取消所有协程以避免内存泄漏。当然，我们可以手动操作上下文和 Job 来绑定 Activity 和协程的生命周期。但是，kotlinx.coroutines 提供了一个抽象封装：CoroutineScope。你应该已经对协程作用域很熟悉了，因为所有的协程构造器都被声明为它的扩展函数
+让我们把关于作用域、子元素和 Job 的知识点放在一起。假设我们的应用程序有一个具有生命周期的对象，但该对象不是协程。例如，我们正在编写一个 Android 应用程序，并在 Android Activity 中启动各种协程，以执行异步操作来获取和更新数据、指定动画等。当 Activity 销毁时，必须取消所有协程以避免内存泄漏。当然，我们可以手动操作上下文和 Job 来绑定 Activity 和协程的生命周期。但是，kotlinx.coroutines 提供了一个抽象封装：CoroutineScope。你应该已经对协程作用域很熟悉了，因为所有的协程构造器都被声明为它的扩展函数
 
 我们通过创建与 Activity 生命周期相关联的协程作用域的实例来管理协程的生命周期。CoroutineScope 的实例可以通过 CoroutineScope() 或 MainScope() 的工厂函数来构建。前者创建通用作用域，后者创建 UI 应用程序的作用域并使用 Dispatchers.Main 作为默认的调度器
 
@@ -348,7 +348,7 @@ class Activity {
 }
 ```
 
-或者，我们可以在这个 Activity 类中实现 CoroutineScope 接口。最好的实现方式是对默认工厂函数使用委托。我们还可以将所需的调度器（在本例中使用Dispatchers.Default）与作用域结合起来：
+或者，我们可以在这个 Activity 类中实现 CoroutineScope 接口。最好的实现方式是对默认工厂函数使用委托。我们还可以将所需的调度器（在本例中使用 Dispatchers.Default）与作用域结合起来：
 
 ```kotlin
     class Activity : CoroutineScope by CoroutineScope(Dispatchers.Default) {
@@ -371,7 +371,7 @@ class Activity {
 } // class Activity ends
 ```
 
-在主函数中，我们创建 Activity 对象，调用测试 doSomething 函数，并在500毫秒后销毁该活动。这将取消从 doSomething 中启动的所有协程。我们可以看到这一点，因为在销毁 activity 对象后，即使我们再等待一会儿，也不会再打印消息
+在主函数中，我们创建 Activity 对象，调用测试 doSomething 函数，并在 500 毫秒后销毁该活动。这将取消从 doSomething 中启动的所有协程。我们可以看到这一点，因为在销毁 activity 对象后，即使我们再等待一会儿，也不会再打印消息
 
 ```kotlin
 import kotlin.coroutines.*
@@ -418,7 +418,7 @@ Coroutine 1 is done
 Destroying activity!
 ```
 
-如你所见，只有前两个协程会打印一条消息，其它的则会被 ```Activity.destroy()``` 中的 ```job.cancel()``` 所取消
+如你所见，只有前两个协程会打印一条消息，其它的则会被 ```Activity.destroy()```中的```job.cancel()``` 所取消
 
 # 十一、线程局部数据
 
@@ -463,4 +463,4 @@ ThreadLocal 具备一等支持，可以与任何基础 kotlinx.coroutines 一起
 
 或者，值可以存储在一个可变的类计数器中(var i: Int)，而类计数器又存储在一个线程局部变量中，但是，在这种情况下，您完全有责任同步此计数器中变量的潜在并发修改
 
-有关高级用法，比如与 logging MDC, transactional contexts或其它在内部使用线程局部变量传递数据的库集成，请参阅实现了 ThreadContextElement 接口的文档
+有关高级用法，比如与 logging MDC, transactional contexts 或其它在内部使用线程局部变量传递数据的库集成，请参阅实现了 ThreadContextElement 接口的文档

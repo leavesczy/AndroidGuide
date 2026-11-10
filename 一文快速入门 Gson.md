@@ -284,7 +284,7 @@ public static void main(String[] args) {
 
 有时候并不是所有的字段都需要进行系列化和反序列化，因此需要对某些字段进行排除，有四种方法可以来实现这种需求。
 
-## 1、基于@Expose注解
+## 1、基于@Expose 注解
 
 Expose 注解包含两个属性值，且均声明了默认值。Expose 的含义即为“暴露”，即用于对外暴露字段，serialize 用于指定是否进行序列化，deserialize 用于指定是否进行反序列化。如果字段不声明 Expose 注解，则意味着不进行序列化和反序列化操作，相当于两个属性值均为 false 。此外，Expose 注解需要和 GsonBuilder 构建的 Gson 对象一起使用才能生效
 
@@ -568,7 +568,7 @@ public static void main(String[] args) {
 ```
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b0c33efba86344c6974cacebcee3470f~tplv-k3u1fbpfcp-zoom-1.image)
 
-## 2、格式化输出Json
+## 2、格式化输出 Json
 
 默认的序列化后的 Josn 字符串并不太直观，可以选择格式化输出
 
@@ -674,7 +674,7 @@ public class User {
 ```
 定义 TypeAdapter 的子类 UserTypeAdapter 来接管 User 类的序列化和反序列化过程
 
-这里设定当 User 类序列化时 Json 中的Key值都是大写字母开头，反序列化时支持“name”和“Name”两种不同的 Json 风格
+这里设定当 User 类序列化时 Json 中的 Key 值都是大写字母开头，反序列化时支持“name”和“Name”两种不同的 Json 风格
 
 ```java
 public class UserTypeAdapter extends TypeAdapter<User> {

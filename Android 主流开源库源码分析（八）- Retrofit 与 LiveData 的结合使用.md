@@ -183,7 +183,7 @@ class LiveDataCallAdapterFactory private constructor() : CallAdapter.Factory() {
 
 }
 ```
-LiveDataCallAdapter 的逻辑也比较简单，如果**网络请求成功且状态码等于 200 **则直接返回接口值，否则就需要根据不同的失败原因构建出不同的 HttpWrapBean 对象
+LiveDataCallAdapter 的逻辑也比较简单，如果**网络请求成功且状态码等于 200**则直接返回接口值，否则就需要根据不同的失败原因构建出不同的 HttpWrapBean 对象
 
 ```kotlin
 class LiveDataCallAdapter<R>(private val responseType: Type) : CallAdapter<R, LiveData<R>> {

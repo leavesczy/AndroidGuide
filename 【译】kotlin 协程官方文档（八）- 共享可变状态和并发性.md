@@ -1,4 +1,4 @@
-> 最近一直在了解关于 **Kotlin协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
+> 最近一直在了解关于 **Kotlin 协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
 >
 > 协程官方文档：[coroutines-guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/coroutines-guide.md)
 
@@ -60,7 +60,7 @@ fun main() = runBlocking {
 //sampleEnd    
 ```
 
-最后会打印出什么呢？不太可能打印出 “Counter=100000”，因为100个协程从多个线程并发地递增 counter 而不进行任何同步。
+最后会打印出什么呢？不太可能打印出 “Counter=100000”，因为 100 个协程从多个线程并发地递增 counter 而不进行任何同步。
 
 # 二、Volatiles 是没有作用的
 
@@ -228,9 +228,9 @@ fun main() = runBlocking {
 
 # 六、互斥
 
-互斥问题的解决方案是保护共享状态的所有修改操作，其中的关键代码永远不会同时执行。在一个阻塞的世界中，通常会使用 ```synchronized``` 或 ```ReentrantLock```。协程的替换方案称为互斥(Mutex)。它具有 ```lock``` 和 ```unlock``` 函数以划定一个关键位置。关键的区别在于 ```Mutex.lock()``` 是一个挂起函数。它不会阻塞线程
+互斥问题的解决方案是保护共享状态的所有修改操作，其中的关键代码永远不会同时执行。在一个阻塞的世界中，通常会使用 ```synchronized```或```ReentrantLock```。协程的替换方案称为互斥(Mutex)。它具有```lock```和```unlock```函数以划定一个关键位置。关键的区别在于```Mutex.lock()``` 是一个挂起函数。它不会阻塞线程
 
-还有一个扩展函数 withLock 可以方便地来实现 ```mutex.lock(); try {...} finally { mutex.unlock() } ```
+还有一个扩展函数 withLock 可以方便地来实现 ```mutex.lock(); try {...} finally { mutex.unlock() }```
 
 ```kotlin
 import kotlinx.coroutines.*

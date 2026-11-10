@@ -396,7 +396,7 @@ CDN 的全称是 Content Delivery Network，即内容分发网络。CDN 是构�
 本文部分内容直接引用自以下文章，具体的性能瓶颈、优化手段和优化效果都需要用户量很大后才能总结出来，以下文章介绍的方案还是很有说服力的，推荐读者去看下
 
 - [百度 APP - Android H5 首屏优化实践](https://mp.weixin.qq.com/s/AqQgDB-0dUp2ScLkqxbLZg)
-- [今日头条品质优化 - 图文详情页秒开实践 ](https://juejin.cn/post/6876011410061852680)
+- [今日头条品质优化 - 图文详情页秒开实践](https://juejin.cn/post/6876011410061852680)
 - [阿里巴巴淘系技术 - 前端性能优化](https://www.zhihu.com/question/385397882/answer/1594966805)
 
 最后也当然少不了本文的示例代码了：[RobustWebView](https://github.com/leavesczy/RobustWebView)

@@ -828,7 +828,7 @@ fun CoilImage(
 
 最后再放一下 compose_chat 的 GitHub 地址：[用 Jetpack Compose 实现一个 IM APP](https://github.com/leavesczy/compose_chat)
 
-Apk 下载尝鲜：[ 用 Jetpack Compose 实现一个 IM APP](https://github.com/leavesczy/compose_chat/releases)
+Apk 下载尝鲜：[用 Jetpack Compose 实现一个 IM APP](https://github.com/leavesczy/compose_chat/releases)
 
 腾讯云 IM SDK 免费版最多只能注册一百个账号，1.0 版本的 compose_chat 用户数已经满了，因此 2.0 版本我更换了新的 AppId。如果发现无法注册，读者可以使用以下几个我预先注册好的账号，但多设备同时登陆的话会互相挤掉线 ~~
 

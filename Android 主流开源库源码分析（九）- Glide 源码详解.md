@@ -26,12 +26,12 @@ Glide 的缓存机制分为 **内存缓存** 和 **磁盘缓存** 两级。默�
 
 此外，Glide 最终会缓存到磁盘的图片类型可以分为两类，一类是原始图片，一类是将原始图片进行各种压缩裁剪变换等各种转换操作后得到的图片。Glide 的磁盘缓存策略（DiskCacheStrategy）就分为以下五种，用于决定如何对这两类图片进行磁盘保存
 
-| 磁盘缓存策略                | 缓存策略说明                                                 |
+| 磁盘缓存策略 | 缓存策略说明 |
 | --------------------------- | ------------------------------------------------------------ |
-| DiskCacheStrategy.NONE      | 不缓存任何内容                                               |
-| DiskCacheStrategy.ALL       | 既缓存原始图片，也缓存转换过后的图片                         |
-| DiskCacheStrategy.DATA      | 只缓存原始图片                                               |
-| DiskCacheStrategy.RESOURCE  | 只缓存转换过后的图片                                         |
+| DiskCacheStrategy.NONE | 不缓存任何内容 |
+| DiskCacheStrategy.ALL | 既缓存原始图片，也缓存转换过后的图片 |
+| DiskCacheStrategy.DATA | 只缓存原始图片 |
+| DiskCacheStrategy.RESOURCE | 只缓存转换过后的图片 |
 | DiskCacheStrategy.AUTOMATIC | 由 Glide 根据图片资源类型来自动选择使用哪一种缓存策略（默认选项） |
 
 当中，比较特殊的缓存策略是 **DiskCacheStrategy.AUTOMATIC**，该策略会根据要加载的图片来源类型采用最佳的缓存策略。如果加载的是远程图片，仅会存储原始图片，不存储转换过后的图片，因为下载远程图片相比调整磁盘上已经存在的数据要昂贵得多。如果加载的是本地图片，则仅会存储转换过后的图片，因为即使需要再次生成另一个尺寸或类型的图片，取回原始图片也很容易
@@ -1396,10 +1396,10 @@ class EngineJob<R> implements DecodeJob.Callback<R>, Poolable {
 
 这四个线程池的创建逻辑可以看 GlideExecutor 类，这四个线程池的区别是：
 
-1. diskCacheExecutor。核心线程数和最大线程数均为1，线程超时时间为0秒。因为 diskCacheExecutor 执行的是磁盘文件读写，核心线程数和最大线程数均为1就使得当线程池被启动后始终只有一个线程处于活跃状态，保证了文件读写时的有序性，避免了加锁操作
-2. sourceExecutor。核心线程数和最大线程数根据设备的 CPU 个数来决定，至少是4个线程，线程超时时间为0秒。线程数量的设置就限制了 Glide 最多发起四个联网加载图片的请求
-3. sourceUnlimitedExecutor。核心线程数为0，最大线程数为 Integer.MAX_VALUE，超时时间为10秒，当线程闲置时就会被马上回收。sourceUnlimitedExecutor 的目的是为了应对需要同时处理大量加载图片请求的需求，允许近乎无限制地新建线程来处理每个请求，在及时性上相对 sourceExecutor 可能会有所提升，但也可能反而会因为多线程竞争而降低效率，且也容易发生 OOM
-4. animationExecutor。如果设备的 CPU 个数大于 4，则核心线程数和最大线程数设为2，否则设为1；线程超时时间为0秒
+1. diskCacheExecutor。核心线程数和最大线程数均为 1，线程超时时间为 0 秒。因为 diskCacheExecutor 执行的是磁盘文件读写，核心线程数和最大线程数均为 1 就使得当线程池被启动后始终只有一个线程处于活跃状态，保证了文件读写时的有序性，避免了加锁操作
+2. sourceExecutor。核心线程数和最大线程数根据设备的 CPU 个数来决定，至少是 4 个线程，线程超时时间为 0 秒。线程数量的设置就限制了 Glide 最多发起四个联网加载图片的请求
+3. sourceUnlimitedExecutor。核心线程数为 0，最大线程数为 Integer.MAX_VALUE，超时时间为 10 秒，当线程闲置时就会被马上回收。sourceUnlimitedExecutor 的目的是为了应对需要同时处理大量加载图片请求的需求，允许近乎无限制地新建线程来处理每个请求，在及时性上相对 sourceExecutor 可能会有所提升，但也可能反而会因为多线程竞争而降低效率，且也容易发生 OOM
+4. animationExecutor。如果设备的 CPU 个数大于 4，则核心线程数和最大线程数设为 2，否则设为 1；线程超时时间为 0 秒
 
 这四个线程池都用于 EngineJob 类。diskCacheExecutor 只用于磁盘缓存，只要本次请求允许使用磁盘缓存， diskCacheExecutor 就会被使用到。而其它三个线程池在我看来都是用于加载本地文件或者联网请求图片，如果 useUnlimitedSourceGeneratorPool 为 true，就使用 sourceUnlimitedExecutor，否则如果 useAnimationPool 为 true，就使用 animationExecutor，否则就使用 sourceExecutor
 
@@ -1508,7 +1508,7 @@ public final class Executors {
 
 默认情况下，Glide 是通过 HttpURLConnection 来联网加载图片的，相对于我们常用的 OkHttp 来说比较原始低效。而 Glide 也提供了 Registry 类，允许外部来自定义实现特定的请求逻辑
 
-例如，如果你想要通过 OkHttp 来请求图片，那么可以依赖 Glide官方提供的支持库：
+例如，如果你想要通过 OkHttp 来请求图片，那么可以依赖 Glide 官方提供的支持库：
 
 ```groovy
 dependencies {

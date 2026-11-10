@@ -4,9 +4,9 @@ TouchEvent 事件分发机制算作是 Android 开发中很重要的知识点了
 
 触摸事件对应的是 MotionEvent 类，触摸事件的类型分为如下三种：
 
- - Action_Down ：用户手指的按下操作，标志着一次触摸事件的开始
- - Action_Move：用户手指按压屏幕后，在松开手指之前如果移动距离超出一定的阈值，则发生了Action _ Move 事件
- - Action_Up：用户手指离开屏幕时触发的操作，标志着当前触摸事件的结束
+- Action_Down ：用户手指的按下操作，标志着一次触摸事件的开始
+- Action_Move：用户手指按压屏幕后，在松开手指之前如果移动距离超出一定的阈值，则发生了 Action _ Move 事件
+- Action_Up：用户手指离开屏幕时触发的操作，标志着当前触摸事件的结束
 
 在一次屏幕触摸操作中，Action_Down 和 Action_Up 这两个事件是必需的，Action_Move 事件则视情况而定
 
@@ -33,7 +33,7 @@ public boolean dispatchTouchEvent(MotionEvent ev)
 ```java
 public boolean onInterceptTouchEvent(MotionEvent ev)
 ```
-这个方法只在 ViewGroup 及其子类中才有，在 View 和 Activity 中是不存在的。该方法通过返回值来决定是否拦截对应的事件。返回 true 表示拦截这个事件，不继续发布给子视图，同时交由自身的 `onTouchEvent(MotionEvent event)` 方法进行处理；返回 false 或者 `super.onInterceptTouchEvent(ev)` 表示不对事件进行拦截，继续传递给子视图。如果当前ViewGroup 拦截了某个事件，那么在同一个事件序列当中，此方法不会被再次调用
+这个方法只在 ViewGroup 及其子类中才有，在 View 和 Activity 中是不存在的。该方法通过返回值来决定是否拦截对应的事件。返回 true 表示拦截这个事件，不继续发布给子视图，同时交由自身的 `onTouchEvent(MotionEvent event)` 方法进行处理；返回 false 或者 `super.onInterceptTouchEvent(ev)` 表示不对事件进行拦截，继续传递给子视图。如果当前 ViewGroup 拦截了某个事件，那么在同一个事件序列当中，此方法不会被再次调用
 
 #### 2.3、消费（Consume）:
 
@@ -60,7 +60,7 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
 ```
 对于一个根 ViewGroup 来说，点击事件发生后，首先会传递给它，这时它的 `dispatchTouchEvent` 方法就会被调用，如果它的 `onInterceptTouchEvent` 方法返回 true 就表示要拦截当前事件，接着事件就会交由 ViewGroup 的 `onTouchEvent` 方法进行处理。如果 `onInterceptTouchEvent` 方法返回 fasle，就表示它不拦截当前事件，事件会继续传递给 ViewGroup 的子元素，再次重复以上步骤
 
-此外，View 的 `onTouchEvent` 方法默认都会返回 true，即消耗事件，除非 View 是不可点击的（**clickable 和 longClickable 同时为 false**）。View 的 longClickable 属性默认都为 false，clickable 属性则不一定，例如 Button 的clickable 属性默认为 true，TextView 的clickable 属性默认为 false。View 的 enable 属性不影响 onTouchEvent 方法的默认返回值。即时View是 disable 状态的，只要它的 clickable 或者 longClickable 有一个为 true，则 onTouchEvent 方法就返回 true
+此外，View 的 `onTouchEvent` 方法默认都会返回 true，即消耗事件，除非 View 是不可点击的（**clickable 和 longClickable 同时为 false**）。View 的 longClickable 属性默认都为 false，clickable 属性则不一定，例如 Button 的 clickable 属性默认为 true，TextView 的 clickable 属性默认为 false。View 的 enable 属性不影响 onTouchEvent 方法的默认返回值。即时 View 是 disable 状态的，只要它的 clickable 或者 longClickable 有一个为 true，则 onTouchEvent 方法就返回 true
 
 我们可以为 View 设置 `setOnTouchListener` 方法和 `setOnClickListener` 方法，与 View 内部的 `onTouchEvent` 方法的优先级进行比较，依次是 **setOnTouchListener > onTouchEvent > setOnClickListener**
 此外，如果为 View 设置了 `setOnClickListener` 方法和 `setOnLongClickListener` 方法，则会分别将 View 的 clickable 和 longClickable 设置为 true
@@ -229,22 +229,22 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
 dispatchTouchEvent 方法和 onTouchEvent 方法的返回值存在三种情况：
 
- - 返回 true
- - 返回 false
- - 返回 父类的同名方法
+- 返回 true
+- 返回 false
+- 返回 父类的同名方法
 
-通过不断改变 Activity 与 MyTextView 中各个方法的返回值，可以得到如下所示的TouchEvent事件发布机制流程图：
+通过不断改变 Activity 与 MyTextView 中各个方法的返回值，可以得到如下所示的 TouchEvent 事件发布机制流程图：
 ![](http://upload-images.jianshu.io/upload_images/2552605-12aabc243379bdf8?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 从上面的流程图可以得出以下结论：
 
- - 触摸事件的传递流程是从 `dispatchTouchEvent` 方法开始的，如果默认返回父类的同名函数，则事件将会依照嵌套层次从外层向内层传递，到达最内层的 View 时，就由它的 `onTouchEvent` 方法进行处理。该方法返回 true 则表示消费了该事件；如果处理不了则返回 false，这时事件会重新向外层传递，并交由外层的 View、ViewGroup 或者 Activity 的 `onTouchEvent` 方法进行处理，依次类推
- - 如果事件传递在向内层传递过程中由于人为干预，事件处理函数返回 true ，则会导致事件被提前消费掉，内层 View 或 ViewGroup 将不会收到这个事件
- - View 控件的事件触发顺序是先执行 onTouch 方法，再执行 onTouchEvent 方法，onClick 方法排在最后。如果优先级高的方法返回了 true，则事件将不会继续传递
+- 触摸事件的传递流程是从 `dispatchTouchEvent` 方法开始的，如果默认返回父类的同名函数，则事件将会依照嵌套层次从外层向内层传递，到达最内层的 View 时，就由它的 `onTouchEvent` 方法进行处理。该方法返回 true 则表示消费了该事件；如果处理不了则返回 false，这时事件会重新向外层传递，并交由外层的 View、ViewGroup 或者 Activity 的 `onTouchEvent` 方法进行处理，依次类推
+- 如果事件传递在向内层传递过程中由于人为干预，事件处理函数返回 true ，则会导致事件被提前消费掉，内层 View 或 ViewGroup 将不会收到这个事件
+- View 控件的事件触发顺序是先执行 onTouch 方法，再执行 onTouchEvent 方法，onClick 方法排在最后。如果优先级高的方法返回了 true，则事件将不会继续传递
 
 ### 四、ViewGroup 的事件传递流程
 
-ViewGroup 相比 View和Activity多出了一个 `onInterceptTouchEvent(MotionEvent ev)` 方法
+ViewGroup 相比 View 和 Activity 多出了一个 `onInterceptTouchEvent(MotionEvent ev)` 方法
 首先继承 LinearLayout 类并重写其与 TouchEvent 事件发布相关的三个方法，输出相应的触摸事件类型
 ```java
 /**
@@ -337,7 +337,7 @@ Activity 的布局文件代码如下所示：
 
 </com.czy.touchevent.MyLinearLayout>
 ```
-运行程序后点击 MyTextView 控件，输出的Log如下所示：
+运行程序后点击 MyTextView 控件，输出的 Log 如下所示：
 
 ```java
 06-18 04:22:54.669 12309-12309/com.czy.touchevent E/Activity: dispatchTouchEvent  ACTION_DOWN
@@ -357,11 +357,11 @@ Activity 的布局文件代码如下所示：
 
 从上面的流程图可以得出以下结论：
 
- - ViewGroup 通过 `onInterceptTouchEvent` 方法对事件进行拦截。如果该方法返回 true，则事件不会继续传递给子View；如果返回 false 或 `super.onInterceptTouchEvent` ，则事件会继续传递给子 View
- - 在子 View 中对事件进行消费后，ViewGroup 将接收不到任何事件
+- ViewGroup 通过 `onInterceptTouchEvent` 方法对事件进行拦截。如果该方法返回 true，则事件不会继续传递给子 View；如果返回 false 或 `super.onInterceptTouchEvent` ，则事件会继续传递给子 View
+- 在子 View 中对事件进行消费后，ViewGroup 将接收不到任何事件
 
 ### 五、事件传递的“记忆”功能
 
 从上边展示的事件传递默认的方法调用顺序可以看出来，Action_Up 事件都是直接交由 Activity 进行处理，而没有传递给内部的 ViewGroup 或 View
-其实，`dispatchTouchEvent` 方法具有“记忆”功能。如果 Action_Down 事件传递给了某 ViewGroup（或者Activity），ViewGroup 默认继续向下传递交由子View进行处理，ViewGroup 会记录该事件是否被子View给消费了。那 ViewGroup 如何知道子 View 是否消费了该事件呢？如果该事件会再次向上传递给 ViewGroup 的 `onTouchEvent` 方法进行处理，那就说明子 View 没能消费掉该事件。当第二次事件（Action_Move或者Action_Up）向下传递到该 ViewGroup， ViewGroup 的 `dispatchTouchEvent` 方法会进行判断，若子 View 消费了上次的 Action_Down 事件，那么本次事件就继续向下传递交由子 View 进行处理，若上次的事件没有被子 View 所消费，那么本次的事件就不会继续向下传递了，ViewGroup 直接调用自己的 `onTouchEvent` 方法来处理该事件
-“记忆”的有效期只在单次的触摸事件中，即从Action_Down 事件开始，在 Action_Up 事件结束
+其实，`dispatchTouchEvent` 方法具有“记忆”功能。如果 Action_Down 事件传递给了某 ViewGroup（或者 Activity），ViewGroup 默认继续向下传递交由子 View 进行处理，ViewGroup 会记录该事件是否被子 View 给消费了。那 ViewGroup 如何知道子 View 是否消费了该事件呢？如果该事件会再次向上传递给 ViewGroup 的 `onTouchEvent` 方法进行处理，那就说明子 View 没能消费掉该事件。当第二次事件（Action_Move 或者 Action_Up）向下传递到该 ViewGroup， ViewGroup 的 `dispatchTouchEvent` 方法会进行判断，若子 View 消费了上次的 Action_Down 事件，那么本次事件就继续向下传递交由子 View 进行处理，若上次的事件没有被子 View 所消费，那么本次的事件就不会继续向下传递了，ViewGroup 直接调用自己的 `onTouchEvent` 方法来处理该事件
+“记忆”的有效期只在单次的触摸事件中，即从 Action_Down 事件开始，在 Action_Up 事件结束

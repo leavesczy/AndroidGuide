@@ -17,11 +17,11 @@ Android 13 在最近也发布了正式版，此次版本中新增的隐私安全
 
 在 Android 13 之前，应用如果想要访问设备中的媒体资源的话，都必须通过 READ_EXTERNAL_STORAGE 权限才能实现。从 Android 13 开始，系统将 READ_EXTERNAL_STORAGE 细分为了三个更加明确的权限，分别用于访问用户的三类媒体资源：Image、Video、Audio，从而让用户能够按需授权，避免隐私风险无序扩大
 
-| 媒体类型 | 请求权限          |
+| 媒体类型 | 请求权限 |
 | :------- | :---------------- |
-| 图片     | READ_MEDIA_IMAGES |
-| 视频     | READ_MEDIA_VIDEO  |
-| 音频     | READ_MEDIA_AUDIO  |
+| 图片 | READ_MEDIA_IMAGES |
+| 视频 | READ_MEDIA_VIDEO |
+| 音频 | READ_MEDIA_AUDIO |
 
 我们需要同时通过 **应用的 targetSdkVersion** 和 **设备的系统版本** 来适配这三个权限
 

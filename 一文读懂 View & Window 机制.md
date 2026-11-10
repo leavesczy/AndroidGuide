@@ -55,7 +55,7 @@ fun showFloatBall() {
 
 3. WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED。表示当前 Window 希望显示在锁屏界面
 
-此外，WindowManager.LayoutParams 的 type 属性就用于表示 Window 的类型。Window 有三种类型：应用 Window、子 Window、系统 Window。应用类Window 对应 Activity。子 Window 具有依赖关系，不能单独存在，需要附属在特定的父 Window 之中，比如 Dialog 就是一个子 Window。系统 Window 是需要权限才能创建的 Window，比如 Toast 和 statusBar 都是系统 Window
+此外，WindowManager.LayoutParams 的 type 属性就用于表示 Window 的类型。Window 有三种类型：应用 Window、子 Window、系统 Window。应用类 Window 对应 Activity。子 Window 具有依赖关系，不能单独存在，需要附属在特定的父 Window 之中，比如 Dialog 就是一个子 Window。系统 Window 是需要权限才能创建的 Window，比如 Toast 和 statusBar 都是系统 Window
 
 从这也可以看出，系统 Window 是处于最顶层的，所以说 type 属性也用于控制 Window 的显示层级，显示层级高的 Window 就会覆盖在显示层级低的 Window 之上。应用 Window 的层级范围是 1～99，子 Window 的层级范围是 1000～1999，系统 Window 的层级范围是 2000～2999。如果想要让我们创建的 Window 位于其它 Window 之上，那么就需要使用比较大的层级值了，但想要显示自定义的系统级 Window 的话就必须向系统申请权限了
 
@@ -591,7 +591,7 @@ void makeVisible() {
 
 # 十、一文系列
 
-最近比较倾向于只用一篇文章来写一个知识点，也懒得总是想文章标题，就一直沿用一开始用的**一文读懂XXX**，写着写着也攒了蛮多篇文章了，之前也已经写了几篇关于 View 系统的文章，希望对你有所帮助
+最近比较倾向于只用一篇文章来写一个知识点，也懒得总是想文章标题，就一直沿用一开始用的**一文读懂 XXX**，写着写着也攒了蛮多篇文章了，之前也已经写了几篇关于 View 系统的文章，希望对你有所帮助
 
 - [一文读懂 View 的 Measure、Layout、Draw 流程](https://juejin.cn/post/6939540905581887502)
 - [一文读懂 View Post 的原理及缺陷](https://juejin.cn/post/6939763855216082974)

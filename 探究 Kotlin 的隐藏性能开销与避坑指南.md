@@ -451,7 +451,7 @@ public static final void main() {
 
 # init 的声明顺序很重要
 
-看以下代码，我们可以在 init 块中调用 parameter1，却无法调用 parameter2，从 IDE 的提示信息 ` Variable 'parameter2' must be initialized` 也可以看出来，对于 init 块来说 parameter2 此时还未赋值，自然就无法使用了
+看以下代码，我们可以在 init 块中调用 parameter1，却无法调用 parameter2，从 IDE 的提示信息 `Variable 'parameter2' must be initialized` 也可以看出来，对于 init 块来说 parameter2 此时还未赋值，自然就无法使用了
 
 ```kotlin
 class KotlinMode {

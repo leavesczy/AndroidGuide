@@ -1072,7 +1072,7 @@ HandlerThread 起到的作用就是方便了主线程和子线程之间的交互
 
 ## 2、IntentService
 
-IntentService 是系统提供的 Service 子类，用于在后台串行执行耗时任务，在处理完所有任务后会自动停止，不必来手动调用 `stopSelf()` 方法。而且由于IntentService 是四大组件之一，拥有较高的优先级，不易被系统杀死，因此适合用于执行一些高优先级的异步任务
+IntentService 是系统提供的 Service 子类，用于在后台串行执行耗时任务，在处理完所有任务后会自动停止，不必来手动调用 `stopSelf()` 方法。而且由于 IntentService 是四大组件之一，拥有较高的优先级，不易被系统杀死，因此适合用于执行一些高优先级的异步任务
 
 **Google 官方以前也推荐开发者使用 IntentService，但是在 Android 11 中已经被标记为废弃状态了，但这也不妨碍我们来了解下其实现原理**
 
@@ -1379,7 +1379,7 @@ public final void removeCallbacksAndMessages(@Nullable Object token) {
 
 因为 Android 系统本身就存在很多事件需要交由 Message 来交付给 mainLooper，所以 Message 的创建是很频繁的。为了减少 Message 频繁重复创建的情况，Message 提供了 MessagePool 用于实现 Message 的缓存复用，以此来优化内存使用
 
-当 Looper 消费了 Message 后会调用 `recycleUnchecked()` 方法将 Message 进行回收，在清除了各项资源后会缓存到 sPool 变量上，同时将之前缓存的 Message 置为下一个节点 next，通过这种链表结构来缓存最多 50 个Message。这里使用到的是**享元设计模式**
+当 Looper 消费了 Message 后会调用 `recycleUnchecked()` 方法将 Message 进行回收，在清除了各项资源后会缓存到 sPool 变量上，同时将之前缓存的 Message 置为下一个节点 next，通过这种链表结构来缓存最多 50 个 Message。这里使用到的是**享元设计模式**
 
 `obtain()` 方法则会判断当前是否有可用的缓存，有的话则将 sPool 从链表中移除后返回，否则就返回一个新的 Message 实例。所以我们在发送消息的时候应该尽量通过调用 `Message.obtain()` 或者 `Handler.obtainMessage()` 方法来获取 Message 实例
 

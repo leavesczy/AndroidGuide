@@ -1,4 +1,4 @@
-> 最近一直在了解关于 **Kotlin协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
+> 最近一直在了解关于 **Kotlin 协程** 的知识，那最好的学习资料自然是官方提供的学习文档了，看了看后我就萌生了翻译官方文档的想法。前后花了要接近一个月时间，一共九篇文章，在这里也分享出来，希望对读者有所帮助。个人知识所限，有些翻译得不是太顺畅，也希望读者能提出意见
 >
 > 协程官方文档：[coroutines-guide](https://github.com/Kotlin/kotlinx.coroutines/blob/master/coroutines-guide.md)
 
@@ -65,7 +65,7 @@ fun main() = runBlocking {
 
 协程生成元素序列(sequence )的模式非常常见。这是可以经常在并发编程中发现的生产者-消费者模式的一部分。你可以将这样一个生产者抽象为一个以 channel 为参数的函数，但这与必须从函数返回结果的常识相反
 
-有一个方便的名为 product 的协程构造器，它使得在 producer 端执行该操作变得很容易；还有一个扩展函数 consumerEach，它替换了consumer 端的 for 循环：
+有一个方便的名为 product 的协程构造器，它使得在 producer 端执行该操作变得很容易；还有一个扩展函数 consumerEach，它替换了 consumer 端的 for 循环：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -152,7 +152,7 @@ fun CoroutineScope.filter(numbers: ReceiveChannel<Int>, prime: Int) = produce<In
 }
 ```
 
-现在，我们通过从2开始一个数字流，从当前通道获取一个质数，并为找到的每个质数启动新的管道：
+现在，我们通过从 2 开始一个数字流，从当前通道获取一个质数，并为找到的每个质数启动新的管道：
 
 ```kotlin
 numbersFrom(2) -> filter(2) -> filter(3) -> filter(5) -> filter(7) ... 
@@ -207,7 +207,7 @@ fun CoroutineScope.filter(numbers: ReceiveChannel<Int>, prime: Int) = produce<In
 
 # 六、扇出
 
-多个协程可以从同一个通道接收数据，在它们之间分配任务。让我们从一个周期性地生成整数（每秒10个数）的 producer 协程开始：
+多个协程可以从同一个通道接收数据，在它们之间分配任务。让我们从一个周期性地生成整数（每秒 10 个数）的 producer 协程开始：
 
 ```kotlin
 fun CoroutineScope.produceNumbers() = produce<Int> {
@@ -229,7 +229,7 @@ fun CoroutineScope.launchProcessor(id: Int, channel: ReceiveChannel<Int>) = laun
 }
 ```
 
-现在让我们启动5个处理器，让它们工作几乎一秒钟。看看会发生什么：
+现在让我们启动 5 个处理器，让它们工作几乎一秒钟。看看会发生什么：
 
 ```kotlin
 import kotlinx.coroutines.*
@@ -356,7 +356,7 @@ fun main() = runBlocking<Unit> {
 }
 ```
 
-使用了容量为4的缓冲通道，所以将打印五次：
+使用了容量为 4 的缓冲通道，所以将打印五次：
 
 ```kotlin
 Sending 0

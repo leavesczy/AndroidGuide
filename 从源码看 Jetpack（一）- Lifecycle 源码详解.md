@@ -303,7 +303,7 @@ public static void injectIfNeededIn(Activity activity) {
 `injectIfNeededIn()` 方法会根据两种情况来进行事件分发：
 
 - 运行设备的系统版本号小于 29。此情况会通过向 Activity 添加一个无 UI 界面的 Fragment（即 ReportFragment），间接获得 Activity 的各个生命周期事件的回调通知
-- 运行设备的系统版本号大于等于29。此情况会向 Activity 注册一个 LifecycleCallbacks ，以此来直接获得各个生命周期事件的回调通知。这里应该还牵扯到对旧版本 ProcessLifecycleOwner 和 support 库的兼容，所以此时也会同时执行第一种情况的操作
+- 运行设备的系统版本号大于等于 29。此情况会向 Activity 注册一个 LifecycleCallbacks ，以此来直接获得各个生命周期事件的回调通知。这里应该还牵扯到对旧版本 ProcessLifecycleOwner 和 support 库的兼容，所以此时也会同时执行第一种情况的操作
 
 之所以会进行这两种情况区分，是因为 `registerActivityLifecycleCallbacks` 中的 `onActivityPostXXX` 和 `onActivityPreXXX` 等方法是 SDK 29 时新添加的方法。当版本小于 29 时，就还是需要通过 ReportFragment 来间接取得事件通知
 
@@ -521,7 +521,7 @@ public void addObserver(@NonNull LifecycleObserver observer) {
 
 向 LifecycleObserver 回调事件的过程可以用以下这张官方提供的图来展示
 
-1. 假设当前 LifecycleRegistry 的 `mState` 处于 RESUMED 状态，此时通过 `addObserver` 方法新添加的 LifecycleObserver 会被包装为 ObserverWithState，且初始化状态为 INITIALIZED。由于 RESUMED 大于INITIALIZED，ObserverWithState 就会按照 `INITIALIZED -> CREATED -> STARTED -> RESUMED ` 这样的顺序先后收到事件通知
+1. 假设当前 LifecycleRegistry 的 `mState` 处于 RESUMED 状态，此时通过 `addObserver` 方法新添加的 LifecycleObserver 会被包装为 ObserverWithState，且初始化状态为 INITIALIZED。由于 RESUMED 大于 INITIALIZED，ObserverWithState 就会按照 `INITIALIZED -> CREATED -> STARTED -> RESUMED` 这样的顺序先后收到事件通知
 2. 假设当前 LifecycleRegistry 的 `mState` 处于 STARTED 状态。如果 LifecycleRegistry 收到 ON_RESUME 事件，`mState` 就需要变更为 RESUMED；如果 LifecycleRegistry 收到 ON_STOP 事件，`mState` 就需要变更为 CREATED；所以说，LifecycleRegistry 的 `mState` 会先后向不同方向迁移
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5314c16fe94b47569f16e34e5f308fdd~tplv-k3u1fbpfcp-zoom-1.image)

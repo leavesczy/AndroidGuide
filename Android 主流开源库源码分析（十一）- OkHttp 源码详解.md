@@ -624,7 +624,7 @@ class LogInterceptor : Interceptor {
 
 }
 ```
-Interceptor 的实现初衷是为了给开发者提供一个可以控制网络请求的**发起过程**及**收尾工作**的入口，例如**添加 header、日志记录、请求拦截、ResponseBody修改 **等，每个 Interceptor 只负责自己关心的操作，那么势必就会有添加多个 Interceptor 的需求
+Interceptor 的实现初衷是为了给开发者提供一个可以控制网络请求的**发起过程**及**收尾工作**的入口，例如**添加 header、日志记录、请求拦截、ResponseBody 修改**等，每个 Interceptor 只负责自己关心的操作，那么势必就会有添加多个 Interceptor 的需求
 
 我们知道，只有让每个 Interceptor 都依次处理完 request 之后，OkHttp 才能根据最终的 request 对象去联网请求得到 response，所以每个 Interceptor 需要依次拿到 request 进行自定义处理。请求到 response 后，Interceptor 可能还需要对 response 进行处理，那么就还需要将 response 再依次传递给每个 Interceptor。那么，怎么实现将多个 Interceptor 给串联起来呢？
 

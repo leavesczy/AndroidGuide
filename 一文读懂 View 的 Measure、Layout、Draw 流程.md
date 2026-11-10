@@ -36,11 +36,11 @@ public static class MeasureSpec {
 
 三种测量模式的含义：
 
-| mode        | 含义                                                         |
+| mode | 含义 |
 | ----------- | ------------------------------------------------------------ |
 | UNSPECIFIED | ViewGroup 对于 View 没有任何限制，View 可以拿到任意想要的 size |
-| EXACTLY     | View 本身设定了确切大小的 size。例如，View 的宽度设置为了 match_parent 或者具体的 dp 值，match_parent 即占满父容器，对于 View 来说也属于精准值 |
-| AT_MOST     | size 是 View 能够占据的最大空间，View 的最终大小不能超出该范围。对应 wrap_content，View 可以在父容器可以容纳的范围内申请空间 |
+| EXACTLY | View 本身设定了确切大小的 size。例如，View 的宽度设置为了 match_parent 或者具体的 dp 值，match_parent 即占满父容器，对于 View 来说也属于精准值 |
+| AT_MOST | size 是 View 能够占据的最大空间，View 的最终大小不能超出该范围。对应 wrap_content，View 可以在父容器可以容纳的范围内申请空间 |
 
 在进行自定义 View 的时候，系统会自动构造出 MeasureSpec 对象并回调给 View 的 `onMeasure(int widthMeasureSpec, int heightMeasureSpec)` 方法，在此方法中我们就需要根据实际情况来计算出 View 应该且可以占有的尺寸值
 

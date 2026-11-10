@@ -879,12 +879,12 @@ public interface RejectedExecutionHandler {
 
 ThreadPoolExecutor 提供了以下几种拒绝策略，默认使用的是 AbortPolicy
 
-| 实现类              | 策略                                                         |
+| 实现类 | 策略 |
 | ------------------- | ------------------------------------------------------------ |
-| AbortPolicy         | 直接抛出异常，是 ThreadPoolExecutor 的默认策略               |
-| DiscardPolicy       | 直接丢弃该任务，不做任何响应也不会抛出异常                   |
+| AbortPolicy | 直接抛出异常，是 ThreadPoolExecutor 的默认策略 |
+| DiscardPolicy | 直接丢弃该任务，不做任何响应也不会抛出异常 |
 | DiscardOldestPolicy | 如果线程池未被停止，则将工作队列中最老的任务丢弃，然后尝试接纳该任务 |
-| CallerRunsPolicy    | 如果线程池未被停止，则直接在客户端线程上执行该任务           |
+| CallerRunsPolicy | 如果线程池未被停止，则直接在客户端线程上执行该任务 |
 
 任务的拒绝策略只会在提交任务的时候被触发，即只在 `execute(Runnable command)` 方法中被触发到。`execute(Runnable command)` 方法会判断当前状态是否允许接受该任务，如果不允许的话则会走拒绝任务的流程
 
@@ -1068,4 +1068,4 @@ public static ScheduledExecutorService newSingleThreadScheduledExecutor(
 
 # 七、参考资料
 
-[Java线程池实现原理及其在美团业务中的实践](https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html)
+[Java 线程池实现原理及其在美团业务中的实践](https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html)

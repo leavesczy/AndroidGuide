@@ -90,7 +90,7 @@ class CircleDetailsActivity : AppCompatActivity() {
 这种方式就会导致三个问题：
 
 - 当用户在 CircleDetailsActivity 改变了圈子的关注状态后返回，CircleListActivity 从后台回到前台后才会收到 focusLiveData 的事件通知，此时才会触发执行动画。而在这种情况下我们并不希望用户看到动画效果，而是希望能够在 CircleListActivity 改变关注状态的同时就实时在触发动画了。此时使用 LiveData 就无法满足我们的需求了，LiveData 不支持在 Activity 处于 onStop 状态时下发通知
-- 如果在 CircleDetailsActivity 先后改变了多个圈子的关注状态的话，那么就会导致另一个问题：中间值被最新值直接掩盖了。这也是由于LiveData 不支持在 Activity 处于 onStop 状态时下发通知导致的
+- 如果在 CircleDetailsActivity 先后改变了多个圈子的关注状态的话，那么就会导致另一个问题：中间值被最新值直接掩盖了。这也是由于 LiveData 不支持在 Activity 处于 onStop 状态时下发通知导致的
 - 在 focusLiveData 已经有值的情况下，当用户第一次打开 CircleListActivity 时，就会收到 focusLiveData 的回调通知。而此时 CircleListActivity 的数据会从服务器获取，可以保证是最新的，并不需要本地值的回调通知，此时 focusLiveData 就相当于脏数据了。这种情况下，LiveData 也会给我们带来困扰，其黏性消息其实就相当于脏数据了
 
 # 五、EventLiveData

@@ -35,14 +35,14 @@ dpi 是一个很重要的值，指的是在系统软件上指定的单位尺寸�
 
 dpi 决定了应用在显示 drawable 时是选择哪一个文件夹内的切图。每个 drawable 文件夹都对应不同的 dpi 大小，Android 系统会自动根据当前手机的实际 dpi 大小从合适的 drawable 文件夹内选取图片，不同的后缀名对应的 dpi 大小就如以下表格所示。**如果 drawable 文件夹名不带后缀，那么该文件夹就对应 160dpi**
 
-| drawable | dpi     |
+| drawable | dpi |
 | -------- | ------- |
-| ldpi     | 120 dpi |
-| mdpi     | 160 dpi |
-| hdpi     | 240 dpi |
-| xhdpi    | 320 dpi |
-| xxhdpi   | 480 dpi |
-| xxxhdpi  | 640 dpi |
+| ldpi | 120 dpi |
+| mdpi | 160 dpi |
+| hdpi | 240 dpi |
+| xhdpi | 320 dpi |
+| xxhdpi | 480 dpi |
+| xxxhdpi | 640 dpi |
 
 举个例子。对于 320dpi 的设备来说，应用在选择图片时就会优先从 `drawable-xhdpi` 文件夹拿，如果该文件夹内没找到图片，就会依照 `xxhdpi -> xxxhdpi -> hdpi -> mdpi -> ldpi` 的顺序进行查找，**优先使用高密度版本，然后从中选择最接近当前屏幕密度的图片资源**
 
@@ -76,7 +76,7 @@ BitmapMainActivity: bitmap byteCount: 8294400
 ```
 
 - 由于模拟器的 density 等于 3，所以 ImageView 的宽高都是 540 px
-- Bitmap 的宽高还是保持其原有大小，即1920 x 1080 px
+- Bitmap 的宽高还是保持其原有大小，即 1920 x 1080 px
 - ARGB_8888 代表的是该 Bitmap 的编码格式，该格式下一个像素点需要占用 4 byte
 - `inDensity` 代表的是系统最终选择的 drawable 文件夹类型，等于 480 说明取的是 `drawable-xxhdpi` 文件夹下的图片
 - `inTargetDensity` 代表的是当前设备的 dpi
@@ -158,7 +158,7 @@ Bitmap.Config 定义了四种常见的编码格式，分别是：
 - ALPHA_8。每个像素点需要一个字节的内存，只存储位图的透明度，没有颜色信息
 - ARGB_4444。A(Alpha)、R(Red)、G(Green)、B（Blue）各占四位精度，共计十六位的精度，折合两个字节，也就是说一个像素点占两个字节的内存，会存储位图的透明度和颜色信息
 - ARGB_8888。ARGB 各占八个位的精度，折合四个字节，会存储位图的透明度和颜色信息
-- RGB_565。R占五位精度，G占六位精度，B占五位精度，一共是十六位精度，折合两个字节，只存储颜色信息，没有透明度信息
+- RGB_565。R 占五位精度，G 占六位精度，B 占五位精度，一共是十六位精度，折合两个字节，只存储颜色信息，没有透明度信息
 
 # 7、优化 Bitmap
 

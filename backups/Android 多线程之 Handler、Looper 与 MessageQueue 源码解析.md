@@ -9,7 +9,7 @@
 - Handler：主线程或者子线程通过 Handler 向 MessageQueue（消息队列） 发送 Message，以此来触发定时任务或者更新 UI
 - MessageQueue：通过 Handler 发送的消息并非是立即执行的，需要存入消息队列中来依次执行，消息队列中的任务依照消息的优先级高低（延时时间的长短）来顺序存放
 - Looper：Looper 用于从 MessageQueue 中循环获取消息并将之传递给消息处理者（即消息发送者 Handler 本身）来进行处理，每条 Message 都有个 target 变量用来指向消息的发送者本身，以此把 Message 和其处理者关联起来
-- 互斥机制：可能会有多条线程（1条 UI 线程，n 条子线程）同时向同一个消息队列插入消息，此时就需要有同步机制来保证消息的有序性以避免竞态
+- 互斥机制：可能会有多条线程（1 条 UI 线程，n 条子线程）同时向同一个消息队列插入消息，此时就需要有同步机制来保证消息的有序性以避免竞态
 
 先从开发者日常的使用方法作为入口，以此来分析其整个流程的走向
 
@@ -369,7 +369,7 @@ Message next() {
 }
 ```
 
-`next()` 方法又是通过 `Looper` 类的 `loop()` 方法来循环调用的，而 `loop()` 方法也是一个无限循环，唯一跳出循环的条件就是 `queue.next()` 方法返回为null ，细心的读者可能已经发现了，`loop()` 就是在 `ActivityThread` 的 `main()` 函数中调用的
+`next()` 方法又是通过 `Looper` 类的 `loop()` 方法来循环调用的，而 `loop()` 方法也是一个无限循环，唯一跳出循环的条件就是 `queue.next()` 方法返回为 null ，细心的读者可能已经发现了，`loop()` 就是在 `ActivityThread` 的 `main()` 函数中调用的
 
 因为 `next()` 方法是一个阻塞操作，所以当没有消息也会导致 `loop()` 方法一只阻塞着，而当 MessageQueue 一中有了新的消息，Looper 就会及时地处理这条消息并调用 `Message.target.dispatchMessage(Message)` 方法将消息传回给 Handler 进行处理
 

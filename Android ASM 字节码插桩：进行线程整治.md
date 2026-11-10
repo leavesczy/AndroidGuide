@@ -64,7 +64,7 @@ class OptimizedThread(runnable: Runnable?, name: String?, className: String) :
 
 }
 ```
-之后，在 Transform 阶段只要遍历到指向 `java/lang/Thread ` 的 TypeInsnNode，且不是包含在 ThreadFactory 内部的话，那就是要处理的匿名线程了
+之后，在 Transform 阶段只要遍历到指向 `java/lang/Thread` 的 TypeInsnNode，且不是包含在 ThreadFactory 内部的话，那就是要处理的匿名线程了
 
 ```kotlin
 class OptimizedThreadTransform(private val config: OptimizedThreadConfig) : BaseTransform() {
@@ -128,7 +128,7 @@ class OptimizedThreadTransform(private val config: OptimizedThreadConfig) : Base
 
 }
 ```
-找到到目标指令后，就将 `java/lang/Thread ` 替换为 OptimizedThread，然后继续向后遍历找到调用 Thread 构造参数的指令，为该指令多插入一个 String 类型的方法入参参数声明，然后将 className 作为构造参数传给 OptimizedThread，至此就完成替换了
+找到到目标指令后，就将 `java/lang/Thread` 替换为 OptimizedThread，然后继续向后遍历找到调用 Thread 构造参数的指令，为该指令多插入一个 String 类型的方法入参参数声明，然后将 className 作为构造参数传给 OptimizedThread，至此就完成替换了
 
 ```kotlin
 private fun transformNew(

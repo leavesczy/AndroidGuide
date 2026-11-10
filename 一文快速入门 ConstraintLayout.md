@@ -157,7 +157,7 @@ ConstraintLayout 最基本的属性包含以下几个，即 `layout_constraintXX
 
 在使用其它布局类型时，如果想让控件在不同的屏幕上都保持固定的宽高比是比较麻烦的，但用 ConstraintLayout 就很简单。例如，如果我们想为 Activity 实现一个固定宽高比的顶部标题栏的话，可以将宽度设置为占满屏幕，高设置为 0dp，然后通过 `app:layout_constraintDimensionRatio` 属性设定宽高比为一个固定比例，此时 ConstraintLayout 就会自动根据屏幕的宽度来动态计算标题栏应该具有的高度
 
-此外，要使用 `layout_constraintDimensionRatio` 属性，需要其宽度或者高度当中有一个值是**可知的**，且剩下的一个是 0dp。所谓的**可知**，即该值是已经具备了明确的约束条件。控件的宽高尺寸比例则通过 “float值” 或者 “宽度 : 高度” 的形式来设置，通过在比例值的前面添加 w 或者 h 来指明比例值是根据宽度还是高度来进行计算
+此外，要使用 `layout_constraintDimensionRatio` 属性，需要其宽度或者高度当中有一个值是**可知的**，且剩下的一个是 0dp。所谓的**可知**，即该值是已经具备了明确的约束条件。控件的宽高尺寸比例则通过 “float 值” 或者 “宽度 : 高度” 的形式来设置，通过在比例值的前面添加 w 或者 h 来指明比例值是根据宽度还是高度来进行计算
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -384,7 +384,7 @@ ConstraintLayout 也可以像 LinearLayout 一样为子控件设置 `layout_weig
 
 1. app:layout_constraintCircle - 目标 View 的 ID
 2. app:layout_constraintCircleAngle - 对齐的角度
-3. app:layout_constraintCircleRadius  - 与目标 View 之间的距离（顺时针方向，0~360度）
+3. app:layout_constraintCircleRadius  - 与目标 View 之间的距离（顺时针方向，0~360 度）
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/13a0d5b1164348b28232f0f1d71287d3~tplv-k3u1fbpfcp-zoom-1.image)
 
@@ -1080,16 +1080,16 @@ ImageFilterView 是放在 ConstraintLayout 的 `utils.widget` 包下的一个 Vi
 
 ImageFilterView 直接继承于 AppCompatImageView，在其基础上扩展了很多用于实现图形变换的功能
 
-| 属性         | 含义                                                         |
+| 属性 | 含义 |
 | ------------ | ------------------------------------------------------------ |
-| altSrc       | 用于指定要从 src 变换成的目标图片，可以依靠 crossfade 来实现淡入淡出 |
-| crossfade    | 设置 src 和 altSrc 两张图片之间的混合程度。0=src 1=altSrc图像 |
-| saturation   | 饱和度。0=灰度，1=原始，2=过饱和                             |
-| brightness   | 亮度。0=黑色，1=原始，2=两倍亮度                             |
-| warmth       | 色温。1=自然，2=暖色，0.5=冷色                               |
-| contrast     | 对比度。1=不变，0=灰色，2=高对比度                           |
-| round        | 用于实现圆角，以 dimension 为值                              |
-| roundPercent | 用于实现圆角，取值在 0f-1f 之间，为 1f 时将形成一张圆形图片  |
+| altSrc | 用于指定要从 src 变换成的目标图片，可以依靠 crossfade 来实现淡入淡出 |
+| crossfade | 设置 src 和 altSrc 两张图片之间的混合程度。0=src 1=altSrc 图像 |
+| saturation | 饱和度。0=灰度，1=原始，2=过饱和 |
+| brightness | 亮度。0=黑色，1=原始，2=两倍亮度 |
+| warmth | 色温。1=自然，2=暖色，0.5=冷色 |
+| contrast | 对比度。1=不变，0=灰色，2=高对比度 |
+| round | 用于实现圆角，以 dimension 为值 |
+| roundPercent | 用于实现圆角，取值在 0f-1f 之间，为 1f 时将形成一张圆形图片 |
 
 看个例子。在 xml 中声明多个 ImageFilterView
 

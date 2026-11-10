@@ -51,9 +51,9 @@ Coil 一共包含五个组件，可以在 `mavenCentral()` 上获取到
 
 - `io.coil-kt:coil-base`。基础组件，提供了基本的图片请求、图片解码、图片缓存、Bitmap 复用等功能
 - `io.coil-kt:coil`。默认组件，依赖于 `io.coil-kt:coil-base`，提供了 Coil 类的单例对象以及 ImageView 相关的扩展函数
-- `io.coil-kt:coil-gif`。包含两个 [decoder](https://coil-kt.github.io/coil/api/coil-base/coil.decode/-decoder/) 用于支持解码 GIFs，有关更多详细信息，请参见 [GIF](https://coil-kt.github.io/coil/gifs/)
-- `io.coil-kt:coil-svg`。包含一个 [decoder](https://coil-kt.github.io/coil/api/coil-base/coil.decode/-decoder) 用于支持解码 SVG。有关更多详细信息，请参见 [SVG](https://coil-kt.github.io/coil/svgs/)
-- `io.coil-kt:coil-video`。包含两个 [fetchers](https://coil-kt.github.io/coil/api/coil-base/coil.fetch/-fetcher) 用于支持读取和解码 [任何 Android 的支持的视频格式](https://developer.android.com/guide/topics/media/media-formats#video-codecs) 的视频帧。有关更多详细信息，请参见 [videos](https://coil-kt.github.io/coil/videos/)
+- `io.coil-kt:coil-gif`。包含两个 [decoder](https://coil-kt.github.io/coil/api/) 用于支持解码 GIFs，有关更多详细信息，请参见 [GIF](https://coil-kt.github.io/coil/gifs/)
+- `io.coil-kt:coil-svg`。包含一个 [decoder](https://coil-kt.github.io/coil/api/) 用于支持解码 SVG。有关更多详细信息，请参见 [SVG](https://coil-kt.github.io/coil/svgs/)
+- `io.coil-kt:coil-video`。包含两个 [fetchers](https://coil-kt.github.io/coil/api/) 用于支持读取和解码 [任何 Android 的支持的视频格式](https://developer.android.com/guide/topics/media/media-formats#video-codecs) 的视频帧。有关更多详细信息，请参见 [videos](https://coil-kt.github.io/coil/videos/)
 
 引入如下依赖就包含了 Coil 最基础的图片加载功能
 
@@ -138,7 +138,7 @@ val drawable = imageLoader.execute(request).drawable
 
 Coil 开箱即用，与 R8 完全兼容，不需要添加任何额外规则
 
-如果你使用了 Proguard，你可能需要添加对应的混淆规则：[Coroutines](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/resources/META-INF/proguard/coroutines.pro)、[OkHttp](https://github.com/square/okhttp/blob/master/okhttp/src/main/resources/META-INF/proguard/okhttp3.pro) and [Okio](https://github.com/square/okio/blob/master/okio/src/jvmMain/resources/META-INF/proguard/okio.pro)。
+如果你使用了 Proguard，你可能需要添加对应的混淆规则：[Coroutines](https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/resources/META-INF/proguard/coroutines.pro)、[OkHttp](https://github.com/square/okhttp/blob/parent-4.12.0/okhttp/src/main/resources/META-INF/proguard/okhttp3.pro) and [Okio](https://github.com/square/okio)。
 
 ## 6、License
 
@@ -700,7 +700,7 @@ private suspend inline fun executeChain(
 1. 通过 fetcher 来执行磁盘加载或者网络请求，得到 fetchResult，执行下一步
 2. 如果 fetchResult 属于 DrawableResult 的话，那么就已经拿到目标图片类型 Drawable 了，那么直接返回，结束流程
 3. 如果 fetchResult 属于 SourceResult 类型，即拿到的数据类型是 BufferedSource，此时还需要转码为 Drawable，执行下一步
-4. 先判断本次请求是否属于**预加载**，即可能外部现在不需要使用到该图片，只是想先将图片缓存到本地磁盘，方便后续能够快速加载。预加载的判断标准就是：**异步请求 + target 为null + 不允许缓存到内存中**。属于预加载的话就不需要将加载到的图片进行转码了，此时就使用 EmptyDecoder，否则就还是需要去找能进行实际转码的 Decoder。拿到 Decoder 后就执行下一步
+4. 先判断本次请求是否属于**预加载**，即可能外部现在不需要使用到该图片，只是想先将图片缓存到本地磁盘，方便后续能够快速加载。预加载的判断标准就是：**异步请求 + target 为 null + 不允许缓存到内存中**。属于预加载的话就不需要将加载到的图片进行转码了，此时就使用 EmptyDecoder，否则就还是需要去找能进行实际转码的 Decoder。拿到 Decoder 后就执行下一步
 5. 通过 Decoder 完成图片转码，得到 Drawable，结束流程
 
 ```kotlin

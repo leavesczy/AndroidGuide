@@ -986,7 +986,7 @@ final class _ARouter {
     
 }
 ```
-`interceptorService` 变量属于 `InterceptorService` 接口类型，该接口的实现类是 `InterceptorServiceImpl`，ARouter内部在初始化的过程中也是根据控制反转的方式来拿到 `interceptorService` 这个实例的
+`interceptorService` 变量属于 `InterceptorService` 接口类型，该接口的实现类是 `InterceptorServiceImpl`，ARouter 内部在初始化的过程中也是根据控制反转的方式来拿到 `interceptorService` 这个实例的
 
 `InterceptorServiceImpl` 的主要逻辑是：
 

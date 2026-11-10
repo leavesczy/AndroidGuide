@@ -12,19 +12,19 @@ Compose Multiplatform 可以看做是 Jetpack Compose 的超集，在 Jetpack Co
 
 Compose Multiplatform 支持市面上的大部分主流平台：
 
-| Target platform                    | Target preset                                                |
+| Target platform | Target preset |
 | ---------------------------------- | ------------------------------------------------------------ |
-| Kotlin/JVM                         | jvm                                                          |
-| Kotlin/JS                          | js                                                           |
-| Android applications and libraries | android                                                      |
-| Android NDK                        | androidNativeArm32、androidNativeArm64、androidNativeX86、androidNativeX64 |
-| iOS                                | iosArm32、iosArm64、iosX64、iosSimulatorArm64                |
-| watchOS                            | watchosArm32、watchosArm64、watchosX86、watchosX64、watchosSimulatorArm64 |
-| tvOS                               | tvosArm64、tvosX64、tvosSimulatorArm64                       |
-| macOS                              | macosX64、macosArm64                                         |
-| Linux                              | linuxArm64、linuxArm32Hfp、linuxMips32、linuxMipsel32、linuxX64 |
-| Windows                            | mingwX64、mingwX86                                           |
-| WebAssembly                        | wasm32                                                       |
+| Kotlin/JVM | jvm |
+| Kotlin/JS | js |
+| Android applications and libraries | android |
+| Android NDK | androidNativeArm32、androidNativeArm64、androidNativeX86、androidNativeX64 |
+| iOS | iosArm32、iosArm64、iosX64、iosSimulatorArm64 |
+| watchOS | watchosArm32、watchosArm64、watchosX86、watchosX64、watchosSimulatorArm64 |
+| tvOS | tvosArm64、tvosX64、tvosSimulatorArm64 |
+| macOS | macosX64、macosArm64 |
+| Linux | linuxArm64、linuxArm32Hfp、linuxMips32、linuxMipsel32、linuxX64 |
+| Windows | mingwX64、mingwX86 |
+| WebAssembly | wasm32 |
 
 Compose Multiplatform 通过用不同的编译器编译同一份代码来生成各端的不同产物，从而达到跨平台的目的，最终的编译产物和目标平台完全相容。例如，通过 Kotlin/JVM 为 JVM 和 Android 平台生成 jar/aar 文件、通过 Kotlin/Native 为 IOS 平台生成 framework 文件、通过 Kotlin/JS 为 Web 平台生成 JavaScript 文件，最终调用的还是原生 API，这使得采用 Compose Multiplatform 不会导致性能损耗，且不会像 Flutter 那样明显增大应用体积
 
@@ -246,7 +246,7 @@ fun DesktopMainScreen() {
 ```
 # 复用业务逻辑
 
-实现跨端复用业务逻辑的思路可以参考一位开发者在 GitHub 上和 JetBrains 官方的讨论：[Useful reading about porting Android apps to Desktop](https://github.com/JetBrains/compose-jb/discussions/1587)
+实现跨端复用业务逻辑的思路可以参考 JetBrains 官方文档：[Compose Multiplatform 入门](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-getting-started.html)
 
 该开发者有一个已经在 Android 平台实现的应用，准备移植到 Windows 平台，在 Android 平台上该开发者通过 ViewModel 来承载具体的业务逻辑，其希望该逻辑能够在 Windows 平台上进行复用
 

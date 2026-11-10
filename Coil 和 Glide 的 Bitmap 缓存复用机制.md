@@ -48,7 +48,7 @@ implementation "io.coil-kt:coil:1.2.0"
 
 JDK 中的 ThreadPoolExecutor 相信大多数开发者都很熟悉，我们一般将之称为“线程池”。**池化**是一个很常见的概念，其目的都是为了实现对象复用，例如 ThreadPoolExecutor 就实现了线程的复用机制
 
-在 Android 系统中也有着“池化”概念的实现。因为系统本身存在很多事件需要通过 Message 来交付给 Looper 进行处理，所以 Message 的创建是很频繁的。为了减少 Message 频繁重复创建的情况，Message 提供了 MessagePool 用于实现 Message 的缓存复用，以此来优化内存使用。当 Looper 消费了 Message 后会调用 `recycleUnchecked()` 方法将 Message 进行回收，在清除了各项资源后会缓存到 `sPool` 变量上，同时将之前缓存的 Message 置为下一个节点 next，通过这种链表结构来缓存最多 50 个Message。`obtain()` 方法则会判断当前是否有可用的缓存，有的话则将 `sPool` 从链表中移除后返回，否则就返回一个新的 Message 实例。所以我们在发送消息的时候应该尽量通过调用 `Message.obtain()` 或者 `Handler.obtainMessage()` 方法来获取 Message 实例
+在 Android 系统中也有着“池化”概念的实现。因为系统本身存在很多事件需要通过 Message 来交付给 Looper 进行处理，所以 Message 的创建是很频繁的。为了减少 Message 频繁重复创建的情况，Message 提供了 MessagePool 用于实现 Message 的缓存复用，以此来优化内存使用。当 Looper 消费了 Message 后会调用 `recycleUnchecked()` 方法将 Message 进行回收，在清除了各项资源后会缓存到 `sPool` 变量上，同时将之前缓存的 Message 置为下一个节点 next，通过这种链表结构来缓存最多 50 个 Message。`obtain()` 方法则会判断当前是否有可用的缓存，有的话则将 `sPool` 从链表中移除后返回，否则就返回一个新的 Message 实例。所以我们在发送消息的时候应该尽量通过调用 `Message.obtain()` 或者 `Handler.obtainMessage()` 方法来获取 Message 实例
 
 ```java
 public final class Message implements Parcelable {

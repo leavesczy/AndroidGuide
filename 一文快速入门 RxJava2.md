@@ -109,10 +109,10 @@ Observer<Integer> observer =
 
 被观察者发送的事件类型有以下几种
 
-| 事件种类     | 作用                                                         |
+| 事件种类 | 作用 |
 | ------------ | ------------------------------------------------------------ |
-| onNext()     | 发送该事件时，观察者会回调 onNext() 方法                     |
-| onError()    | 发送该事件时，观察者会回调 onError() 方法，当发送该事件之后，其他事件将不会继续发送 |
+| onNext() | 发送该事件时，观察者会回调 onNext() 方法 |
+| onError() | 发送该事件时，观察者会回调 onError() 方法，当发送该事件之后，其他事件将不会继续发送 |
 | onComplete() | 发送该事件时，观察者会回调 onComplete() 方法，当发送该事件之后，其他事件将不会继续发送 |
 
 下面来讲解 RxJava 中各种常见的操作符
@@ -737,7 +737,7 @@ Observable.fromIterable(listArrayList).flatMap(new Function<List<String>, Observ
 
 ## 1、concat() & concatArray()
 
-用于将多个观察者组合在一起，然后按照参数的传入顺序发送事件，`concat()` 最多只可以发送4个事件
+用于将多个观察者组合在一起，然后按照参数的传入顺序发送事件，`concat()` 最多只可以发送 4 个事件
 
 ```java
         Observable.concat(Observable.just(1, 2),
@@ -1778,13 +1778,13 @@ Observable.create(new ObservableOnSubscribe<Integer>() {
 10-06 07:54:02.869 12629-12629/leavesc.hello.rxjavademo E/MainActivity: onComplete
 ```
 
-| 调度器                         | 作用                                       |
+| 调度器 | 作用 |
 | ------------------------------ | ------------------------------------------ |
-| Schedulers.computation( )      | 用于使用计算任务，如事件循环和回调处理     |
-| Schedulers.immediate( )        | 当前线程                                   |
-| Schedulers.io( )               | 用于 IO 密集型任务，如果异步阻塞 IO 操作。 |
-| Schedulers.newThread( )        | 创建一个新的线程                           |
-| AndroidSchedulers.mainThread() | Android 的 UI 线程，用于操作 UI。          |
+| Schedulers.computation( ) | 用于使用计算任务，如事件循环和回调处理 |
+| Schedulers.immediate( ) | 当前线程 |
+| Schedulers.io( ) | 用于 IO 密集型任务，如果异步阻塞 IO 操作。 |
+| Schedulers.newThread( ) | 创建一个新的线程 |
+| AndroidSchedulers.mainThread() | Android 的 UI 线程，用于操作 UI。 |
 
 # 六、过滤操作符
 

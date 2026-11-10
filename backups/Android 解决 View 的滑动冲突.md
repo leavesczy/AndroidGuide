@@ -41,7 +41,7 @@ public boolean onInterceptTouchEvent(MotionEvent event) {
 ```
 - 根据实际的业务需求，判断是否需要处理 ACTION_MOVE 事件，如果父 View 需要处理则返回 true，否则返回 false 并交由子 View 去处理
 - ACTION_DOWN 事件需要返回 false，父容器不能进行拦截，否则根据 View 的事件分发机制，后续的 ACTION_MOVE 与 ACTION_UP 事件都将默认交由父容器进行处理
-- 原则上 ACTION_UP 事件也需要返回 false，如果返回 true，那么子 View 将接收不到 ACTION_UP 事件，子 View 的onClick 事件也无法触发
+- 原则上 ACTION_UP 事件也需要返回 false，如果返回 true，那么子 View 将接收不到 ACTION_UP 事件，子 View 的 onClick 事件也无法触发
 
 ### 二、内部拦截法
 
@@ -92,7 +92,7 @@ public boolean onInterceptTouchEvent(MotionEvent event) {
     }
 }
 ```
-- 内部拦截法要求父容器不能拦截 ACTION_DOWN 事件，否则一旦父容器拦截 ACTION_DOWN 事件，那么后续的触摸事件都不会传递给子View
+- 内部拦截法要求父容器不能拦截 ACTION_DOWN 事件，否则一旦父容器拦截 ACTION_DOWN 事件，那么后续的触摸事件都不会传递给子 View
 - 滑动策略的逻辑放在子 View 的 `dispatchTouchEvent` 方法的 ACTION_MOVE 事件中，如果父容器需要处理事件则调用 `parent.requestDisallowInterceptTouchEvent(false)` 方法让父容器去拦截事件
 
 ### 三、滑动冲突实例

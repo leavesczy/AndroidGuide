@@ -2,7 +2,7 @@
 >
 > 项目主页：https://github.com/leavesczy/AndroidGuide
 >
-> 想要了解 HandlerThread 的工作原理需要先对 Android 系统中以 Handler、Looper、MessageQueue 组成的异步消息处理机制有所了解，如果你还没有这方面的知识，可以先看我写的另一篇文章：[Handler、Looper与MessageQueue源码解析](https://github.com/leavesczy/AndroidGuide/blob/master/android_multithreading/Android多线程之Handler、Looper与MessageQueue源码解析.md)
+> 想要了解 HandlerThread 的工作原理需要先对 Android 系统中以 Handler、Looper、MessageQueue 组成的异步消息处理机制有所了解，如果你还没有这方面的知识，可以先看我写的另一篇文章：[Handler、Looper 与 MessageQueue 源码解析](<Android 多线程之 Handler、Looper 与 MessageQueue 源码解析.md>)
 
 #### 一、概述
 

@@ -1,10 +1,10 @@
-对于Android 6.0以下的系统，App在安装时会生成一个权限列表，用户只有在同意之后才能完成App的安装，使得我们想要使用某个App，就要忍受其一些不必要的权限，当然我们也可以对单个权限进行授权或者解除。
+对于 Android 6.0 以下的系统，App 在安装时会生成一个权限列表，用户只有在同意之后才能完成 App 的安装，使得我们想要使用某个 App，就要忍受其一些不必要的权限，当然我们也可以对单个权限进行授权或者解除。
 
-在Android 6.0开始，App可以直接安装，然后在运行时请求用户授予权限，系统会弹出一个对话框（这个Dialog不能由开发者定制）让用户决定是否授予某个权限给App。
+在 Android 6.0 开始，App 可以直接安装，然后在运行时请求用户授予权限，系统会弹出一个对话框（这个 Dialog 不能由开发者定制）让用户决定是否授予某个权限给 App。
 
-Google将系统权限分为两类
+Google 将系统权限分为两类
 一类是 `Normal Permissions`，这类权限一般不涉及用户隐私，安装即授权，不需要每次使用时都检查权限，比如访问网络、蓝牙、震动等。
-另一类是 `Dangerous Permission`，一般是涉及到用户隐私的，需要用户进行授权，比如读写SDCard、发送短信、访问通讯录等。
+另一类是 `Dangerous Permission`，一般是涉及到用户隐私的，需要用户进行授权，比如读写 SDCard、发送短信、访问通讯录等。
 
 ### 一、Normal Permissions
 
@@ -106,9 +106,9 @@ adb shell pm list permissions -d -g
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-26dbf36c79f22372?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-如果App运行在Android 6.0以上的系统中，如果申请某个危险的权限，假设App已被用户授予了同一组的某个危险权限，那么系统会立即授权而不需要用户再次确认。
+如果 App 运行在 Android 6.0 以上的系统中，如果申请某个危险的权限，假设 App 已被用户授予了同一组的某个危险权限，那么系统会立即授权而不需要用户再次确认。
 此外，申请时弹出的对话框之上的权限说明也是对整个权限组的说明，而不是单个权限。
-需要注意的是，如果App运行在Android 5.1 (API level 22)或更低级别的设备中，或者targetSdkVersion<=22时（此时设备可以是Android 6.0 (API level 23)或者更高），在系统中仍将采用旧的权限管理策略，系统会要求用户在安装的时候授予所有权限。
+需要注意的是，如果 App 运行在 Android 5.1 (API level 22)或更低级别的设备中，或者 targetSdkVersion<=22 时（此时设备可以是 Android 6.0 (API level 23)或者更高），在系统中仍将采用旧的权限管理策略，系统会要求用户在安装的时候授予所有权限。
 
 运行时权限涉及到的常量与方法有以下几个：
 
@@ -153,14 +153,14 @@ public void onRequestPermissionsResult(int requestCode, @NonNull String[] permis
 
 新建一个工程，进行拨打电话以及发送短信权限的申请操作
 
-同样要在AndroidManifest中进行权限声明
+同样要在 AndroidManifest 中进行权限声明
 
 ```java
  <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
 ```
 
-确保此时targetSdkVersion要大于等于23
+确保此时 targetSdkVersion 要大于等于 23
 
 ```java
 defaultConfig {
@@ -322,6 +322,6 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 ```
-确保此时运行的设备系统版本为6.0或更高版本
+确保此时运行的设备系统版本为 6.0 或更高版本
 
 ![](http://upload-images.jianshu.io/upload_images/2552605-763892fad132c56c?imageMogr2/auto-orient/strip)

@@ -33,9 +33,9 @@ public final int getHeight() {
 
 触摸事件最常见的有以下三种类型：
 
- - ACTION_DOWN：用户手指的按下操作，是用户每次触摸屏幕时触发的第一个事件
- - ACTION_MOVE：用户手指按压屏幕后，在松开手指之前如果滑动屏幕超出一定的阈值，则发生了 ACTION_MOVE 事件
- - ACTION_UP：用户手指离开屏幕时触发的操作，是当次触摸操作的最后一个事件
+- ACTION_DOWN：用户手指的按下操作，是用户每次触摸屏幕时触发的第一个事件
+- ACTION_MOVE：用户手指按压屏幕后，在松开手指之前如果滑动屏幕超出一定的阈值，则发生了 ACTION_MOVE 事件
+- ACTION_UP：用户手指离开屏幕时触发的操作，是当次触摸操作的最后一个事件
 
 一次完整的事件序列包含**用户从按下屏幕到离开屏幕之间触发的所有事件**，在这个序列当中，**ACTION_DOWN 和 ACTION_UP 是一定会有的，有且只有一个，ACTION_MOVE 则视情况而定，数量大于等于零**（这里不考虑多点触控的情况）
 
@@ -1103,7 +1103,7 @@ class InsideScrollView @JvmOverloads constructor(
 
 **将触摸事件只交于点击区域所在的 View 进行处理是肯定不行的**。想像个场景，一个 ViewPager 包含了多个 Fragment，每个 Fragment 均包含一个 RecyclerView，如果将触摸事件只交于 RecyclerView 处理的话，那么 RecyclerView 可以正常响应上下滑动的事件，但是 ViewPager 就无法左右滑动了，因为左右滑动的事件都被 RecyclerView 给消费掉了，即使该事件对于 RecyclerView 本身来说是不需要的。所以事件分发机制必须要包含**一个在父容器和子内容区域之间流转触摸事件的流程**，各个 View 根据各自所需来进行选择性消费
 
-**那能不能是由内向外的形式呢？也不合适。**一个ViewGroup 可能包含一个到多个 View，ViewGroup 需要通过判断触摸点的坐标系位于哪个 View 区域内来确定触摸事件的下一个接收者。而我们知道，触摸事件按照从外向内的传递顺序是： DecorView -> Activity -> PhoneWindow -> DecorView -> ContentView，由于触摸事件的早期接收者已经是处于外层的 DecorView 了，所以按照从外向内进行传递会更加合适（这也只是我自己的个人见解，有误的话欢迎指出）
+**那能不能是由内向外的形式呢？也不合适。**一个 ViewGroup 可能包含一个到多个 View，ViewGroup 需要通过判断触摸点的坐标系位于哪个 View 区域内来确定触摸事件的下一个接收者。而我们知道，触摸事件按照从外向内的传递顺序是： DecorView -> Activity -> PhoneWindow -> DecorView -> ContentView，由于触摸事件的早期接收者已经是处于外层的 DecorView 了，所以按照从外向内进行传递会更加合适（这也只是我自己的个人见解，有误的话欢迎指出）
 
 ## mFirstTouchTarget 怎么设计的？
 

@@ -279,7 +279,7 @@ private fun removeWeaklyReachableObjects() {
     } while (ref != null)
 }
 ```
-# 四、ActivityDestroyWatcher：检测Activity
+# 四、ActivityDestroyWatcher：检测 Activity
 
 理解了 `ObjectWatcher` 的流程后来看 `ActivityDestroyWatcher` 就会比较简单了。`ActivityDestroyWatcher` 会向 `Application` 注册一个 `ActivityLifecycleCallbacks` 回调，当收到每个 Activity 执行了 `onDestroy` 的回调后，就会将将 Activity 对象转交由 `ObjectWatcher` 来进行监听
 
@@ -304,7 +304,7 @@ internal class ActivityDestroyWatcher private constructor(private val objectWatc
 
 }
 ```
-# 五、FragmentDestroyWatcher：检测Fragment
+# 五、FragmentDestroyWatcher：检测 Fragment
 
 做 Android 应用开发的应该都知道，现在 Google 提供的基础依赖包分为了 **Support** 和 **AndroidX** 两种，**Support** 版本已经不再维护，主流的都是使用 **AndroidX** 了。而 LeakCanary 为了照顾老项目，就贴心的为这两种版本分别提供了 Fragment 的内存检测功能
 
@@ -445,7 +445,7 @@ internal class AndroidXFragmentDestroyWatcher(
 ```
 Fragment 和 FragmentView 走向 `Destroyed` 时，正常情况下它们都是不会被复用的，应该会很快就被 GC 回收，且它们本质上都只是一种对象，所以直接使用 `ObjectWatcher` 进行检测即可
 
-# 六、ViewModelClearedWatcher：检测ViewModel
+# 六、ViewModelClearedWatcher：检测 ViewModel
 
 和 Fragment、FragmentView 相比，ViewModel 就比较特殊了，由于可能存在一个 Activity 和多个 Fragment 同时持有一个 ViewModel 实例的情况，而 leakcanary 无法知道 ViewModel 到底是同时被几个持有者所持有，所以无法通过单独一个 Activity 和 Fragment 的 `Destroyed` 回调来启动对 ViewModel 的检测。幸好 ViewMode 也提供了 `onCleared()` 的回调事件，leakcanary 就通过该回调来知道 ViewModel 是什么时候需要被回收。对 ViewModel 的实现原理不清楚的同学可以看我的这篇文章：[从源码看 Jetpack（六）- ViewModel 源码详解](https://juejin.im/post/6873356946896846856)
 

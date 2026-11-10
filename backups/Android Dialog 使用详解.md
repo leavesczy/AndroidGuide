@@ -2,9 +2,9 @@
 
 Dialog 类是对话框的基类，但应该避免直接实例化 Dialog，而应使用其子类，比如
 
- - AlertDialog
+- AlertDialog
   此对话框可显示标题、提示信息、按钮、可选择项列表或自定义布局等
- - DatePickerDialog 或 TimePickerDialog
+- DatePickerDialog 或 TimePickerDialog
   此类对话框带有允许用户选择日期或时间的预定义 UI
 
 这些类定义了对话框的样式和结构，但开发者应该将 **DialogFragment** 用作对话框的容器。DialogFragment 类提供了创建对话框和管理其外观所需的所有控件，而不是调用 Dialog 对象上的方法

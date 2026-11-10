@@ -110,22 +110,22 @@ Activity 的亲和关系由 **taskAffinity** 属性定义。 任务的亲和关�
 
 列出 Activity 将自行处理的配置更改。在运行时发生配置更改时，默认情况下会关闭 Activity 然后将其重新启动，但使用该属性声明配置将阻止 Activity 重新启动。 Activity 会保持运行状态，并且系统会调用其 **onConfigurationChanged()** 方法。应避免使用该属性，并且只应在万不得已的情况下使用
 
-|       属性值       |                             说明                             |
+| 属性值 | 说明 |
 | :----------------: | :----------------------------------------------------------: |
-|        mcc         | IMSI 移动国家/地区代码 (MCC) 发生了变化 - 检测到了 SIM 并更新了 MCC |
-|        mnc         | IMSI 移动网络代码 (MNC) 发生了变化 - 检测到了 SIM 并更新了 MNC |
-|       locale       |      语言区域发生了变化 — 用户为文本选择了新的显示语言       |
-|    touchscreen     |         触摸屏发生了变化（这种情况通常永远不会发生）         |
-|      keyboard      |      键盘类型发生了变化 — 例如，用户插入了一个外置键盘       |
-|   keyboardHidden   |     键盘无障碍功能发生了变化 — 例如，用户显示了硬件键盘      |
-|     navigation     | 导航类型（轨迹球/方向键）发生了变化（这种情况通常永远不会发生） |
-|    screenLayout    |    屏幕布局发生了变化 — 这可能是由激活了其他显示方式所致     |
-|     fontScale      |       字体缩放系数发生了变化 — 用户选择了新的全局字号        |
-|       uiMode       | 用户界面模式发生了变化 — 这可能是因用户将设备放入桌面/车载基座或夜间模式发生变化所致。 请参阅 UiModeManager。 此项为 API 级别 8 中新增配置 |
-|    orientation     | 屏幕方向发生了变化 — 用户旋转了设备。注：如果您的应用面向 API 级别 13 或更高级别（按照 minSdkVersion 和 targetSdkVersion 属性所声明的级别），则还应声明 "screenSize" 配置，因为当设备在横向与纵向之间切换时，该配置也会发生变化 |
-|     screenSize     | 当前可用屏幕尺寸发生了变化。它表示当前可用尺寸相对于当前纵横比的变化，因此会在用户在横向与纵向之间切换时发生变化。 不过，如果您的应用面向 API 级别 12 或更低级别，则 Activity 始终会自行处理此配置变更（即便是在 Android 3.2 或更高版本的设备上运行，此配置变更也不会重新启动 Activity）。此项为 API 级别 13 中新增配置 |
-| smallestScreenSize | 物理屏幕尺寸发生了变化。它表示与方向无关的尺寸变化，因此只有在实际物理屏幕尺寸发生变化（如切换到外部显示器）时才会变化。 对此配置的变更对应于smallestWidth 配置的变化。 不过，如果您的应用面向 API 级别 12 或更低级别，则 Activity 始终会自行处理此配置变更（即便是在 Android 3.2 或更高版本的设备上运行，此配置变更也不会重新启动 Activity）。此项为 API 级别 13 中新增配置 |
-|  layoutDirection   | 布局方向发生了变化。例如，从从左至右 (LTR) 更改为从右至左 (RTL)。 此项为 API 级别 17 中新增配置 |
+| mcc | IMSI 移动国家/地区代码 (MCC) 发生了变化 - 检测到了 SIM 并更新了 MCC |
+| mnc | IMSI 移动网络代码 (MNC) 发生了变化 - 检测到了 SIM 并更新了 MNC |
+| locale | 语言区域发生了变化 — 用户为文本选择了新的显示语言 |
+| touchscreen | 触摸屏发生了变化（这种情况通常永远不会发生） |
+| keyboard | 键盘类型发生了变化 — 例如，用户插入了一个外置键盘 |
+| keyboardHidden | 键盘无障碍功能发生了变化 — 例如，用户显示了硬件键盘 |
+| navigation | 导航类型（轨迹球/方向键）发生了变化（这种情况通常永远不会发生） |
+| screenLayout | 屏幕布局发生了变化 — 这可能是由激活了其他显示方式所致 |
+| fontScale | 字体缩放系数发生了变化 — 用户选择了新的全局字号 |
+| uiMode | 用户界面模式发生了变化 — 这可能是因用户将设备放入桌面/车载基座或夜间模式发生变化所致。 请参阅 UiModeManager。 此项为 API 级别 8 中新增配置 |
+| orientation | 屏幕方向发生了变化 — 用户旋转了设备。注：如果您的应用面向 API 级别 13 或更高级别（按照 minSdkVersion 和 targetSdkVersion 属性所声明的级别），则还应声明 "screenSize" 配置，因为当设备在横向与纵向之间切换时，该配置也会发生变化 |
+| screenSize | 当前可用屏幕尺寸发生了变化。它表示当前可用尺寸相对于当前纵横比的变化，因此会在用户在横向与纵向之间切换时发生变化。 不过，如果您的应用面向 API 级别 12 或更低级别，则 Activity 始终会自行处理此配置变更（即便是在 Android 3.2 或更高版本的设备上运行，此配置变更也不会重新启动 Activity）。此项为 API 级别 13 中新增配置 |
+| smallestScreenSize | 物理屏幕尺寸发生了变化。它表示与方向无关的尺寸变化，因此只有在实际物理屏幕尺寸发生变化（如切换到外部显示器）时才会变化。 对此配置的变更对应于 smallestWidth 配置的变化。 不过，如果您的应用面向 API 级别 12 或更低级别，则 Activity 始终会自行处理此配置变更（即便是在 Android 3.2 或更高版本的设备上运行，此配置变更也不会重新启动 Activity）。此项为 API 级别 13 中新增配置 |
+| layoutDirection | 布局方向发生了变化。例如，从从左至右 (LTR) 更改为从右至左 (RTL)。 此项为 API 级别 17 中新增配置 |
 
 所有这些配置变更都可能影响应用看到的资源值。 因此，调用 **onConfigurationChanged()** 时，通常有必要再次获取所有资源（包括视图布局、可绘制对象等）以正确处理变化
 
@@ -134,12 +134,12 @@ Activity 的亲和关系由 **taskAffinity** 属性定义。 任务的亲和关�
 指定每次启动任务时应如何向其中添加新的 Activity 实例。 该属性允许用户让多个来自同一应用的文档出现在概览屏幕中
 该属性有四个值，会在用户使用该应用打开文档时产生以下效果：
 
-|    属性值    |                             说明                             |
+| 属性值 | 说明 |
 | :----------: | :----------------------------------------------------------: |
 | intoExisting | Activity 会为文档重复使用现有任务。使用该值与不设置 FLAG_ACTIVITY_MULTIPLE_TASK 标志、但设置 FLAG_ACTIVITY_NEW_DOCUMENT 标志所产生的效果相同，如使用 Intent 标志添加任务中所述 |
-|    always    | Activity 为文档创建新任务，即便文档已打开也是如此。 这与同时设置 FLAG_ACTIVITY_NEW_DOCUMENT 和 FLAG_ACTIVITY_MULTIPLE_TASK 标志的效果相同 |
-|     none     | 该 Activity 不会为 Activity 创建新任务。这是默认值，它只会在设置了 FLAG_ACTIVITY_NEW_TASK 时创建新任务。 概览屏幕将按其默认方式对待此 Activity：为应用显示单个任务，该任务将从用户上次调用的任意 Activity 开始继续执行 |
-|    never     | 即使 Intent 包含 FLAG_ACTIVITY_NEW_DOCUMENT，该 Activity 也不会启动到新文档之中。 设置此值会替代 FLAG_ACTIVITY_NEW_DOCUMENT 和 FLAG_ACTIVITY_MULTIPLE_TASK 标志的行为（如果在 Activity 中设置了其中一个标志），并且概览屏幕将为应用显示单个任务，该任务将从用户上次调用的任意 Activity 开始继续执行 |
+| always | Activity 为文档创建新任务，即便文档已打开也是如此。 这与同时设置 FLAG_ACTIVITY_NEW_DOCUMENT 和 FLAG_ACTIVITY_MULTIPLE_TASK 标志的效果相同 |
+| none | 该 Activity 不会为 Activity 创建新任务。这是默认值，它只会在设置了 FLAG_ACTIVITY_NEW_TASK 时创建新任务。 概览屏幕将按其默认方式对待此 Activity：为应用显示单个任务，该任务将从用户上次调用的任意 Activity 开始继续执行 |
+| never | 即使 Intent 包含 FLAG_ACTIVITY_NEW_DOCUMENT，该 Activity 也不会启动到新文档之中。 设置此值会替代 FLAG_ACTIVITY_NEW_DOCUMENT 和 FLAG_ACTIVITY_MULTIPLE_TASK 标志的行为（如果在 Activity 中设置了其中一个标志），并且概览屏幕将为应用显示单个任务，该任务将从用户上次调用的任意 Activity 开始继续执行 |
 
 对于除“**none**”和“**never**”以外的值，必须使用 **launchMode="standard"** 定义 Activity。 如果未指定此属性，则使用 **documentLaunchMode="none"**
 
@@ -192,12 +192,12 @@ Activity 的图标。该图标会在需要在屏幕上表示 Activity 时显示�
 同理，如果您向上导航到当前堆栈上的某个 Activity，该行为由父 Activity 的启动模式决定。 如果父 Activity 有启动模式 singleTop（或 **up Intent** 包含 **FLAG_ACTIVITY_CLEAR_TOP**），则系统会将该父项置于堆栈顶部，并保留其状态。 导航 Intent 由父 Activity 的 **onNewIntent()** 方法接收。 如果父 Activity 有启动模式 standard（并且 **up Intent** 不包含 **FLAG_ACTIVITY_CLEAR_TOP**），则系统会将当前 Activity 及其父项同时弹出堆栈，并创建一个新的父 Activity 实例来接收导航 Intent
 “singleTask”和“singleInstance”模式同样只在一个方面有差异： “singleTask”Activity 允许其他 Activity 成为其任务的组成部分。 它始终位于其任务的根位置，但其他 Activity（必然是“standard”和“singleTop”Activity）可以启动到该任务中。 相反，“singleInstance”Activity 则不允许其他 Activity 成为其任务的组成部分。它是任务中唯一的 Activity。 如果它启动另一个 Activity，系统会将该 Activity 分配给其他任务 — 就好像 Intent 中包含 **FLAG_ACTIVITY_NEW_TASK** 一样。
 
-|              用例              |    启动模式    | 多个实例？ |                             注释                             |
+| 用例 | 启动模式 | 多个实例？ | 注释 |
 | :----------------------------: | :------------: | :--------: | :----------------------------------------------------------: |
-|   大多数 Activity 的正常启动   |    standard    |     是     | 默认值。系统始终会在目标任务中创建新的 Activity 实例并向其传送 Intent |
-|   大多数 Activity 的正常启动   |   singleTop    |   有条件   | 如果目标任务的顶部已存在一个 Activity 实例，则系统会通过调用该实例的 onNewIntent() 方法向其传送 Intent，而不是创建新的 Activity 实例 |
-| 专用启动（不建议用作常规用途） |   singleTask   |     否     | 系统在新任务的根位置创建 Activity 并向其传送 Intent。 不过，如果已存在一个 Activity 实例，则系统会通过调用该实例的 onNewIntent() 方法向其传送 Intent，而不是创建新的 Activity 实例 |
-| 专用启动（不建议用作常规用途） | singleInstance |     否     | 与“singleTask"”相同，只是系统不会将任何其他 Activity 启动到包含实例的任务中。 该 Activity 始终是其任务唯一仅有的成员 |
+| 大多数 Activity 的正常启动 | standard | 是 | 默认值。系统始终会在目标任务中创建新的 Activity 实例并向其传送 Intent |
+| 大多数 Activity 的正常启动 | singleTop | 有条件 | 如果目标任务的顶部已存在一个 Activity 实例，则系统会通过调用该实例的 onNewIntent() 方法向其传送 Intent，而不是创建新的 Activity 实例 |
+| 专用启动（不建议用作常规用途） | singleTask | 否 | 系统在新任务的根位置创建 Activity 并向其传送 Intent。 不过，如果已存在一个 Activity 实例，则系统会通过调用该实例的 onNewIntent() 方法向其传送 Intent，而不是创建新的 Activity 实例 |
+| 专用启动（不建议用作常规用途） | singleInstance | 否 | 与“singleTask"”相同，只是系统不会将任何其他 Activity 启动到包含实例的任务中。 该 Activity 始终是其任务唯一仅有的成员 |
 
 如上表所示，standard 是默认模式，并且适用于大多数的 Activity 类型。对许多类型的 Activity 而言，SingleTop 也是一个常见并且有用的启动模式。 其他模式 — singleTask 和 singleInstance 不适合大多数应用因为它们所形成的交互模式可能让用户感到陌生，并且与大多数其他应用迥异。
 
@@ -265,24 +265,24 @@ Activity 是否将其任务标识符交给任务栈中在其之上的 Activity�
 Activity 在设备上的显示方向。如果 Activity 是在多窗口模式下运行，系统会忽略该属性
 其值可以是下列任一字符串：
 
-|      属性值      |                             说明                             |
+| 属性值 | 说明 |
 | :--------------: | :----------------------------------------------------------: |
-|   unspecified    | 默认值。由系统选择方向。在不同设备上，系统使用的政策以及基于政策在特定上下文所做的选择可能有所差异 |
-|      behind      |        与 Activity 栈中紧接着它的 Activity 的方向相同        |
-|    landscape     |                横向方向（显示的宽度大于高度）                |
-|     portrait     |                纵向方向（显示的高度大于宽度）                |
-| reverseLandscape |    与正常横向方向相反的横向方向。API 级别 9 中的新增配置     |
-| reversePortrait  |    与正常纵向方向相反的纵向方向。API 级别 9 中的新增配置     |
-| sensorLandscape  | 横向方向，但根据设备传感器，可以是正常或反向的横向方向。API 级别 9 中的新增配置 |
-|  sensorPortrait  | 纵向方向，但根据设备传感器，可以是正常或反向的纵向方向。API 级别 9 中的新增配置 |
-|  userLandscape   | 横向方向，但根据设备传感器和用户的传感器首选项，可以是正常或反向的横向方向。 如果用户锁定了基于传感器的旋转，其行为与 landscape 相同，否则，其行为与 sensorLandscape 相同。API 级别 18 中的新增配置 |
-|   userPortrait   | 纵向方向，但根据设备传感器和用户的传感器首选项，可以是正常或反向的纵向方向。 如果用户锁定了基于传感器的旋转，其行为与 portrait 相同，否则，其行为与 sensorPortrait 相同。API 级别 18 中的新增配置 |
-|      sensor      | 方向由设备方向传感器决定。显示方向取决于用户如何手持设备，它会在用户旋转设备时发生变化。 但一些设备默认情况下不会旋转到所有四种可能的方向。要允许全部四种方向，请使用 "fullSensor" |
-|    fullSensor    | 方向由 4 种方向中任一方向的设备方向传感器决定。这与 "sensor" 类似，不同的是它允许所有 4 种可能的屏幕方向，无论设备正常情况下采用什么方向（例如，一些设备正常情况下不使用反向纵向或反向横向，但它支持这些方向）。 API 级别 9 中的新增配置 |
-|     nosensor     | 决定方向时不考虑物理方向传感器。传感器会被忽略，因此显示不会随用户对设备的移动而旋转。 除了这个区别，系统在选择方向时使用的政策与“unspecified”设置相同 |
-|       user       |                      用户当前的首选方向                      |
-|     fullUser     | 如果用户锁定了基于传感器的旋转，其行为与 user 相同，否则，其行为与 fullSensor 相同，允许所有 4 种可能的屏幕方向。 API 级别 18 中的新增配置 |
-|      locked      |  将方向锁定在其当前的任意旋转方向。API 级别 18 中的新增配置  |
+| unspecified | 默认值。由系统选择方向。在不同设备上，系统使用的政策以及基于政策在特定上下文所做的选择可能有所差异 |
+| behind | 与 Activity 栈中紧接着它的 Activity 的方向相同 |
+| landscape | 横向方向（显示的宽度大于高度） |
+| portrait | 纵向方向（显示的高度大于宽度） |
+| reverseLandscape | 与正常横向方向相反的横向方向。API 级别 9 中的新增配置 |
+| reversePortrait | 与正常纵向方向相反的纵向方向。API 级别 9 中的新增配置 |
+| sensorLandscape | 横向方向，但根据设备传感器，可以是正常或反向的横向方向。API 级别 9 中的新增配置 |
+| sensorPortrait | 纵向方向，但根据设备传感器，可以是正常或反向的纵向方向。API 级别 9 中的新增配置 |
+| userLandscape | 横向方向，但根据设备传感器和用户的传感器首选项，可以是正常或反向的横向方向。 如果用户锁定了基于传感器的旋转，其行为与 landscape 相同，否则，其行为与 sensorLandscape 相同。API 级别 18 中的新增配置 |
+| userPortrait | 纵向方向，但根据设备传感器和用户的传感器首选项，可以是正常或反向的纵向方向。 如果用户锁定了基于传感器的旋转，其行为与 portrait 相同，否则，其行为与 sensorPortrait 相同。API 级别 18 中的新增配置 |
+| sensor | 方向由设备方向传感器决定。显示方向取决于用户如何手持设备，它会在用户旋转设备时发生变化。 但一些设备默认情况下不会旋转到所有四种可能的方向。要允许全部四种方向，请使用 "fullSensor" |
+| fullSensor | 方向由 4 种方向中任一方向的设备方向传感器决定。这与 "sensor" 类似，不同的是它允许所有 4 种可能的屏幕方向，无论设备正常情况下采用什么方向（例如，一些设备正常情况下不使用反向纵向或反向横向，但它支持这些方向）。 API 级别 9 中的新增配置 |
+| nosensor | 决定方向时不考虑物理方向传感器。传感器会被忽略，因此显示不会随用户对设备的移动而旋转。 除了这个区别，系统在选择方向时使用的政策与“unspecified”设置相同 |
+| user | 用户当前的首选方向 |
+| fullUser | 如果用户锁定了基于传感器的旋转，其行为与 user 相同，否则，其行为与 fullSensor 相同，允许所有 4 种可能的屏幕方向。 API 级别 18 中的新增配置 |
+| locked | 将方向锁定在其当前的任意旋转方向。API 级别 18 中的新增配置 |
 
 如果声明其中一个横向或纵向值，系统将其视为对 Activity 运行方向的硬性要求。 因此，声明的值支持通过 Google Play 之类的服务进行过滤，这样就能将应用只提供给支持 Activity 所要求方向的设备。 例如，如果声明了 "landscape"、"reverseLandscape" 或 "sensorLandscape"，则应用将只提供给支持横向方向的设备。 不过，还应通过 **< uses-feature >** 元素明确声明，应用要求采用纵向或横向方向。 例如，**< uses-feature android:name="android.hardware.screen.portrait"/ >**。这纯粹是 Google Play（以及其他支持它的服务）提供的一种过滤行为，平台本身并不能控制当设备仅支持特定方向时应用能否安装
 
@@ -312,31 +312,31 @@ Activity 在设备上的显示方向。如果 Activity 是在多窗口模式下�
 
 针对 Activity UI 的附加选项，该属性是在 API 级别 14 添加的，必须是下列值之一
 
-|          属性值          |                             说明                             |
+| 属性值 | 说明 |
 | :----------------------: | :----------------------------------------------------------: |
-|           none           |                  无附加 UI 选项。这是默认值                  |
+| none | 无附加 UI 选项。这是默认值 |
 | splitActionBarWhenNarrow | 当水平空间受限时（例如在手持设备上的纵向模式下时）在屏幕底部添加一个栏以显示应用栏（也称为操作栏）中的操作项）。 应用栏不是以少量操作项形式出现在屏幕顶部的应用栏中，而是分成了顶部导航区和底部操作项栏。 这可以确保操作项以及顶部的导航和标题元素都能获得合理的空间。 菜单项不会拆分到两个栏中，它们始终一起出现 |
 
 ## **三十二、android:windowSoftInputMode**
 
 Activity 的主窗口与包含屏幕软键盘的窗口的交互方式。 该属性是在 API 级别 3 引入的
 该属性的设置影响两个方面：
-	 - 当 Activity 成为用户注意的焦点时软键盘的状态 — 隐藏还是可见。
-	 - 对 Activity 主窗口所做的调整 — 是否将其尺寸调小以为软键盘腾出空间，或者当窗口部分被软键盘遮挡时是否平移其内容以使当前焦点可见
+- 当 Activity 成为用户注意的焦点时软键盘的状态 — 隐藏还是可见。
+- 对 Activity 主窗口所做的调整 — 是否将其尺寸调小以为软键盘腾出空间，或者当窗口部分被软键盘遮挡时是否平移其内容以使当前焦点可见
 
- 该设置必须是下表所列的值之一，或者是一个“state...”值加上一个“adjust...”值的组合。 在任一组中设置多个值（例如，多个“state...”值）都会产生未定义结果。各值之间使用垂直条“ | ”分隔
+该设置必须是下表所列的值之一，或者是一个“state...”值加上一个“adjust...”值的组合。 在任一组中设置多个值（例如，多个“state...”值）都会产生未定义结果。各值之间使用垂直条“ | ”分隔
 
 ```xml
 <activity android:windowSoftInputMode="stateVisible|adjustResize" . . . >
 ```
-|       属性值       |                             说明                             |
+| 属性值 | 说明 |
 | :----------------: | :----------------------------------------------------------: |
-|  stateUnspecified  | 不指定软键盘的状态（隐藏还是可见）。 将由系统选择合适的状态，或依赖主题中的设置。这是对软键盘行为的默认设置 |
-|   stateUnchanged   | 当 Activity 转至前台时保留软键盘最后所处的任何状态，无论是可见还是隐藏 |
-|    stateHidden     | 当用户选择 Activity 时 — 也就是说，当用户确实是向前导航到 Activity，而不是因离开另一 Activity 而返回时 — 隐藏软键盘 |
-| stateAlwaysHidden  |        当 Activity 的主窗口有输入焦点时始终隐藏软键盘        |
-|    stateVisible    | 在正常的适宜情况下（当用户向前导航到 Activity 的主窗口时）显示软键盘 |
+| stateUnspecified | 不指定软键盘的状态（隐藏还是可见）。 将由系统选择合适的状态，或依赖主题中的设置。这是对软键盘行为的默认设置 |
+| stateUnchanged | 当 Activity 转至前台时保留软键盘最后所处的任何状态，无论是可见还是隐藏 |
+| stateHidden | 当用户选择 Activity 时 — 也就是说，当用户确实是向前导航到 Activity，而不是因离开另一 Activity 而返回时 — 隐藏软键盘 |
+| stateAlwaysHidden | 当 Activity 的主窗口有输入焦点时始终隐藏软键盘 |
+| stateVisible | 在正常的适宜情况下（当用户向前导航到 Activity 的主窗口时）显示软键盘 |
 | stateAlwaysVisible | 当用户选择 Activity 时 — 也就是说，当用户确实是向前导航到 Activity，而不是因离开另一 Activity 而返回时 — 显示软键盘 |
-| adjustUnspecified  | 不指定 Activity 的主窗口是否调整尺寸以为软键盘腾出空间，或者窗口内容是否进行平移以在屏幕上显露当前焦点。 系统会根据窗口的内容是否存在任何可滚动其内容的布局视图来自动选择其中一种模式。 如果存在这样的视图，窗口将进行尺寸调整，前提是可通过滚动在较小区域内看到窗口的所有内容。这是对主窗口行为的默认设置 |
-|    adjustResize    |   始终调整 Activity 主窗口的尺寸来为屏幕上的软键盘腾出空间   |
-|     adjustPan      | 不调整 Activity 主窗口的尺寸来为软键盘腾出空间， 而是自动平移窗口的内容，使当前焦点永远不被键盘遮盖，让用户始终都能看到其输入的内容。 这通常不如尺寸调正可取，因为用户可能需要关闭软键盘以到达被遮盖的窗口部分或与这些部分进行交互 |
+| adjustUnspecified | 不指定 Activity 的主窗口是否调整尺寸以为软键盘腾出空间，或者窗口内容是否进行平移以在屏幕上显露当前焦点。 系统会根据窗口的内容是否存在任何可滚动其内容的布局视图来自动选择其中一种模式。 如果存在这样的视图，窗口将进行尺寸调整，前提是可通过滚动在较小区域内看到窗口的所有内容。这是对主窗口行为的默认设置 |
+| adjustResize | 始终调整 Activity 主窗口的尺寸来为屏幕上的软键盘腾出空间 |
+| adjustPan | 不调整 Activity 主窗口的尺寸来为软键盘腾出空间， 而是自动平移窗口的内容，使当前焦点永远不被键盘遮盖，让用户始终都能看到其输入的内容。 这通常不如尺寸调正可取，因为用户可能需要关闭软键盘以到达被遮盖的窗口部分或与这些部分进行交互 |
